@@ -1,0 +1,49 @@
+=========================================================
+      REPORTE DE EJECUCIÓN DE PRUEBAS UNITARIAS - UPN    
+=========================================================
+
+test_ut01_inicializacion_camara (__main__.TestTraductorLSP_Completo.test_ut01_inicializacion_camara)
+UT-01: Inicialización correcta de la cámara web ... ok
+test_ut02_conversion_frames (__main__.TestTraductorLSP_Completo.test_ut02_conversion_frames)
+UT-02: Conversión correcta de frames (BGR a RGB) ... ok
+test_ut03_manejo_error_ausencia_camara (__main__.TestTraductorLSP_Completo.test_ut03_manejo_error_ausencia_camara)
+UT-03: Manejo de error ante ausencia de cámara ... ok
+test_ut04_reconocimiento_puntos_clave (__main__.TestTraductorLSP_Completo.test_ut04_reconocimiento_puntos_clave)
+UT-04: Reconocimiento de puntos clave de la mano (Landmarks) ... ok
+test_ut05_delimitacion_roi (__main__.TestTraductorLSP_Completo.test_ut05_delimitacion_roi)
+UT-05: Delimitación correcta de la región de interés (Padding 30px) ... ok
+test_ut06_manejo_frames_sin_mano (__main__.TestTraductorLSP_Completo.test_ut06_manejo_frames_sin_mano)
+UT-06: Manejo de frames sin presencia de mano ... ok
+test_ut07_carga_modelo_entrenado (__main__.TestTraductorLSP_Completo.test_ut07_carga_modelo_entrenado)
+UT-07: Carga correcta del modelo entrenado (SVM) ... ok
+test_ut08_reconocimiento_valido_senas (__main__.TestTraductorLSP_Completo.test_ut08_reconocimiento_valido_senas)
+UT-08: Reconocimiento válido de señas del alfabeto LSP ... ok
+test_ut09_precision_minima_modelo (__main__.TestTraductorLSP_Completo.test_ut09_precision_minima_modelo)
+UT-09: Precisión mínima requerida del modelo (>= 85%) ... ok
+test_ut10_validacion_cruzada (__main__.TestTraductorLSP_Completo.test_ut10_validacion_cruzada)
+UT-10: Validación cruzada del modelo estable ... ok
+test_ut11_manejo_entradas_invalidas (__main__.TestTraductorLSP_Completo.test_ut11_manejo_entradas_invalidas)
+UT-11: Manejo de entradas inválidas mediante excepciones ... ok
+test_ut12_presentacion_texto_interfaz (__main__.TestTraductorLSP_Completo.test_ut12_presentacion_texto_interfaz)
+UT-12: Presentación correcta de texto en interfaz (OpenCV) ... ok
+test_ut13_gestion_historial_senas (__main__.TestTraductorLSP_Completo.test_ut13_gestion_historial_senas)
+UT-13: Gestión del historial de señas traducidas ... ok
+test_ut14_reinicio_historial (__main__.TestTraductorLSP_Completo.test_ut14_reinicio_historial)
+UT-14: Reinicio correcto del historial de visualización ... ok
+test_ut15_flujo_completo_reconocimiento (__main__.TestTraductorLSP_Completo.test_ut15_flujo_completo_reconocimiento)
+UT-15: Flujo completo de reconocimiento continuo estable ... ok
+test_ut16_privacidad_almacenamiento (__main__.TestTraductorLSP_Completo.test_ut16_privacidad_almacenamiento)
+UT-16: Validación de privacidad de almacenamiento temporal ... ok
+test_ut17_verificacion_trafico_externo (__main__.TestTraductorLSP_Completo.test_ut17_verificacion_trafico_externo)
+UT-17: Verificación de tráfico externo (Ejecución local offline) ... ok
+test_ut18_ejecucion_sistema_portable (__main__.TestTraductorLSP_Completo.test_ut18_ejecucion_sistema_portable)
+UT-18: Ejecución del sistema portable en entornos externos ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.000s
+
+OK
+
+Resultado Final: EXITOSO
+Pruebas ejecutadas: 18
+Errores: 0 | Fallos: 0
