@@ -71,7 +71,7 @@ if len(clases) < 2:
 print(f"\nTotal de muestras: {len(X)} | Letras disponibles: {', '.join(c.upper() for c in clases)}")
 print("Entrenando el modelo SVM...")
 
-clf = svm.SVC(kernel='linear', C=1)
+clf = svm.SVC(kernel='linear', C=1, probability=True)  # probability=True -> permite mostrar % de confianza
 
 # Si hay datos suficientes, separamos en entrenamiento/prueba para medir precisión.
 # Si el dataset es muy pequeño, entrenamos con todo.
