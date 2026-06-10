@@ -178,7 +178,11 @@ st.write("")
 class Traductor(VideoProcessorBase):
     def __init__(self):
         self.hands = mp_hands.Hands(
-            static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7
+            static_image_mode=False,
+            max_num_hands=1,
+            model_complexity=0,          # modo rápido (menos carga de CPU)
+            min_detection_confidence=0.6,
+            min_tracking_confidence=0.5,
         )
         self.lock = threading.Lock()
         self.letra = "-"
@@ -190,8 +194,11 @@ class Traductor(VideoProcessorBase):
     def recv(self, frame):
         img = frame.to_ndarray(format="bgr24")
         h, w, _ = img.shape
+        # Procesar a menor resolución para aliviar la CPU. Los landmarks de MediaPipe
+        # son coordenadas normalizadas (0-1), así que NO se pierde precisión al reducir.
         rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        results = self.hands.process(rgb)
+        rgb_small = cv2.resize(rgb, (320, 240))
+        results = self.hands.process(rgb_small)
 
         letra, conf, mano = "-", 0.0, False
         if results.multi_hand_landmarks:
