@@ -3,3 +3,7 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# CSV de landmarks de cada compañero (intermedios, no van al repo)
+landmarks_*.csv
+landmarks_csv/*.csv
