@@ -1,0 +1,13 @@
+[tool.black]
+line-length = 120
+target-version = ["py312"]
+extend-exclude = "data|reportes"
+
+[tool.pylint.main]
+ignore = ["data", "reportes", ".venv", "venv"]
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint."messages control"]
+disable = ["C0114", "C0115", "C0116", "C0103", "W0718", "R0914", "R0801"]

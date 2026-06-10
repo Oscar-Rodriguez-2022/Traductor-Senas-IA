@@ -7,3 +7,9 @@ venv/
 # CSV de landmarks de cada compañero (intermedios, no van al repo)
 landmarks_*.csv
 landmarks_csv/*.csv
+
+# Artefactos de QA (se regeneran). Los reportes finales SÍ se conservan.
+.pytest_cache/
+htmlcov/
+.coverage
+.pylint.d/

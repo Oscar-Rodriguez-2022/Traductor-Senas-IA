@@ -1,0 +1,70 @@
+<html><head><meta charset='utf-8'><title>Reporte QA — Traductor LSP</title>
+<style>body{font-family:Arial;margin:30px;color:#222}h1{color:#E30613}h2{color:#b00410;border-bottom:2px solid #E30613;padding-bottom:4px}table{border-collapse:collapse;margin:10px 0 24px}td,th{border:1px solid #ccc;padding:6px 12px;font-size:14px}th{background:#E30613;color:#fff}tr:nth-child(even){background:#fbf3f3}img{max-width:560px}</style></head><body>
+<h1>🤟 Reporte de Calidad de Software — Traductor LSP</h1>
+<p>Universidad Privada del Norte (UPN) — Capstone Project Sistemas</p>
+<h2>1. Rendimiento por etapa (ms)</h2><table>
+<tr><th>etapa</th><th>promedio_ms</th><th>minimo_ms</th><th>maximo_ms</th><th>desv_std_ms</th></tr>
+<tr><td>Carga de modelo</td><td>138.76</td><td>0.41</td><td>1383.02</td><td>414.75</td></tr>
+<tr><td>Deteccion + extraccion (MediaPipe)</td><td>17.39</td><td>15.52</td><td>26.18</td><td>1.6</td></tr>
+<tr><td>Clasificacion SVM</td><td>0.1</td><td>0.08</td><td>0.54</td><td>0.06</td></tr>
+<tr><td>Pipeline total por prediccion</td><td>18.04</td><td>15.74</td><td>29.48</td><td>2.02</td></tr>
+</table>
+<h2>2. FPS sostenidos</h2><table>
+<tr><th>frames_totales</th><th>fps_promedio</th><th>fps_maximo</th><th>fps_minimo</th></tr>
+<tr><td>377</td><td>73.2</td><td>87</td><td>37</td></tr>
+</table>
+<h2>3. Métricas globales del modelo</h2><table>
+<tr><th>muestras</th><th>clases</th><th>accuracy</th><th>precision_macro</th><th>recall_macro</th><th>f1_macro</th></tr>
+<tr><td>183</td><td>18</td><td>0.929</td><td>0.7646</td><td>0.7854</td><td>0.7741</td></tr>
+</table>
+<h2>4. Métricas por letra</h2><table>
+<tr><th>letra</th><th>precision</th><th>recall</th><th>f1</th><th>muestras</th></tr>
+<tr><td>A</td><td>0.727</td><td>0.923</td><td>0.814</td><td>26</td></tr>
+<tr><td>B</td><td>1.0</td><td>1.0</td><td>1.0</td><td>45</td></tr>
+<tr><td>C</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1</td></tr>
+<tr><td>D</td><td>1.0</td><td>1.0</td><td>1.0</td><td>9</td></tr>
+<tr><td>E</td><td>1.0</td><td>1.0</td><td>1.0</td><td>9</td></tr>
+<tr><td>F</td><td>1.0</td><td>1.0</td><td>1.0</td><td>9</td></tr>
+<tr><td>G</td><td>0.0</td><td>0.0</td><td>0.0</td><td>9</td></tr>
+<tr><td>H</td><td>1.0</td><td>1.0</td><td>1.0</td><td>8</td></tr>
+<tr><td>I</td><td>1.0</td><td>1.0</td><td>1.0</td><td>9</td></tr>
+<tr><td>J</td><td>1.0</td><td>1.0</td><td>1.0</td><td>4</td></tr>
+<tr><td>K</td><td>0.0</td><td>0.0</td><td>0.0</td><td>0</td></tr>
+<tr><td>M</td><td>1.0</td><td>1.0</td><td>1.0</td><td>8</td></tr>
+<tr><td>Q</td><td>0.0</td><td>0.0</td><td>0.0</td><td>1</td></tr>
+<tr><td>T</td><td>1.0</td><td>1.0</td><td>1.0</td><td>8</td></tr>
+<tr><td>V</td><td>0.0</td><td>0.0</td><td>0.0</td><td>1</td></tr>
+<tr><td>W</td><td>0.9</td><td>1.0</td><td>0.947</td><td>9</td></tr>
+<tr><td>X</td><td>1.0</td><td>1.0</td><td>1.0</td><td>9</td></tr>
+<tr><td>Y</td><td>0.9</td><td>1.0</td><td>0.947</td><td>9</td></tr>
+<tr><td>Z</td><td>1.0</td><td>1.0</td><td>1.0</td><td>9</td></tr>
+</table>
+<h2>5. Validación cruzada K-Fold</h2><table>
+<tr><th>k</th><th>accuracy_media</th><th>desv_std</th><th>nota</th></tr>
+<tr><td>5</td><td>N/A</td><td>N/A</td><td>clase minima=1</td></tr>
+<tr><td>10</td><td>N/A</td><td>N/A</td><td>clase minima=1</td></tr>
+</table>
+<h2>6. Test de estrés</h2><table>
+<tr><th>predicciones</th><th>errores</th><th>excepciones</th><th>promedio_ms</th><th>total_s</th><th>estado</th></tr>
+<tr><td>100</td><td>0</td><td>0</td><td>0.092</td><td>0.01</td><td>OK</td></tr>
+<tr><td>500</td><td>0</td><td>0</td><td>0.093</td><td>0.05</td><td>OK</td></tr>
+<tr><td>1000</td><td>0</td><td>0</td><td>0.096</td><td>0.1</td><td>OK</td></tr>
+<tr><td>5000</td><td>0</td><td>0</td><td>0.094</td><td>0.47</td><td>OK</td></tr>
+</table>
+<h2>7. Consumo de RAM y CPU</h2><table>
+<tr><th>ram_inicial_mb</th><th>ram_promedio_mb</th><th>ram_maxima_mb</th><th>ram_final_mb</th><th>posible_leak_mb</th><th>cpu_promedio_pct</th><th>cpu_pico_pct</th></tr>
+<tr><td>169.4</td><td>264.2</td><td>264.3</td><td>264.3</td><td>94.9</td><td>98.8</td><td>118.1</td></tr>
+</table>
+<h2>8. Robustez ante condiciones adversas</h2><table>
+<tr><th>condicion</th><th>detectadas</th><th>total</th><th>tasa_deteccion_pct</th></tr>
+<tr><td>Normal (referencia)</td><td>40</td><td>40</td><td>100.0</td></tr>
+<tr><td>Poca luz</td><td>13</td><td>40</td><td>32.5</td></tr>
+<tr><td>Luz intensa</td><td>7</td><td>40</td><td>17.5</td></tr>
+<tr><td>Fondo complejo (ruido)</td><td>0</td><td>40</td><td>0.0</td></tr>
+<tr><td>Mano inclinada (35 grados)</td><td>27</td><td>40</td><td>67.5</td></tr>
+<tr><td>Mano parcial</td><td>24</td><td>40</td><td>60.0</td></tr>
+<tr><td>Distancia corta (zoom)</td><td>1</td><td>40</td><td>2.5</td></tr>
+<tr><td>Distancia larga (lejos)</td><td>39</td><td>40</td><td>97.5</td></tr>
+</table>
+<h2>9. Matriz de confusión</h2><img src='matriz_confusion.png'>
+</body></html>

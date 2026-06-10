@@ -1,0 +1,5 @@
+predicciones,errores,excepciones,promedio_ms,total_s,estado
+100,0,0,0.092,0.01,OK
+500,0,0,0.093,0.05,OK
+1000,0,0,0.096,0.1,OK
+5000,0,0,0.094,0.47,OK

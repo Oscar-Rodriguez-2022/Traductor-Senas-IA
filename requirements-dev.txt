@@ -1,0 +1,8 @@
+# Dependencias SOLO para desarrollo / QA (no necesarias para desplegar la web)
+-r requirements.txt
+pytest
+pytest-cov
+psutil
+flake8
+black
+pylint

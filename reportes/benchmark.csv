@@ -1,0 +1,5 @@
+etapa,promedio_ms,minimo_ms,maximo_ms,desv_std_ms
+Carga de modelo,138.76,0.41,1383.02,414.75
+Deteccion + extraccion (MediaPipe),17.39,15.52,26.18,1.6
+Clasificacion SVM,0.1,0.08,0.54,0.06
+Pipeline total por prediccion,18.04,15.74,29.48,2.02
