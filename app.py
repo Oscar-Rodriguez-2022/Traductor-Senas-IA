@@ -21,7 +21,12 @@ import numpy as np
 import joblib
 import mediapipe as mp
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration
+from streamlit_webrtc import (
+    webrtc_streamer,
+    VideoProcessorBase,
+    RTCConfiguration,
+    VideoHTMLAttributes,
+)
 
 # ───────────────────────────── Configuración general ─────────────────────────────
 st.set_page_config(
@@ -242,6 +247,12 @@ with col_main:
         video_processor_factory=Traductor,
         rtc_configuration=RTC_CONFIG,
         media_stream_constraints={"video": True, "audio": False},
+        video_html_attrs=VideoHTMLAttributes(
+            autoPlay=True,
+            controls=False,   # oculta play/pausa, tiempo, volumen, pantalla completa
+            muted=True,
+            style={"width": "100%", "border-radius": "14px"},
+        ),
     )
 
 with col_side:
