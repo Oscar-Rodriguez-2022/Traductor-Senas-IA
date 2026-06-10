@@ -41,3 +41,33 @@ Para ejecutar y probar el sistema localmente, asegúrese de contar con Python in
 2. Instalar las dependencias esenciales ejecutando en la terminal:
    ```bash
    pip install opencv-python mediapipe numpy scikit-learn
+   ```
+3. Ejecutar la aplicación web:
+   ```bash
+   streamlit run app.py
+   ```
+
+---
+
+## Artefactos Académicos del Capstone (Scrum / ISO)
+
+Los siguientes archivos son **artefactos de planificación y calidad congelados**. Reflejan los requisitos establecidos en el prompt inicial del Capstone y no deben modificarse sin aprobación explícita del equipo:
+
+| Artefacto | Descripción |
+|---|---|
+| [`HISTORIAS_USUARIO.md`](HISTORIAS_USUARIO.md) | 22 Historias de Usuario (HU-01..HU-22) con criterios Gherkin, prioridad MoSCoW, módulo y estado |
+| [`DEFINITION_OF_DONE.md`](DEFINITION_OF_DONE.md) | Criterios de calidad que todo ítem debe cumplir: TDD, DevSecOps, WCAG 2.1 AA, privacidad |
+| [`SEGURIDAD.md`](SEGURIDAD.md) | Análisis de superficie de ataque y controles DevSecOps implementados |
+
+### Estándares que cumple el proyecto
+
+| Punto del prompt | Artefacto / módulo |
+|---|---|
+| Refactorización y modularidad (XP/Scrum) | `lsp_core.py`, `lsp_video.py`, `lsp_ui.py` |
+| TDD y pruebas unitarias/integración/sistema | `tests/` (30 tests automatizados) |
+| Pruebas de carga y estrés | `qa/benchmark.py`, `qa/fps_test.py` (HU-22) |
+| Autenticación y manejo de sesiones | `lsp_auth.py` — HMAC-SHA256, expira 60 min |
+| Auditoría y privacidad (GDPR Art. 25) | `lsp_audit.py` — IDs anónimos SHA-256[:8] |
+| Accesibilidad WCAG 2.1 AA | `lsp_ui.py` — aria-live, contraste, skip-nav |
+| Explicabilidad del sistema de IA | `lsp_ui.render_pipeline_explicado()` |
+| Definition of Done documentado | `DEFINITION_OF_DONE.md` |

@@ -2,14 +2,23 @@
 Fase 19 — Dashboard de métricas QA (página secundaria de la web).
 Muestra los resultados de las pruebas (reportes/) y recursos en vivo.
 Se abre desde el menú lateral de la app, o en la URL .../Metricas_QA
+
+Requiere autenticación previa (HU-17 CA-17.3): si el token de sesión
+no es válido, redirige al formulario de login de la página principal.
 """
 import os
 import csv
 import json
 
 import streamlit as st
+import lsp_auth
+import lsp_audit
 
 st.set_page_config(page_title="Métricas QA — LSP", page_icon="📊", layout="wide")
+
+# ── Guard de autenticación (HU-17 CA-17.3) ──────────────────────────────────
+if not lsp_auth.login_requerido(st.session_state):
+    st.stop()
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPORTES = os.path.join(RAIZ, "reportes")
@@ -79,3 +88,20 @@ png = os.path.join(REPORTES, "matriz_confusion.png")
 if os.path.exists(png):
     st.subheader("🔢 Matriz de confusión")
     st.image(png, width=560)
+
+# ── Log de auditoría de la sesión (HU-17 CA-17.3) ───────────────────────────
+st.subheader("🔐 Log de auditoría (últimas 20 entradas de la sesión)")
+entradas = lsp_audit.leer_log_reciente(n=20)
+if not entradas:
+    st.info("Sin eventos registrados aún. Usa la aplicación para generar entradas.")
+else:
+    st.dataframe(
+        {
+            "Timestamp": [e.get("ts", "") for e in entradas],
+            "Evento": [e.get("evento", "") for e in entradas],
+            "Sesión (hash)": [e.get("sesion", "") for e in entradas],
+            "Detalle": [e.get("detalle", "") for e in entradas],
+        },
+        use_container_width=True,
+    )
+    st.caption("El campo 'Sesión' es un hash SHA-256[:8] — no identifica al usuario (GDPR Art. 25).")

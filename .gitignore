@@ -13,3 +13,7 @@ landmarks_csv/*.csv
 htmlcov/
 .coverage
 .pylint.d/
+
+# Seguridad: secretos y log de auditoría (nunca al repositorio)
+.streamlit/secrets.toml
+audit_log.jsonl

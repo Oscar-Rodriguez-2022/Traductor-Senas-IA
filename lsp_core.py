@@ -25,7 +25,18 @@ _hands_cache = {}
 
 # ───────────────────────── Modelo ─────────────────────────
 def cargar_modelo(path=MODELO_PATH):
-    """Carga el modelo SVM entrenado. Lanza FileNotFoundError si no existe."""
+    """
+    Carga el modelo SVM entrenado desde disco.
+
+    Args:
+        path (str): Ruta al archivo pickle del modelo. Por defecto 'modelo.pkl'.
+
+    Returns:
+        object: Clasificador scikit-learn con métodos predict() y predict_proba().
+
+    Raises:
+        FileNotFoundError: Si el archivo no existe en la ruta indicada.
+    """
     import joblib
     if not os.path.exists(path):
         raise FileNotFoundError(f"No se encontró el modelo en '{path}'.")
@@ -34,7 +45,13 @@ def cargar_modelo(path=MODELO_PATH):
 
 # ───────────────────────── MediaPipe ─────────────────────────
 def _get_hands(static_image_mode=True):
-    """Devuelve (y cachea) una instancia de MediaPipe Hands."""
+    """
+    Devuelve (y cachea) una instancia de MediaPipe Hands.
+
+    Usar static_image_mode=True para imágenes fijas (dataset, QA).
+    Usar static_image_mode=False para video en tiempo real (app.py).
+    El caché evita reinicializar el modelo de detección en cada llamada.
+    """
     import mediapipe as mp
     clave = bool(static_image_mode)
     if clave not in _hands_cache:
@@ -49,8 +66,18 @@ def _get_hands(static_image_mode=True):
 
 def extraer_landmarks(img, static_image_mode=True):
     """
-    Recibe una imagen BGR (numpy array) y devuelve una lista de 42 floats
-    (x0,y0,...,x20,y20) normalizados en [0,1], o None si no detecta mano.
+    Extrae los landmarks de la mano detectada en una imagen BGR.
+
+    Usa MediaPipe Hands para detectar 21 puntos anatómicos y devuelve
+    sus coordenadas (x, y) normalizadas en el rango [0, 1].
+
+    Args:
+        img (numpy.ndarray): Imagen en formato BGR (como la devuelve cv2.imread).
+        static_image_mode (bool): True para imágenes fijas, False para video. Por defecto True.
+
+    Returns:
+        list[float] | None: Lista de 42 floats [x0,y0,...,x20,y20] normalizados,
+            o None si no se detecta ninguna mano en la imagen.
     """
     import cv2
     if img is None or not hasattr(img, "shape") or img.size == 0:
@@ -68,7 +95,15 @@ def extraer_landmarks(img, static_image_mode=True):
 
 
 def extraer_landmarks_de_archivo(path):
-    """Lee una imagen del disco y extrae sus landmarks (o None)."""
+    """
+    Lee una imagen PNG del disco y extrae sus landmarks.
+
+    Args:
+        path (str): Ruta al archivo de imagen (PNG, JPG, etc.).
+
+    Returns:
+        list[float] | None: Vector de 42 floats, o None si no hay mano o el archivo no existe.
+    """
     import cv2
     img = cv2.imread(path)
     return extraer_landmarks(img)
@@ -76,7 +111,20 @@ def extraer_landmarks_de_archivo(path):
 
 # ───────────────────────── Validación ─────────────────────────
 def landmarks_validos(landmarks):
-    """True si 'landmarks' es un vector de 42 números finitos en rango razonable."""
+    """
+    Valida que un vector de landmarks sea apto para clasificación.
+
+    Verifica que el vector tenga exactamente NUM_FEATURES (42) valores,
+    que todos sean números finitos (sin NaN ni Inf), y que estén dentro
+    del rango [-0.5, 1.5] (MediaPipe normaliza en [0,1]; el margen
+    cubre manos parcialmente fuera del encuadre).
+
+    Args:
+        landmarks: Lista, array o cualquier valor a validar.
+
+    Returns:
+        bool: True si el vector es válido para predicción, False en caso contrario.
+    """
     if landmarks is None:
         return False
     arr = np.asarray(landmarks, dtype=float).ravel()
@@ -84,14 +132,29 @@ def landmarks_validos(landmarks):
         return False
     if not np.all(np.isfinite(arr)):
         return False
-    # MediaPipe normaliza en [0,1], pero damos margen por manos en el borde.
     return bool(np.all(arr >= -0.5) and np.all(arr <= 1.5))
 
 
 # ───────────────────────── Predicción ─────────────────────────
 def predecir(modelo, landmarks):
     """
-    Devuelve (letra, confianza_0a100). Lanza ValueError si el vector es inválido.
+    Clasifica un vector de landmarks con el modelo SVM entrenado.
+
+    Usa predict_proba() si está disponible (SVM con probability=True)
+    para devolver la confianza como porcentaje. Si no está disponible,
+    usa predict() y devuelve 100.0 como confianza.
+
+    Args:
+        modelo: Clasificador scikit-learn cargado con cargar_modelo().
+        landmarks: Lista o array de 42 floats (x0,y0,...,x20,y20) normalizados.
+
+    Returns:
+        tuple[str, float]: (letra a-z, confianza 0.0–100.0).
+            La letra es el carácter predicho en minúscula.
+            La confianza es la probabilidad de Platt × 100.
+
+    Raises:
+        ValueError: Si landmarks no supera la validación de landmarks_validos().
     """
     if not landmarks_validos(landmarks):
         raise ValueError("Vector de landmarks inválido (se esperaban 42 valores).")
@@ -107,8 +170,20 @@ def predecir(modelo, landmarks):
 # ───────────────────────── Dataset ─────────────────────────
 def cargar_dataset(data_folder=DATA_FOLDER, limite_por_letra=None):
     """
-    Recorre 'data/<letra>/*.png', extrae landmarks y devuelve (X, y) como arrays.
-    'limite_por_letra' permite muestrear para pruebas rápidas.
+    Carga el dataset de imágenes y extrae landmarks para entrenamiento o evaluación.
+
+    Recorre 'data/<letra>/*.png' en orden alfabético, extrae los landmarks
+    de cada imagen y descarta las que MediaPipe no detecta correctamente.
+
+    Args:
+        data_folder (str): Carpeta raíz del dataset. Por defecto 'data'.
+        limite_por_letra (int | None): Si se especifica, toma solo las primeras
+            N imágenes de cada letra (útil para pruebas rápidas).
+
+    Returns:
+        tuple[numpy.ndarray, numpy.ndarray]:
+            - X: Array de forma (n_muestras, 42) con vectores de landmarks.
+            - y: Array de forma (n_muestras,) con etiquetas de letra (a-z).
     """
     X, y = [], []
     for letra in LETTERS:
@@ -127,5 +202,13 @@ def cargar_dataset(data_folder=DATA_FOLDER, limite_por_letra=None):
 
 
 def imagenes_disponibles(data_folder=DATA_FOLDER):
-    """Lista de rutas de todas las imágenes del dataset."""
+    """
+    Lista todas las rutas de imágenes en el dataset.
+
+    Args:
+        data_folder (str): Carpeta raíz del dataset. Por defecto 'data'.
+
+    Returns:
+        list[str]: Lista de rutas absolutas/relativas de archivos PNG, ordenadas alfabéticamente.
+    """
     return sorted(glob.glob(os.path.join(data_folder, "*", "*.png")))
