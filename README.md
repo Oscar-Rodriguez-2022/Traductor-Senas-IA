@@ -86,7 +86,7 @@ El sistema está desplegado como aplicación web Streamlit con autenticación HM
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/Gael2409/Traductor-Senas-IA.git
+git clone https://github.com/Oscar-Rodriguez-2022/Traductor-Senas-IA.git
 cd Traductor-Senas-IA
 
 # 2. Crear entorno virtual (recomendado)
