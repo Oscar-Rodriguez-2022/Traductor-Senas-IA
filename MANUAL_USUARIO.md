@@ -275,6 +275,9 @@ Este sistema fue desarrollado como proyecto Capstone para la Universidad Privada
 | Integrante | Rol |
 |------------|-----|
 | Rodriguez Chacara, Oscar Daniel | Desarrollo Full-Stack, ML, QA y Despliegue |
+| Armas Alvarado, José Deyvis | Desarrollo y ML |
+| Arias Chauca, Nicolás Enrry | Desarrollo y QA |
+| Reátegui Arévalo, Oscar Manuel | Desarrollo y Despliegue |
 
 **Docente:** Edward Jose Flores Masias
 

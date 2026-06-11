@@ -13,6 +13,9 @@
 | Integrante | Rol | Contribución |
 |---|---|---|
 | **Rodriguez Chacara, Oscar Daniel** | Desarrollo Full-Stack, ML, QA, Despliegue | 100% |
+| **Armas Alvarado, José Deyvis** | Desarrollo y ML | 100% |
+| **Arias Chauca, Nicolás Enrry** | Desarrollo y QA | 100% |
+| **Reátegui Arévalo, Oscar Manuel** | Desarrollo y Despliegue | 100% |
 
 ---
 
