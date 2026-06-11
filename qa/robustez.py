@@ -108,7 +108,7 @@ def main():
         print(f"{nombre:<30}{detectadas:>5}/{len(base):<5}{tasa:>7.1f}%")
 
     ruta = guardar_csv("robustez.csv", filas)
-    print(f"\n✅ Reporte guardado en {ruta}")
+    print(f"\n[OK] Reporte guardado en {ruta}")
 
 
 if __name__ == "__main__":

@@ -63,9 +63,9 @@ def main():
     guardar_csv("metricas_por_clase.csv", filas)
     guardar_json("metricas.json", resumen)
     guardar_csv("metricas_resumen.csv", [resumen])
-    print("\n  ⚠️  Nota: medido sobre el MISMO dataset de entrenamiento (optimista).")
-    print("      Para evaluación rigurosa, ver qa/cross_validation.py")
-    print("✅ Reportes guardados en reportes/")
+    print("\n  NOTA: medido sobre el MISMO dataset de entrenamiento (optimista).")
+    print("      Para evaluacion rigurosa, ver qa/cross_validation.py")
+    print("[OK] Reportes guardados en reportes/")
 
 
 if __name__ == "__main__":

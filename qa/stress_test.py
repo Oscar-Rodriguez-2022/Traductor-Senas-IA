@@ -81,8 +81,8 @@ def main():
     mem_ok = mem_max <= LIMITE_MEMORIA_MB
 
     print(f"\n  Degradación (5000 vs 100): {degradacion:+.3f} ms/predicción")
-    print(f"  Pico de memoria (ΔMB):     {mem_max:.2f} MB  →  {'✅ PASA CA-22.3' if mem_ok else '❌ SUPERA límite 50 MB'}")
-    print(f"✅ Reporte guardado en {ruta}")
+    print(f"  Pico de memoria (DeltaMB): {mem_max:.2f} MB  -->  {'PASA CA-22.3' if mem_ok else 'SUPERA limite 50 MB'}")
+    print(f"[OK] Reporte guardado en {ruta}")
 
 
 if __name__ == "__main__":

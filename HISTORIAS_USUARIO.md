@@ -1,5 +1,6 @@
 # Historias de Usuario — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
+### Autor: Rodriguez Chacara, Oscar Daniel
 ### Versión final unificada (documentación de planificación + features implementados)
 
 Todas las historias siguen el formato: **"Como [rol], quiero [acción] para [beneficio]"**
@@ -673,7 +674,7 @@ El proyecto se desarrolló en **5 Sprints** (> 3 requeridos por estándar acadé
 
 **Prioridad:** S (Should have)
 **Módulos:** documentación de QA / evidencias
-**Estado:** ⏳ Por confirmar
+**Estado:** 🔄 En progreso (sesiones planificadas)
 
 ### Criterios de Aceptación
 
@@ -694,6 +695,43 @@ El proyecto se desarrolló en **5 Sprints** (> 3 requeridos por estándar acadé
 - Cuando se recogen los resultados,
 - Entonces las observaciones y sugerencias se registran y documentan para futuras mejoras,
 - Y el sistema demuestra un nivel adecuado de reconocimiento durante la validación.
+
+### Plantilla de evidencias UAT
+
+Las sesiones de prueba deben registrarse en el siguiente formato. Completar antes de la sustentación.
+
+#### Tabla de participantes
+
+| # | Perfil | Edad aprox. | Discapacidad auditiva | Fecha sesión |
+|---|--------|-------------|----------------------|--------------|
+| P-01 | Estudiante universitario | — | No (oyente) | Por coordinar |
+| P-02 | Estudiante universitario | — | No (oyente) | Por coordinar |
+| P-03 | Usuario externo | — | Sí | Por coordinar |
+| P-04 | Usuario externo | — | Sí | Por coordinar |
+
+#### Cuestionario de satisfacción (SUS simplificado — escala 1 a 5)
+
+| Pregunta | P-01 | P-02 | P-03 | P-04 | Promedio |
+|----------|------|------|------|------|----------|
+| 1. La interfaz fue fácil de entender | — | — | — | — | — |
+| 2. Pude activar la cámara sin dificultad | — | — | — | — | — |
+| 3. Las letras detectadas fueron correctas | — | — | — | — | — |
+| 4. El indicador de confianza me ayudó a saber cuándo la seña fue captada | — | — | — | — | — |
+| 5. Usaría el sistema para comunicarme | — | — | — | — | — |
+| **Promedio global** | — | — | — | — | **—** |
+
+> Puntaje mínimo esperado: promedio global ≥ 3.5/5 para considerar la HU aprobada.
+
+#### Observaciones por sesión
+
+| Participante | Observación | Mejora sugerida |
+|---|---|---|
+| P-01 | (completar) | (completar) |
+| P-02 | (completar) | (completar) |
+| P-03 | (completar) | (completar) |
+| P-04 | (completar) | (completar) |
+
+**Tests de referencia:** Sesiones presenciales documentadas en este registro.
 
 ---
 
@@ -737,13 +775,13 @@ El proyecto se desarrolló en **5 Sprints** (> 3 requeridos por estándar acadé
 > **para** facilitar su distribución y uso sin requerir configuraciones complejas.
 
 **Prioridad:** M (Must have)
-**Módulos:** configuración de despliegue (Streamlit Cloud), `requirements.txt`
-**Estado:** 🔄 En progreso / Por confirmar
+**Módulos:** configuración de despliegue (Streamlit Cloud), `requirements.txt`, `MANUAL_USUARIO.md`, `LECCIONES_APRENDIDAS.md`
+**Estado:** 🔄 En progreso (pendiente URL pública y validación en equipos externos)
 
-> ⚠️ **Discrepancia a resolver:** la documentación original (Sprint 4) describía el despliegue como un
-> **ejecutable portable para Windows** (sin instalar Python). Sin embargo, el sistema implementado es una
-> **aplicación web Streamlit** (Streamlit Cloud, WebRTC, `st.secrets`, `pages/`). Los criterios siguientes
-> reflejan el despliegue web real; confirma con el equipo cuál es el objetivo vigente (o si ambos aplican).
+> **Decisión de despliegue:** el sistema se despliega como **aplicación web en Streamlit Cloud**
+> (WebRTC, `st.secrets`, `pages/`). Esta modalidad elimina la necesidad de instalación local
+> compleja y permite el acceso desde cualquier navegador moderno.
+> Ver guía completa en [`TUTORIAL_DESPLIEGUE_WEB.md`](TUTORIAL_DESPLIEGUE_WEB.md).
 
 ### Criterios de Aceptación
 
@@ -836,9 +874,9 @@ Tipo de verificación: **Automatizada** (`pytest`) · **QA** (scripts de medici�
 | HU-16 | Explicación transparente de la IA | Checklist manual de UI (pipeline, expander, baja confianza) | Manual | ✅ |
 | HU-17 | Dashboard de métricas QA | `qa/evaluate.py`, `qa/benchmark.py`, `qa/fps_test.py` | QA | ✅ |
 | HU-18 | Pruebas unitarias automatizadas | Suite completa `tests/` (gate de calidad pre-release) | Automatizada | ✅ |
-| HU-19 | Pruebas de aceptación con usuarios | Sesiones con usuarios oyentes y sordos + cuestionario de satisfacción | Manual | ⏳ |
+| HU-19 | Pruebas de aceptación con usuarios | Sesiones con usuarios oyentes y sordos + cuestionario de satisfacción (plantilla en esta HU) | Manual | 🔄 |
 | HU-20 | Validación de privacidad y protección de datos | Revisión de `SEGURIDAD.md` + verificación en pruebas | Manual | ✅ |
-| HU-21 | Despliegue del sistema | Evidencias de despliegue, pruebas en equipos distintos y Manual de Usuario Preliminar | Manual | 🔄 |
+| HU-21 | Despliegue del sistema | `MANUAL_USUARIO.md`, `LECCIONES_APRENDIDAS.md`, `TUTORIAL_DESPLIEGUE_WEB.md`, URL pública | Manual | 🔄 |
 | HU-22 | Pruebas de rendimiento, carga y estrés | `qa/benchmark.py` (latencias por etapa), `qa/fps_test.py` (FPS ≥ 24 en 60 s), sesión de estrés 300 s | QA | ✅ |
 
 ### Totales

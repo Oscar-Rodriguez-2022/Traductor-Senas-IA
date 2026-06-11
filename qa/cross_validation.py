@@ -38,7 +38,7 @@ def main():
             filas.append({"k": k, "accuracy_media": "N/A",
                           "desv_std": "N/A", "nota": f"clase minima={min_por_clase}"})
             continue
-        clf = svm.SVC(kernel="linear", C=1)
+        clf = svm.SVC(kernel="rbf", C=10, gamma="scale")
         cv = StratifiedKFold(n_splits=k, shuffle=True, random_state=42)
         scores = cross_val_score(clf, X, y, cv=cv, scoring="accuracy")
         media, std = float(np.mean(scores)), float(np.std(scores))
@@ -51,7 +51,7 @@ def main():
         })
 
     ruta = guardar_csv("cross_validation.csv", filas)
-    print(f"\n✅ Reporte guardado en {ruta}")
+    print(f"\n[OK] Reporte guardado en {ruta}")
 
 
 if __name__ == "__main__":

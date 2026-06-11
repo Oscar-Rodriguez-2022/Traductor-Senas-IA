@@ -23,7 +23,7 @@ import numpy as np
 import joblib
 from sklearn import svm
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 
 carpeta = "landmarks_csv"
 if not os.path.isdir(carpeta):
@@ -68,18 +68,26 @@ if len(clases) < 2:
 print(f"\nTotal combinado: {len(X)} muestras | Letras: {', '.join(c.upper() for c in clases)}")
 print("Entrenando el modelo SVM con los datos de TODOS...")
 
-clf = svm.SVC(kernel='linear', C=1, probability=True)
+clf = svm.SVC(kernel="rbf", C=10, gamma="scale", probability=True)
 puede_dividir = all(list(y).count(c) >= 5 for c in clases)
 if puede_dividir:
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
     clf.fit(X_train, y_train)
-    print(f"Precisión en datos de prueba: {accuracy_score(y_test, clf.predict(X_test)) * 100:.1f}%")
+    y_pred = clf.predict(X_test)
+    print(f"Accuracy en datos de prueba: {accuracy_score(y_test, y_pred) * 100:.1f}%")
+    print("\nReporte por letra:")
+    print(classification_report(
+        y_test, y_pred,
+        labels=clases,
+        target_names=[c.upper() for c in clases],
+        zero_division=0,
+    ))
 else:
     clf.fit(X, y)
     print("Dataset pequeño: se entrenó con todas las muestras.")
 
 joblib.dump(clf, "modelo.pkl")
-print("\n✅ 'modelo.pkl' actualizado con los datos de todo el equipo.")
-print("➡️  Ahora súbelo:  git add modelo.pkl  →  git commit  →  git push")
+print("\n[OK] 'modelo.pkl' actualizado con los datos de todo el equipo.")
+print("-->  Ahora subelo: git add modelo.pkl -> git commit -> git push")

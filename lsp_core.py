@@ -212,3 +212,19 @@ def imagenes_disponibles(data_folder=DATA_FOLDER):
         list[str]: Lista de rutas absolutas/relativas de archivos PNG, ordenadas alfabéticamente.
     """
     return sorted(glob.glob(os.path.join(data_folder, "*", "*.png")))
+
+
+def close_hands() -> None:
+    """
+    Libera explícitamente los recursos de las instancias de MediaPipe Hands en caché.
+
+    Debe llamarse al final de scripts de entrenamiento o QA que usen
+    extraer_landmarks() para evitar que los handles de MediaPipe queden abiertos.
+    En la app web (lsp_video.py) las instancias son gestionadas por la clase Traductor.
+    """
+    for hands_instance in _hands_cache.values():
+        try:
+            hands_instance.close()
+        except Exception:
+            pass
+    _hands_cache.clear()

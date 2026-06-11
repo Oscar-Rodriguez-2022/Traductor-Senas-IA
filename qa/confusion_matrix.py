@@ -55,8 +55,8 @@ def main():
     np.savetxt(ruta_csv, cm, fmt="%d", delimiter=",",
                header=",".join(c.upper() for c in clases), comments="")
 
-    print(f"\n✅ Heatmap: {ruta_png}")
-    print(f"✅ CSV    : {ruta_csv}")
+    print(f"\n[OK] Heatmap: {ruta_png}")
+    print(f"[OK] CSV    : {ruta_csv}")
 
 
 if __name__ == "__main__":

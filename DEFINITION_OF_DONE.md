@@ -1,5 +1,6 @@
 # Definition of Done — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
+### Autor: Rodriguez Chacara, Oscar Daniel
 
 Todo trabajo se considera **"Done"** cuando cumple la totalidad de los siguientes criterios antes de marcarse como completado en el tablero Scrum.
 

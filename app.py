@@ -69,9 +69,26 @@ if modelo is None:
 lsp_ui.render_hero()
 
 # ─────────────────────────── Layout principal ─────────────────────────────────
-RTC_CONFIG = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-)
+RTC_CONFIG = RTCConfiguration({
+    "iceServers": [
+        {"urls": ["stun:stun.l.google.com:19302"]},
+        {
+            "urls": ["turn:openrelay.metered.ca:80"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+        {
+            "urls": ["turn:openrelay.metered.ca:443"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+        {
+            "urls": ["turn:openrelay.metered.ca:443?transport=tcp"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+    ]
+})
 
 col_main, col_side = st.columns([3, 2], gap="large")
 

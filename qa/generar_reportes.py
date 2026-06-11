@@ -121,10 +121,10 @@ def generar_pdf():
 def main():
     banner("FASE 18 — REPORTE CONSOLIDADO (PDF + HTML)")
     html = generar_html()
-    print(f"  ✅ HTML: {html}")
+    print(f"  [OK] HTML: {html}")
     pdf = generar_pdf()
     if pdf:
-        print(f"  ✅ PDF : {pdf}")
+        print(f"  [OK] PDF : {pdf}")
     print("\nLos CSV y PNG individuales también están en la carpeta reportes/.")
 
 

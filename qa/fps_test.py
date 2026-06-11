@@ -61,7 +61,7 @@ def main(duracion=DURACION):
     print(f"  FPS máximo        : {fila['fps_maximo']}")
     print(f"  FPS mínimo        : {fila['fps_minimo']}")
     ruta = guardar_csv("fps.csv", [fila])
-    print(f"\n✅ Reporte guardado en {ruta}")
+    print(f"\n[OK] Reporte guardado en {ruta}")
 
 
 if __name__ == "__main__":

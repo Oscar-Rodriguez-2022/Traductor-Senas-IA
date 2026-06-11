@@ -21,7 +21,7 @@ import cv2
 import mediapipe as mp
 
 mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1)
+hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1, model_complexity=0)
 
 data_folder = "data"
 letters = "abcdefghijklmnopqrstuvwxyz"
@@ -59,6 +59,8 @@ for letter in letters:
     if usadas:
         print(f"  Letra {letter.upper()}: {usadas} muestras")
 
+hands.close()
+
 if not filas:
     print("\n¡No se extrajo nada! ¿Seguro capturaste fotos con A.py primero?")
     raise SystemExit(1)
@@ -68,6 +70,5 @@ with open(salida, "w", newline="") as f:
     escritor = csv.writer(f)
     escritor.writerow(encabezado)
     escritor.writerows(filas)
-
-print(f"\n✅ Listo: {len(filas)} muestras guardadas en '{salida}'.")
-print("➡️  Envía SOLO ese archivo CSV al encargado del dataset. ¡Eso es todo!")
+print(f"\n[OK] Listo: {len(filas)} muestras guardadas en '{salida}'.")
+print("-->  Envia SOLO ese archivo CSV al encargado del dataset.")

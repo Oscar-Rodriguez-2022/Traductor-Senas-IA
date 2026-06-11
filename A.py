@@ -3,11 +3,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
+import platform
 import cv2
 import mediapipe as mp
 import numpy as np
 import time
-import shutil  # Librería para borrar carpetas específicas
+import shutil
 
 # Inicializar MediaPipe
 mp_hands = mp.solutions.hands
@@ -44,7 +45,7 @@ def siguiente_indice(folder, letter):
     return max(indices) + 1 if indices else 0
 
 
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW) if platform.system() == "Windows" else cv2.VideoCapture(0)
 
 print("--- [MEJORÍA] Capturador Interactivo Colaborativo de Dataset ---")
 print("Varias personas pueden AUMENTAR el dataset sin borrar el trabajo de los demás.\n")

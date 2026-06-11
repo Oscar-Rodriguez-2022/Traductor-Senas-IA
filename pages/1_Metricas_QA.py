@@ -31,7 +31,7 @@ def leer_csv(nombre):
     ruta = os.path.join(REPORTES, nombre)
     if not os.path.exists(ruta):
         return None
-    with open(ruta, encoding="utf-8") as f:
+    with open(ruta, encoding="utf-8", newline="") as f:
         filas = list(csv.reader(f))
     return filas
 
@@ -39,11 +39,17 @@ def leer_csv(nombre):
 def mostrar_tabla(titulo, nombre):
     filas = leer_csv(nombre)
     st.subheader(titulo)
-    if not filas:
+    if not filas or len(filas) < 2:
         st.info("Aún no generado. Ejecuta la suite (QA.bat).")
         return
+    encabezado = filas[0]
+    n_cols = len(encabezado)
+    datos = [fila for fila in filas[1:] if len(fila) >= n_cols]
+    if not datos:
+        st.info("El archivo existe pero no tiene filas de datos.")
+        return
     st.dataframe(
-        {col: [fila[i] for fila in filas[1:]] for i, col in enumerate(filas[0])},
+        {col: [fila[i] for fila in datos] for i, col in enumerate(encabezado)},
         use_container_width=True,
     )
 

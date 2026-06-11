@@ -71,7 +71,7 @@ def main(duracion=DURACION):
     print(f"  CPU promedio  : {fila['cpu_promedio_pct']} %")
     print(f"  CPU pico      : {fila['cpu_pico_pct']} %")
     ruta = guardar_csv("recursos.csv", [fila])
-    print(f"\n✅ Reporte guardado en {ruta}")
+    print(f"\n[OK] Reporte guardado en {ruta}")
 
 
 if __name__ == "__main__":

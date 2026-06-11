@@ -79,7 +79,7 @@ def main():
         print(f"{f['etapa']:<42}{f['promedio_ms']:>10}{f['minimo_ms']:>8}{f['maximo_ms']:>8}{f['desv_std_ms']:>8}")
 
     ruta = guardar_csv("benchmark.csv", filas)
-    print(f"\n✅ Reporte guardado en {ruta}")
+    print(f"\n[OK] Reporte guardado en {ruta}")
 
 
 if __name__ == "__main__":

@@ -17,10 +17,10 @@ import joblib
 import mediapipe as mp
 from sklearn import svm
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 
 mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1)
+hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1, model_complexity=0)
 
 data_folder = "data"
 letters = "abcdefghijklmnopqrstuvwxyz"
@@ -71,21 +71,30 @@ if len(clases) < 2:
 print(f"\nTotal de muestras: {len(X)} | Letras disponibles: {', '.join(c.upper() for c in clases)}")
 print("Entrenando el modelo SVM...")
 
-clf = svm.SVC(kernel='linear', C=1, probability=True)  # probability=True -> permite mostrar % de confianza
+clf = svm.SVC(kernel="rbf", C=10, gamma="scale", probability=True)
 
-# Si hay datos suficientes, separamos en entrenamiento/prueba para medir precisión.
-# Si el dataset es muy pequeño, entrenamos con todo.
+# Si hay datos suficientes, separamos en entrenamiento/prueba para medir precision.
+# Si el dataset es muy pequeno, entrenamos con todo.
 puede_dividir = all(list(y_labels).count(c) >= 5 for c in clases)
 if puede_dividir:
     X_train, X_test, y_train, y_test = train_test_split(
         X, y_labels, test_size=0.2, random_state=42, stratify=y_labels
     )
     clf.fit(X_train, y_train)
-    precision = accuracy_score(y_test, clf.predict(X_test))
-    print(f"Precisión en datos de prueba: {precision * 100:.1f}%")
+    y_pred = clf.predict(X_test)
+    precision = accuracy_score(y_test, y_pred)
+    print(f"Precision en datos de prueba: {precision * 100:.1f}%")
+    print("\nReporte por letra:")
+    print(classification_report(
+        y_test, y_pred,
+        labels=clases,
+        target_names=[c.upper() for c in clases],
+        zero_division=0,
+    ))
 else:
     clf.fit(X, y_labels)
-    print("Dataset pequeño: se entrenó con todas las muestras (sin prueba aparte).")
+    print("Dataset pequeno: se entrenó con todas las muestras (sin prueba aparte).")
 
+hands.close()
 joblib.dump(clf, "modelo.pkl")
-print("\n✅ Modelo guardado en 'modelo.pkl'. Ya puedes desplegar la web (app.py).")
+print("\n[OK] Modelo guardado en 'modelo.pkl'. Ya puedes desplegar la web (app.py).")
