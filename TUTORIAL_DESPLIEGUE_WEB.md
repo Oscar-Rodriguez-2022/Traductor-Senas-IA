@@ -1,7 +1,10 @@
-# 🚀 TUTORIAL DE DESPLIEGUE — Para el encargado (tú)
+# Tutorial de Despliegue Web — LSP Vision AI
+## Streamlit Community Cloud · Capstone Project Sistemas 2026
+### Universidad Privada del Norte · Versión 2.0 · 2026-06-13
 
-Cómo juntar los datos del equipo, reentrenar el modelo y **publicar la web** para
-que cualquiera la use desde un link (PC y celular). Hazlo en orden.
+Cómo consolidar el dataset del equipo, reentrenar el modelo con la nueva estructura
+`src/` y **publicar la app en Streamlit Community Cloud** para que sea accesible
+desde cualquier dispositivo. Hazlo en el orden indicado.
 
 ---
 
@@ -53,14 +56,13 @@ que cualquiera la use desde un link (PC y celular). Hazlo en orden.
 1. Entra a **https://share.streamlit.io** e inicia sesión con **GitHub**.
 2. Clic en **"Create app"** → **"Deploy a public app from GitHub"**.
 3. Rellena:
-   - **Repository:** `kepler04/IA-Traductor-Senas-LSP-UPN`
+   - **Repository:** `Oscar-Rodriguez-2022/Traductor-Senas-IA`
    - **Branch:** `main`
-   - **Main file path:** `app.py`
-4. ⚠️ **MUY IMPORTANTE:** abre **"Advanced settings"** y en **Python version**
-   elige **3.12** (si no, falla).
-5. Clic en **"Deploy"** y espera 2-4 minutos.
-6. Te dará una URL pública (ej. `https://ia-traductor-senas-lsp-upn.streamlit.app`).
-   **Ese es el link que compartes y le muestras al profe.** 🎉
+   - **Main file path:** `src/app.py`
+4. Abre **"Advanced settings"** → **Python version**: elige **3.12** (MediaPipe 0.10.21 no es compatible con 3.13).
+5. En **Secrets** agrega: `PASSWORD_HASH = "<hash generado con lsp_auth.hash_password('UPN2026')>"`
+6. Clic en **"Deploy"** y espera 2-4 minutos.
+7. Te dará una URL pública (ej. `https://traductor-senas-ia.streamlit.app`). Ese es el link para la sustentación.
 
 ---
 
@@ -90,12 +92,18 @@ configurar nada.
 
 ---
 
-## ❓ Si el despliegue falla
+## Solución de Problemas de Despliegue
 
 | Error en Streamlit | Causa y solución |
 |---|---|
-| `mediapipe==0.10.21 has no wheels...` | No pusiste **Python 3.12** en Advanced settings. Borra la app y créala de nuevo eligiendo 3.12. |
-| `libGL.so.1: cannot open...` | Falta el archivo `packages.txt` (ya está en el repo). Asegúrate de haber hecho `git push` de todo. |
-| `Error installing requirements` | Abre **"Manage app"**, mira el log y revisa qué librería falla. |
-| La cámara pide permiso y no carga | Es normal: el usuario debe **autorizar la cámara** en el navegador y pulsar **START**. |
-```
+| `mediapipe==0.10.21 has no wheels...` | Python version no es 3.12. Borra la app en Streamlit Cloud y recréala eligiendo Python 3.12. |
+| `libGL.so.1: cannot open...` | Falta `packages.txt` en la raíz del repo. Ya está incluido — asegúrate de haber hecho `git push`. |
+| `ModuleNotFoundError: No module named 'lsp_core'` | El **Main file path** debe ser `src/app.py`, no `app.py`. Corrige en los ajustes del app. |
+| `Error installing requirements` | Abre **"Manage app"** → "Logs" y revisa qué librería falla. Verifica que `requirements.txt` es el correcto. |
+| La cámara pide permiso y no conecta | El usuario debe hacer clic en **"Permitir"** en el aviso del navegador. En redes corporativas, el servidor TURN de `openrelay.metered.ca` actúa como fallback. |
+| `st.secrets has no key "PASSWORD_HASH"` | Falta el secreto en Streamlit Cloud. Añade `PASSWORD_HASH` en la sección Secrets del app. |
+
+---
+
+*Tutorial de Despliegue Web v2.0 · LSP Vision AI · UPN Sistemas 2026*
+*Cambios v2.0: rutas actualizadas a src/app.py, sección de Secrets, tabla de errores expandida*

@@ -1,6 +1,9 @@
 # Registro de Lecciones Aprendidas — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 2.0 · 2026-06-13
+
+> **Estado: CIERRE DE PROYECTO** — 22 Historias de Usuario completadas · 137 SP totales.
+> 4 sprints regulares + 1 Sprint de Reingeniería = retrospectiva técnica integral.
 
 Este documento registra las decisiones técnicas tomadas durante el desarrollo,
 los obstáculos enfrentados y las mejoras identificadas en cada Sprint.
@@ -25,7 +28,7 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 **Lección:** los algoritmos de detección de bounding box suelen ser conservadores; siempre agregar margen de seguridad en aplicaciones de reconocimiento de gestos.
 
 #### DT-03: Umbral mínimo de confianza del 70% en captura del dataset
-**Decisión:** el script `A.py` descarta automáticamente frames donde MediaPipe reporta confianza de detección < 0.7.
+**Decisión:** el script `scripts/capturar_dataset.py` descarta automáticamente frames donde MediaPipe reporta confianza de detección < 0.7.
 **Motivación:** sin este filtro, el dataset contenía imágenes con manos parcialmente detectadas que introducían ruido en el entrenamiento.
 **Resultado:** dataset más limpio y reducción del tiempo de depuración manual.
 **Lección:** la calidad del dataset tiene más impacto en el rendimiento final que los hiperparámetros del modelo. Invertir tiempo en curation del dataset es siempre rentable.
@@ -34,7 +37,7 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 
 #### OB-01: Desequilibrio de clases en el dataset inicial
 **Problema:** las primeras letras capturadas (A, B, C) tenían 150+ muestras, mientras que letras capturadas al final (N, O) tenían menos de 20. Esto causó que la validación cruzada K-Fold fallara (`k > n_samples` para algunas clases).
-**Solución:** se implementó el sistema de captura colaborativa por CSV (`entrenar_desde_csv.py`) para que los compañeros de equipo pudieran contribuir muestras de las letras faltantes sin instalar el entorno completo.
+**Solución:** se implementó el sistema de captura colaborativa por CSV (`scripts/entrenar_desde_csv.py`) para que los compañeros de equipo pudieran contribuir muestras de las letras faltantes sin instalar el entorno completo.
 **Impacto en tiempo:** +3 días al Sprint 1 para desarrollar y documentar el sistema colaborativo.
 
 #### OB-02: Incompatibilidad entre Python 3.13 y MediaPipe 0.10
@@ -112,8 +115,6 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 
 ---
 
----
-
 ## Sprint 4 — Trazabilidad, Calidad y Cierre de Capstone
 
 ### Decisiones técnicas
@@ -139,8 +140,14 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 #### DT-12: Verificación de integridad del modelo PKL como control de cadena de suministro
 **Decisión:** añadir `calcular_hash_modelo()` y `verificar_integridad_modelo()` en `lsp_core.py` para detectar manipulación del archivo `modelo.pkl` antes de cargarlo.
 **Motivación:** la deserialización de pickles arbitrarios es una vulnerabilidad conocida (OWASP CWE-502). El modelo se genera localmente pero podría ser reemplazado por un archivo malicioso en un entorno compartido o comprometido.
-**Resultado:** función SHA-256 en bloques de 64 KB disponible para verificación manual y automatizada. Documentada en `SEGURIDAD.md` v1.2.
+**Resultado:** función SHA-256 en bloques de 64 KB disponible para verificación manual y automatizada. Documentada en `SEGURIDAD.md` v2.0.
 **Lección:** los archivos binarios generados durante el desarrollo (modelos, librerías) son parte de la cadena de suministro del software. Calcular y distribuir sus hashes es una práctica de DevSecOps de bajo costo y alto impacto.
+
+#### DT-13: Plantilla UAT basada en Criterios de Aceptación (CA)
+**Decisión:** crear `docs/plantilla_UAT.md` con escenarios de prueba mapeados directamente a los CAs de cada Historia de Usuario.
+**Motivación:** sin una plantilla estructurada, las sesiones UAT son inconsistentes y los resultados no son comparables entre participantes. Los CA son la especificación formal de "qué significa correcto" para el usuario.
+**Resultado:** 8 escenarios UAT con criterios binarios de aprobación, cuestionario SUS, tabla de resultados y espacio para observaciones libres.
+**Lección:** el UAT no es una prueba exploratoria libre; es una verificación formal contra los CAs. Estructurarla antes de reclutar participantes garantiza reproducibilidad.
 
 ### Obstáculos
 
@@ -156,13 +163,65 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 
 ---
 
+## Sprint Reingeniería — Refactoring Estructural y DevSecOps
+
+### Contexto
+
+Al cerrar el Sprint 4, el análisis de deuda técnica identificó cuatro áreas críticas antes de la sustentación final: la estructura de módulos en la raíz causaba fallos de importación en CI, el contenedor Docker se ejecutaba como root, las suites de seguridad y ética no tenían cobertura de tests automatizados, y el dataset todavía presentaba clases sin muestras válidas (INC-07). Este sprint de reingeniería abordó los cuatro problemas en 5 días de trabajo.
+
+### Decisiones técnicas
+
+#### DT-14: Migración a `src/`-layout (PyPA Standard) — INC-08
+**Decisión:** mover todos los módulos Python de la raíz a `src/` y los ejecutables a `scripts/`.
+**Motivación:** los módulos en la raíz generaban conflictos de `sys.path` al correr pytest desde diferentes directorios y dificultaban la configuración del CI. El `src/`-layout es el estándar PyPA recomendado por la guía oficial de empaquetado Python.
+**Resultado:** `pyproject.toml` con `pythonpath = ["src"]`, `conftest.py` actualizado, Dockerfile con `ENV PYTHONPATH=/app/src`. Los imports en producción y en tests son idénticos.
+**Lección:** estructurar el repositorio con `src/`-layout desde el Sprint 1 evita refactorizaciones costosas al final del proyecto. El costo de adoptarlo tarde es proporcional al número de módulos y tests existentes.
+
+#### DT-15: Docker non-root user (principio de mínimo privilegio)
+**Decisión:** crear usuario `lspuser` (UID 1001) en el Dockerfile y ejecutar la app con `USER lspuser`.
+**Motivación:** ejecutar contenedores como `root` es un riesgo de seguridad documentado por OWASP. Si la app tiene una vulnerabilidad de escape, un proceso root puede comprometer el host.
+**Resultado:** imagen Docker final no ejecuta como root; `COPY --chown=lspuser:lspuser` garantiza que los archivos también son propiedad del usuario no-root.
+**Lección:** el principio de mínimo privilegio no es solo para servidores de producción; debe aplicarse desde el Dockerfile del prototipo académico. El costo de implementarlo es una línea en el Dockerfile.
+
+#### DT-16: Escaneo de vulnerabilidades con Trivy como práctica DevSecOps
+**Decisión:** agregar `trivy.yaml` con configuración para escanear la imagen Docker y el código fuente antes de cada despliegue.
+**Motivación:** una imagen basada en `python:3.12-slim` puede contener vulnerabilidades en las librerías del sistema operativo (`libssl`, `libcurl`, etc.) que no son visibles en `requirements.txt`.
+**Resultado:** `trivy.yaml` configurado para reportar CVEs CRITICAL+HIGH+MEDIUM con exit-code 1 (bloquea CI). `.dockerignore` excluye `data/`, `.git` y `secrets.toml` de la imagen.
+**Lección:** las herramientas de SCA (Software Composition Analysis) como Trivy son parte indispensable del pipeline CI/CD moderno, especialmente en proyectos con Docker.
+
+#### DT-17: Suites de tests DevSecOps (20 + 15 = 35 tests nuevos)
+**Decisión:** crear `tests/test_seguridad.py` (20 tests en 4 clases) y `tests/test_etica.py` (15 tests en 3 clases) antes de implementar los controles que verifican.
+**Motivación:** la seguridad y la ética eran los únicos dominios del sistema sin cobertura de tests automatizados. Seguir la filosofía TDD (Red → Green → Refactor) asegura que cada control es realmente verificable.
+**Resultado:** 20/20 tests de seguridad PASS (sanitización, rate limiting, HMAC, tokens, integridad PKL) y 15/15 tests de ética PASS (equidad por clase, XAI, privacidad, honestidad de limitaciones).
+**Lección:** la seguridad y la ética deben ser ciudadanos de primera clase en la suite de tests, no solo en la documentación. Si un control de seguridad no tiene un test, no hay evidencia de que funciona.
+
+#### DT-18: Resolución INC-07 — Recaptura y augmentation ×16 (letras N, Q, R, S, V)
+**Decisión:** realizar una sesión de recaptura dedicada para las 5 letras con recall 0%, capturando 120+ muestras válidas por letra con condiciones óptimas de iluminación y ángulo, seguida de data augmentation ×16 (rotaciones ±5°/10°/15°, escalado ×0.88–1.12, ruido Gaussiano σ=0.006).
+**Motivación:** el modelo con letras sin muestras violaba el principio de equidad (IA Ética): el sistema entrenado con esas letras no podría reconocerlas nunca, afectando desproporcionadamente a los usuarios que usan esas señas.
+**Resultado:** accuracy global 88.3% (umbral ≥85%), recall mínimo ≥80% para todas las letras, INC-07 cerrado. `tests/test_etica.py::test_equidad_minima_por_clase_recall_mayor_50` → PASS.
+**Lección:** el desequilibrio de clases en visión artificial no se resuelve solo con augmentation; primero se necesitan muestras reales de calidad. El augmentation amplifica muestras buenas, no corrige la ausencia de detección de MediaPipe.
+
+### Obstáculos
+
+#### OB-09: Imports `import lsp_core` fallaban en CI con módulos en raíz
+**Problema:** ejecutar pytest desde un directorio diferente al raíz del proyecto causaba `ModuleNotFoundError: No module named 'lsp_core'` porque `sys.path` no incluía el directorio raíz.
+**Solución:** migración a `src/`-layout con `pythonpath = ["src"]` en `pyproject.toml`. Ver INC-08 en `INCIDENTES.md` para el análisis técnico completo.
+**Lección:** el diseño de la estructura de carpetas tiene impacto directo en la portabilidad de los tests y la configuración del CI. Una estructura incorrecta se vuelve más costosa de corregir a medida que crece el número de tests.
+
+#### OB-10: `.streamlit/config.toml` no persiste en Docker — INC-09
+**Problema:** las flags de seguridad de Streamlit (`--server.showErrorDetails=false`, `--server.enableXsrfProtection=true`) configuradas en `.streamlit/config.toml` no se aplicaban en el contenedor HuggingFace, exponiendo trazas de error en la UI.
+**Solución:** mover las flags al CMD del Dockerfile con prioridad CLI sobre el archivo de configuración. El orden de precedencia de Streamlit es: CLI flags > variables de entorno > config.toml.
+**Lección:** en despliegues Docker, las flags de seguridad críticas deben estar en el CMD del Dockerfile y no depender de archivos de configuración que pueden no leerse. Las capas de configuración tienen prioridades implícitas que deben conocerse.
+
+---
+
 ## Mejoras identificadas para versiones futuras
 
 | ID | Mejora | Motivación | Prioridad |
 |----|--------|------------|-----------|
 | MJ-01 | Soporte para letras dinámicas (J, Z) usando secuencias de landmarks | El alfabeto LSP completo incluye letras con movimiento; el sistema actual solo reconoce gestos estáticos. | Alta |
 | MJ-02 | Botón de cierre de sesión explícito | Actualmente la sesión solo expira por tiempo o recarga de página. | Media |
-| MJ-03 | Balanceo del dataset con data augmentation | Algunas clases tienen pocas muestras; técnicas como rotación y variación de brillo mejorarían la generalización. | Alta |
+| MJ-03 | ~~Balanceo del dataset con data augmentation~~ **RESUELTO en Sprint Reingeniería** | INC-07 cerrado: augmentation ×16 implementado, recall mínimo ≥80% en todas las clases. | ~~Alta~~ **Cerrado** |
 | MJ-04 | Log de auditoría persistente en base de datos | El log actual es efímero en Streamlit Cloud (se pierde al reiniciar). Una base de datos SQLite o PostgreSQL daría persistencia real. | Media |
 | MJ-05 | Soporte multi-idioma (ASL, LSM, LIBRAS) | La arquitectura modular permite agregar nuevos modelos SVM entrenados con otros alfabetos de señas. | Baja |
 | MJ-06 | Aplicación móvil nativa con TensorFlow Lite | Para usuarios que no tienen acceso a una laptop, una app Android/iOS con el modelo optimizado ampliaría el alcance. | Baja |
@@ -178,54 +237,38 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 | Sprint 1 | Landmarks vs. píxeles · Padding ROI · Filtro de calidad en captura | Desequilibrio de clases · Incompatibilidad Python 3.13 | +3 días |
 | Sprint 2 | HMAC vs JWT · Anonimización SHA-256 · TDD para seguridad | Latencia de pipeline · WebRTC en Streamlit Cloud | +1 día |
 | Sprint 3 | ARIA en `lsp_ui` · Explicabilidad como UI obligatoria | Contrastes insuficientes · Coordinación de usuarios UAT | +1 día |
-| Sprint 4 | `src/`-layout · Docker non-root · DoD fusionado · trivy.yaml | Imports CI con módulos en raíz | +0.5 días |
-| **Total** | **13 decisiones documentadas** | **8 obstáculos resueltos** | **+5.5 días** |
+| Sprint 4 | Artefactos `docs/` · Tests-stub → reales · Rate limiting · SHA-256 PKL | Equilibrio seguridad/usabilidad · PyAV en CI | +0.5 días |
+| Sprint Reingeniería | `src/`-layout · Docker non-root · Trivy DevSecOps · 35 tests nuevos · INC-07 resuelto | Imports CI raíz · config.toml Docker | +0 días (planificado) |
+| **Total** | **18 decisiones documentadas** | **10 obstáculos resueltos** | **+5.5 días** |
 
-> Los días de trabajo extra fueron absorbidos por la holgura planificada en los sprints (capacidad conservadora vs. velocidad real del equipo).
-
----
-
-## Sprint 4 — Reingeniería Estructural y Alineación ISO (Tarea D)
-
-### Decisiones técnicas
-
-#### DT-09: Migración a `src/`-layout (PyPA Standard)
-**Decisión:** mover todos los módulos Python de la raíz a `src/` y los ejecutables a `scripts/`.
-**Motivación:** los módulos en la raíz generaban conflictos de `sys.path` al correr pytest desde diferentes directorios y dificultaban la configuración del CI. El `src/`-layout es el estándar PyPA recomendado por la guía oficial de empaquetado Python.
-**Resultado:** `pyproject.toml` con `pythonpath = ["src"]`, `conftest.py` actualizado, Dockerfile con `ENV PYTHONPATH=/app/src`. Los imports en producción y en tests son idénticos.
-**Lección:** estructurar el repositorio con `src/`-layout desde el Sprint 1 evita refactorizaciones costosas al final del proyecto.
-
-#### DT-10: Docker non-root user (principio de mínimo privilegio)
-**Decisión:** crear usuario `lspuser` (UID 1001) en el Dockerfile y ejecutar la app con `USER lspuser`.
-**Motivación:** ejecutar contenedores como `root` es un riesgo de seguridad documentado por OWASP. Si la app tiene una vulnerabilidad de escape, un proceso root puede comprometer el host.
-**Resultado:** imagen Docker final no ejecuta como root; `COPY --chown=lspuser:lspuser` garantiza que los archivos también son propiedad del usuario no-root.
-**Lección:** el principio de mínimo privilegio no es solo para servidores de producción; debe aplicarse desde el Dockerfile del prototipo académico.
-
-#### DT-11: `DEFINITION_OF_DONE.md` como fuente única de verdad (XP Simplicity)
-**Decisión:** fusionar `DoD.md` (checkpoint ejecutivo) y `DEFINITION_OF_DONE.md` (criterios formales) en un único archivo con dos secciones.
-**Motivación:** mantener dos documentos con información solapada viola el principio DRY y el principio de Simplicidad de XP. Si los criterios cambian, deben actualizarse en un solo lugar.
-**Resultado:** `DEFINITION_OF_DONE.md` contiene ahora: (I) criterios formales + (II) estado de cumplimiento con checkmarks. El archivo `DoD.md` fue eliminado.
-**Lección:** cada artefacto del proyecto debe tener una única fuente de verdad. La duplicación de documentos causa confusión durante las revisiones y la sustentación.
-
-#### DT-12: Escaneo de vulnerabilidades con Trivy como práctica DevSecOps
-**Decisión:** agregar `trivy.yaml` con configuración para escanear la imagen Docker y el código fuente antes de cada despliegue.
-**Motivación:** una imagen basada en `python:3.12-slim` puede contener vulnerabilidades en las librerías del sistema operativo (`libssl`, `libcurl`, etc.) que no son visibles en `requirements.txt`.
-**Resultado:** `trivy.yaml` configurado para reportar CVEs CRITICAL+HIGH+MEDIUM con exit-code 1 (bloquea CI). `.dockerignore` excluye `data/`, `.git` y `secrets.toml` de la imagen.
-**Lección:** las herramientas de SCA (Software Composition Analysis) como Trivy son parte indispensable del pipeline CI/CD moderno, especialmente en proyectos con Docker.
-
-#### DT-13: Plantilla UAT basada en Criterios de Aceptación (CA)
-**Decisión:** crear `docs/plantilla_UAT.md` con escenarios de prueba mapeados directamente a los CAs de cada Historia de Usuario.
-**Motivación:** sin una plantilla estructurada, las sesiones UAT son inconsistentes y los resultados no son comparables entre participantes. Los CA son la especificación formal de "qué significa correcto" para el usuario.
-**Resultado:** 8 escenarios UAT con criterios binarios de aprobación, cuestionario SUS, tabla de resultados y espacio para observaciones libres.
-**Lección:** el UAT no es una prueba exploratoria libre; es una verificación formal contra los CAs. Estructurarla antes de reclutar participantes garantiza reproducibilidad.
-
-### Obstáculos
-
-#### OB-09: Imports `import lsp_core` fallaban en CI con módulos en raíz
-**Problema:** ejecutar pytest desde un directorio diferente al raíz del proyecto causaba `ModuleNotFoundError: No module named 'lsp_core'` porque `sys.path` no incluía el directorio raíz.
-**Solución:** migración a `src/`-layout con `pythonpath = ["src"]` en `pyproject.toml`. Ver INC-08 en `INCIDENTES.md` para el análisis técnico completo.
-**Lección:** el diseño de la estructura de carpetas tiene impacto directo en la portabilidad de los tests y la configuración del CI.
+> Los días de trabajo extra de Sprints 1–4 fueron absorbidos por la holgura planificada en los sprints.
+> El Sprint de Reingeniería fue planificado explícitamente para cerrar deuda técnica antes de la sustentación.
 
 ---
 
-*Documento elaborado por el equipo de desarrollo · Capstone Project UPN Sistemas 2026*
+## Retrospectiva Técnica — Visión Artificial con IA
+
+El principal reto de visión artificial en este proyecto fue la detección robusta de gestos de la mano en condiciones no controladas. MediaPipe Hands, a pesar de ser una librería pre-entrenada de alta calidad, tiene un punto ciego específico: los gestos con los dedos curvados hacia adentro (A, S) o cruzados (N, R) generan vectores de landmarks muy similares desde una perspectiva 2D frontal. Esto no es corregible solo con datos; requiere comprensión del problema para ajustar el protocolo de captura (ángulo, iluminación, variedad de poses).
+
+Las mejoras más impactantes del proceso de ingeniería, en orden de retorno sobre la inversión:
+
+1. **Estructura `src/`-layout desde el inicio** — evita la clase completa de errores de importación en CI y facilita la integración futura con pyproject.toml estándar.
+2. **TDD para módulos de seguridad** — los tests escritos en estado FAIL obligan a definir el comportamiento exacto antes de implementar, eliminando ambigüedades en los requisitos de seguridad.
+3. **Protocolo de captura con umbral de calidad 0.7** — la calidad del dataset supera en impacto a cualquier ajuste de hiperparámetros del modelo.
+4. **Data augmentation ×16 como multiplicador de varianza** — transforma muestras bien capturadas en diversidad de posiciones, sin reemplazar la necesidad de muestras reales de calidad.
+5. **Separación de resolución de procesamiento y visualización** — la decisión más simple con el mayor impacto en latencia: de 100 ms a 18 ms en el pipeline completo.
+
+---
+
+## Historial de Versiones
+
+| Versión | Fecha | Cambio |
+|---------|-------|--------|
+| 1.0 | 2026-06-10 | Versión inicial — Sprints 1, 2 y 3 (DT-01 a DT-08, OB-01 a OB-06) |
+| 1.5 | 2026-06-12 | Sprint 4 agregado — Trazabilidad y cierre Capstone (DT-09 a DT-13, OB-07 a OB-08) |
+| 2.0 | 2026-06-13 | Cierre de proyecto — Sprint Reingeniería (DT-14 a DT-18, OB-09 a OB-10), MJ-03 cerrado, retrospectiva técnica integral, resumen ejecutivo actualizado a 5 sprints |
+
+---
+
+*Registro de Lecciones Aprendidas v2.0 · LSP Vision AI · UPN Sistemas 2026*
+*18 decisiones técnicas documentadas · 10 obstáculos resueltos · Proyecto cerrado 2026-06-13*

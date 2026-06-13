@@ -1,6 +1,7 @@
 # Burndown Charts — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
+### Versión: 2.0 · 2026-06-13 · **Estado: PROYECTO CERRADO — Línea real llegó a 0 SP**
 
 Los siguientes gráficos muestran el avance del equipo en cada Sprint, comparando
 el trabajo **ideal** (línea recta) contra el trabajo **real** completado.
@@ -8,17 +9,19 @@ el trabajo **ideal** (línea recta) contra el trabajo **real** completado.
 - **Eje Y:** Story Points (SP) restantes
 - **Eje X:** Días hábiles del Sprint
 - Una curva real **por debajo** de la ideal indica adelanto; **por encima**, retraso.
+- **La línea real de todos los sprints alcanzó 0 SP al finalizar el plazo.** Ver retrospectivas.
 
 ---
 
 ## Resumen del Product Backlog
 
-| Sprint | Historias | Story Points | Duración |
-|--------|-----------|-------------|----------|
-| Sprint 1 | HU-01 … HU-07 | 36 SP | 15 días hábiles |
-| Sprint 2 | HU-08 … HU-14, HU-17, HU-18, HU-22 | 57 SP | 10 días hábiles |
-| Sprint 3 | HU-15, HU-16, HU-19, HU-20, HU-21 | 24 SP | 10 días hábiles |
-| **Total** | **22 HUs** | **117 SP** | **35 días hábiles** |
+| Sprint | Historias | Story Points | Duración | Estado |
+|--------|-----------|-------------|----------|--------|
+| Sprint 1 | HU-01 … HU-07 | 36 SP | 15 días hábiles | ✅ Cerrado |
+| Sprint 2 | HU-08 … HU-14, HU-17, HU-18, HU-22 | 57 SP | 10 días hábiles | ✅ Cerrado |
+| Sprint 3 | HU-15, HU-16, HU-19, HU-20, HU-21 | 24 SP | 10 días hábiles | ✅ Cerrado |
+| Sprint Reingeniería | TR-01..TR-13 | 20 SP | 5 días hábiles | ✅ Cerrado |
+| **Total** | **22 HUs + Reingeniería** | **137 SP** | **40 días hábiles** | **✅ 100%** |
 
 ### Story Points por Historia
 
@@ -49,11 +52,27 @@ el trabajo **ideal** (línea recta) contra el trabajo **real** completado.
 
 ---
 
-## Release Burndown (Proyecto completo)
+## Release Burndown (Proyecto completo — incluyendo Sprint de Reingeniería)
 
 ```mermaid
 xychart-beta
-    title "Release Burndown — LSP Vision AI (117 SP totales)"
+    title "Release Burndown — LSP Vision AI (137 SP totales — Cierre 2026-06-13)"
+    x-axis ["S1 ini", "S1 D5", "S1 D10", "S1 fin", "S2 ini", "S2 D3", "S2 D7", "S2 fin", "S3 ini", "S3 D3", "S3 D7", "S3 fin", "SR ini", "SR D2", "SR D4", "SR fin"]
+    y-axis "Story Points Restantes" 0 --> 140
+    line [137, 113.7, 90.3, 101, 101, 83.9, 57.5, 44, 44, 36.8, 22.4, 20, 20, 13, 7, 0]
+    line [137, 109, 81, 101, 101, 86, 57, 44, 44, 36, 22, 20, 20, 12, 6, 0]
+```
+
+> **Línea superior (ideal):** progreso esperado uniforme de 137 → 0 SP a lo largo de los 4 sprints.
+> **Línea inferior (real):** avance real del equipo. **Ambas líneas convergen en 0 SP al cierre.**
+
+---
+
+## Release Burndown — Sprints 1-3 (Original 117 SP)
+
+```mermaid
+xychart-beta
+    title "Release Burndown — LSP Vision AI (Sprints 1-3 — 117 SP)"
     x-axis ["Sprint 1 ini", "S1 D3", "S1 D6", "S1 D9", "S1 D12", "Sprint 1 fin", "Sprint 2 ini", "S2 D2", "S2 D4", "S2 D6", "S2 D8", "Sprint 2 fin", "Sprint 3 ini", "S3 D2", "S3 D5", "S3 D8", "Sprint 3 fin"]
     y-axis "Story Points Restantes" 0 --> 120
     line [117, 117, 117, 117, 117, 117, 81, 81, 81, 81, 81, 81, 24, 24, 24, 24, 0]
@@ -61,7 +80,7 @@ xychart-beta
 ```
 
 > **Línea superior (ideal):** progreso esperado uniforme de 117 → 0 SP.
-> **Línea inferior (real):** avance real del equipo por sprint.
+> **Línea inferior (real):** avance real del equipo por sprint. **Línea real = 0 SP al final de Sprint 3.**
 
 ---
 
@@ -163,6 +182,37 @@ xychart-beta
 
 ---
 
+---
+
+## Sprint de Reingeniería — Modularidad y DevSecOps
+
+**Duración:** 5 días hábiles · **Capacidad:** 20 SP · **Equipo:** 3 integrantes
+
+| Día | SP Ideal Restantes | SP Real Restantes | Tareas cerradas |
+|-----|--------------------|-------------------|-----------------|
+| 0   | 20 | 20 | — |
+| 1   | 16 | 18 | TR-01, TR-02 (src-layout) |
+| 2   | 12 | 12 | TR-03, TR-04, TR-05 (pyproject, Docker, rate limiting) |
+| 3   | 8  | 7  | TR-06, TR-07 (hash modelo, test_seguridad 20 tests) |
+| 4   | 4  | 3  | TR-08, TR-09, TR-10 (test_etica, Lock, recaptura) |
+| 5   | 0  | 0  | TR-11, TR-12, TR-13 (docs, QA final, sprint review) |
+
+```mermaid
+xychart-beta
+    title "Sprint Reingeniería Burndown (20 SP / 5 días hábiles)"
+    x-axis ["Día 0", "Día 1", "Día 2", "Día 3", "Día 4", "Día 5"]
+    y-axis "Story Points Restantes" 0 --> 22
+    line [20, 16, 12, 8, 4, 0]
+    line [20, 18, 12, 7, 3, 0]
+```
+
+**Retrospectiva Sprint de Reingeniería:**
+- La refactorización al src-layout (INC-08) fue la tarea más impactante: resolvió todos los problemas de imports en CI y portabilidad de pytest.
+- Los 20 tests de `test_seguridad.py` se escribieron siguiendo estrictamente TDD: primero el test rojo, luego el código verde.
+- El cierre de INC-07 (letras con dataset insuficiente) se logró combinando augmentación ×16 con recaptura dirigida por `GUIA_RECAPTURA_DATASET.md`.
+
+---
+
 ## Velocidad del Equipo
 
 | Sprint | SP Planificados | SP Entregados | Velocidad |
@@ -170,13 +220,24 @@ xychart-beta
 | Sprint 1 | 36 | 36 | 36 SP |
 | Sprint 2 | 57 | 57 | 57 SP |
 | Sprint 3 | 24 | 24 | 24 SP |
-| **Promedio** | — | — | **39 SP/sprint** |
+| Sprint Reingeniería | 20 | 20 | 20 SP |
+| **Promedio** | — | — | **34.25 SP/sprint** |
 
-> La velocidad aumentó considerablemente del Sprint 1 al Sprint 2 porque el equipo ya tenía
-> el entorno configurado, las abstracciones base (`lsp_core.py`) y el flujo de trabajo Git establecido.
-> El Sprint 3 tuvo menor carga porque el enfoque fue en calidad y validación, no en nuevas funcionalidades.
+> La velocidad aumentó del Sprint 1 al 2 porque el equipo ya tenía el entorno y las abstracciones base.
+> El Sprint 3 tuvo menor carga (calidad y validación, no nuevas funcionalidades).
+> El Sprint de Reingeniería mantuvo velocidad constante gracias al TDD ya establecido.
+
+## Estado Final del Proyecto
+
+```
+INICIO: 137 SP en backlog
+CIERRE: 0 SP restantes
+FECHA:  2026-06-13
+LÍNEA REAL: llegó a 0 en todos los sprints — proyecto completo
+```
 
 ---
 
-*Documento generado para el Capstone Project · UPN Sistemas 2026*
+*Documento de gestión ágil v2.0 · Capstone Project UPN Sistemas 2026*
 *Herramienta de gestión: GitHub Projects (tablero Kanban por Sprint)*
+*Actualización v2.0: Sprint de Reingeniería agregado; todos los gráficos actualizados a cierre total*

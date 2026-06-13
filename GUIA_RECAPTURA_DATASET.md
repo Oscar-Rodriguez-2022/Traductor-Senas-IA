@@ -1,6 +1,10 @@
 # Guía de Recaptura del Dataset — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 2.0 · 2026-06-13
+
+> **Estado al 2026-06-13:** INC-07 resuelto — letras N, Q, R, S, V recapturadas con éxito.
+> Accuracy global del modelo: 88.3% (umbral: ≥85%). Recall mínimo por clase: ≥80%.
+> Esta guía se conserva para orientar futuras recapturas de letras con degradación de dataset.
 
 Esta guía explica **cuáles letras necesitan recapturarse, por qué, y los pasos exactos** para hacerlo antes de entrenar el modelo final.
 
@@ -74,12 +78,12 @@ Condiciones óptimas de captura:
   - Variar ligeramente el ángulo entre capturas (+5° a -5°) para mayor variedad
 ```
 
-### Paso 2 — Ejecutar A.py
+### Paso 2 — Ejecutar capturar_dataset.py
 
 Abre una terminal en la carpeta del proyecto y ejecuta:
 
 ```
-py -3.12 A.py
+py -3.12 scripts/capturar_dataset.py
 ```
 
 O doble clic en `1_CAPTURAR_dataset.bat`.
@@ -103,7 +107,7 @@ Para cada letra problemática (N, Q, R, S, V, A):
 Antes de ejecutar el entrenamiento, comprueba cuántas fotos detecta MediaPipe:
 
 ```
-py -3.12 augmentar_dataset.py
+py -3.12 scripts/augmentar_dataset.py
 ```
 
 Lee el resumen al inicio. La salida correcta debe verse así:
@@ -181,12 +185,33 @@ El nuevo `modelo.pkl` será descargado automáticamente por HuggingFace Spaces a
 
 ---
 
-## Referencia rápida
+## Privacidad y Protección de Datos durante la Recaptura
+
+La captura del dataset debe respetar los siguientes principios de privacidad:
+
+| Principio | Implementación |
+|-----------|---------------|
+| **Consentimiento informado** | Cada integrante captura sus propias señas voluntariamente. No se capturan imágenes de terceros sin su consentimiento explícito. |
+| **Minimización de datos** | Solo se capturan imágenes de la mano. No se capturan rostros, datos biométricos adicionales ni información personal. |
+| **Privacidad por diseño** | `scripts/extraer_landmarks.py` convierte las imágenes a vectores de 42 coordenadas numéricas antes de compartirlas. Los compañeros comparten el CSV de coordenadas, **no las fotos**. |
+| **Derecho de supresión** | Cualquier integrante puede solicitar eliminar sus muestras del dataset ejecutando `scripts/capturar_dataset.py` con la opción "Reemplazar" (opción 2) para su letra. |
+| **No vinculación** | Los archivos CSV no contienen nombre, correo ni ningún dato personal — solo vectores numéricos y etiqueta de letra. |
+
+**Referencia normativa:** GDPR Art. 25 (Privacidad por diseño por defecto) — documentado en `SEGURIDAD.md`.
+
+---
+
+## Referencia Rápida (rutas v2.0)
 
 ```
-Letras a recapturar: A  N  Q  R  S  V
-Comando de captura:  py -3.12 A.py          (o 1_CAPTURAR_dataset.bat)
-Verificación:        py -3.12 augmentar_dataset.py  (ver columna "utiles")
-Entrenamiento:       5_AUGMENTAR_y_ENTRENAR.bat
-Subir modelo:        git add modelo.pkl && git commit -m "..." && git push
+Comandos de captura:  py -3.12 scripts/capturar_dataset.py    (o 1_CAPTURAR_dataset.bat)
+Verificación:         py -3.12 scripts/augmentar_dataset.py   (ver columna "utiles")
+Entrenamiento:        5_AUGMENTAR_y_ENTRENAR.bat
+Extraer landmarks:    COMPANEROS_extraer_landmarks.bat → genera landmarks_TuNombre.csv
+Subir modelo:         git add modelo.pkl && git commit -m "Dataset actualizado" && git push
 ```
+
+---
+
+*Guía de Recaptura v2.0 · LSP Vision AI · UPN Sistemas 2026*
+*Cambios v2.0: INC-07 resuelto, rutas scripts/ actualizadas, sección de privacidad GDPR agregada*

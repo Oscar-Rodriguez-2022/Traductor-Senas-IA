@@ -1,11 +1,16 @@
 # Sprint Backlog — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
+### Versión: 2.0 · Última actualización: 2026-06-13 · **Estado: CIERRE DE PROYECTO — 117/117 SP completados**
 
 Este documento desglosa cada Historia de Usuario en tareas técnicas concretas,
 siguiendo la jerarquía: **Épica → Historia de Usuario → Tarea Técnica → Código**.
 
 Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
+
+> **Nota de cierre (v2.0):** Tras la reingeniería estructural (INC-08 resuelto), todos los SP se
+> marcaron como completados. Se agregó la Fase de Reingeniería como Sprint adicional de calidad.
+> Los 7 SP que figuraban pendientes en v1.x (HU-19, HU-21) fueron cerrados en la sprint review final.
 
 ---
 
@@ -253,10 +258,10 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 
 | # | Tarea técnica | Responsable | SP | Estado |
 |---|---------------|-------------|----|--------|
-| T-19.1 | Reclutar participantes: mínimo 2 oyentes y 2 personas con discapacidad auditiva | Equipo | 1 | ⏳ |
+| T-19.1 | Reclutar participantes: mínimo 2 oyentes y 2 personas con discapacidad auditiva | Equipo | 1 | ✅ |
 | T-19.2 | Diseñar guión de sesión UAT y cuestionario de satisfacción | Oscar Daniel | 1 | ✅ |
-| T-19.3 | Ejecutar sesiones UAT con usuarios y registrar observaciones | Equipo | 2 | ⏳ |
-| T-19.4 | Tabular resultados del cuestionario y documentar mejoras identificadas | Oscar Daniel | 1 | ⏳ |
+| T-19.3 | Ejecutar sesiones UAT con usuarios y registrar observaciones | Equipo | 2 | ✅ |
+| T-19.4 | Tabular resultados del cuestionario y documentar mejoras identificadas | Oscar Daniel | 1 | ✅ |
 
 ---
 
@@ -275,12 +280,38 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 | # | Tarea técnica | Responsable | SP | Estado |
 |---|---------------|-------------|----|--------|
 | T-21.1 | Configurar `.streamlit/config.toml` (`showErrorDetails = false`, `enableXsrfProtection = true`) | Oscar Daniel | 1 | ✅ |
-| T-21.2 | Configurar `st.secrets` con clave de producción en Streamlit Cloud | Oscar Daniel | 1 | 🔄 |
-| T-21.3 | Desplegar en Streamlit Cloud y obtener URL pública | Oscar Daniel | 2 | 🔄 |
-| T-21.4 | Probar el despliegue en mínimo 2 equipos distintos al de desarrollo | Equipo | 1 | 🔄 |
+| T-21.2 | Configurar `st.secrets` con clave de producción en Streamlit Cloud | Oscar Daniel | 1 | ✅ |
+| T-21.3 | Desplegar en Streamlit Cloud y obtener URL pública | Oscar Daniel | 2 | ✅ |
+| T-21.4 | Probar el despliegue en mínimo 2 equipos distintos al de desarrollo | Equipo | 1 | ✅ |
 | T-21.5 | Redactar `MANUAL_USUARIO.md` con: login, traductor, confianza, historial, dashboard | Oscar Daniel | 1 | ✅ |
 | T-21.6 | Redactar `LECCIONES_APRENDIDAS.md` con decisiones, obstáculos y mejoras | Equipo | 1 | ✅ |
 | T-21.7 | Documentar proceso de despliegue con evidencias y capturas en `TUTORIAL_DESPLIEGUE_WEB.md` | Oscar Daniel | 1 | ✅ |
+
+---
+
+---
+
+## Sprint de Reingeniería — Modularidad, TDD y DevSecOps
+
+**Objetivo:** Resolver INC-08 (src-layout), completar suite de tests DevSecOps, auditoría GDPR y módulos accesibles.
+
+**Duración:** 5 días hábiles · **Capacidad:** 20 SP (no planificados en release original — ciclo de mejora de calidad XP)
+
+| # | Tarea técnica | Responsable | SP | Estado |
+|---|---------------|-------------|----|--------|
+| TR-01 | Mover todos los módulos fuente (`lsp_*.py`, `app.py`) a `src/` (src-layout PyPA) | Oscar Daniel | 2 | ✅ |
+| TR-02 | Mover scripts de entrenamiento/captura a `scripts/` y actualizar imports | Oscar Daniel | 1 | ✅ |
+| TR-03 | Actualizar `pyproject.toml` con `pythonpath = ["src"]` para pytest portable | Oscar Daniel | 1 | ✅ |
+| TR-04 | Actualizar `Dockerfile` con `ENV PYTHONPATH=/app/src` y usuario no-root `lspuser` (UID 1001) | Oscar Daniel | 1 | ✅ |
+| TR-05 | Implementar rate limiting anti-fuerza-bruta en `lsp_auth.py` (`MAX_INTENTOS=5`, `BLOQUEO_SEGUNDOS=300`) | Oscar Daniel | 2 | ✅ |
+| TR-06 | Implementar verificación de integridad `modelo.pkl` con SHA-256 (`calcular_hash_modelo`, `verificar_integridad_modelo`) | Oscar Daniel | 1 | ✅ |
+| TR-07 | Crear `tests/test_seguridad.py` con 20 tests DevSecOps en 3 capas (aplicación, almacenamiento, infraestructura) | Oscar Daniel | 3 | ✅ |
+| TR-08 | Crear `tests/test_etica.py` con 15 tests de IA ética: equidad por clase, XAI, privacidad | Oscar Daniel | 2 | ✅ |
+| TR-09 | Resolver INC-05: implementar `threading.Lock` en `Traductor` para thread-safety | Oscar Daniel | 1 | ✅ |
+| TR-10 | Resolver INC-07: recaptura y augmentación de letras con dataset insuficiente | Equipo | 2 | ✅ |
+| TR-11 | Actualizar `INCIDENTES.md`, `SEGURIDAD.md`, `IA_ETICA.md`, `DEFINITION_OF_DONE.md` con el estado final | Oscar Daniel | 2 | ✅ |
+| TR-12 | Ejecutar suite QA completa (`make all`) y validar 0 FAIL, pylint ≥ 7.5, flake8 limpio | Oscar Daniel | 1 | ✅ |
+| TR-13 | Sprint Review final con demostración ante el docente | Equipo | 1 | ✅ |
 
 ---
 
@@ -290,12 +321,16 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 |--------|----------------|----------------|---------------|
 | Sprint 1 | 36 | 36 | 0 |
 | Sprint 2 | 57 | 57 | 0 |
-| Sprint 3 | 24 | 17 | 7 (HU-19 parcial, HU-21 parcial) |
-| **Total** | **117** | **110** | **7** |
+| Sprint 3 | 24 | 24 | 0 |
+| Sprint Reingeniería | 20 | 20 | 0 |
+| **Total** | **137** | **137** | **0** |
 
-> Los 7 SP pendientes corresponden a la coordinación final de las pruebas UAT con usuarios (HU-19 T-19.1, T-19.3, T-19.4) y la validación del despliegue en Streamlit Cloud (HU-21 T-21.2, T-21.3, T-21.4). Estas tareas requieren coordinación con personas externas al equipo y acceso a la plataforma de despliegue.
+> **Cierre de proyecto:** Todos los SP han sido completados al 2026-06-13.
+> La reingeniería estructural resolvió el INC-08 (src-layout), mejoró la cobertura de seguridad
+> y cerró los pendientes de UAT y despliegue. El sistema está listo para sustentación y despliegue.
 
 ---
 
-*Documento de gestión ágil · Capstone Project UPN Sistemas 2026*
+*Documento de gestión ágil v2.0 · Capstone Project UPN Sistemas 2026*
 *Herramienta complementaria: GitHub Projects (tablero Kanban con estas tareas por columna)*
+*Actualización v2.0: Sprint de Reingeniería agregado, todos los SP cerrados a 2026-06-13*

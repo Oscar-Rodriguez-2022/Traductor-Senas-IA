@@ -1,12 +1,29 @@
-# 📘 TUTORIAL PARA EL EQUIPO — Cómo capturar tus señas y enviarlas
+# Tutorial para Nuevos Integrantes del Equipo — LSP Vision AI
+## Propiedad Compartida del Código, Captura de Dataset y Contribución al Proyecto
+### Universidad Privada del Norte · Capstone Project Sistemas 2026
+### Versión: 2.0 · 2026-06-13
 
-> **Lee TODO con calma y hazlo en orden.** No te saltes pasos.
-> Si algo falla, ve al final: **"❓ Si algo sale mal"**.
-> Tiempo total: unos 30-40 minutos (la mayoría es instalar y capturar).
+> **Lee en orden y no te saltes pasos.**
+> Tiempo estimado: 30-40 minutos (mayoría es instalación y captura).
 
-Tu misión es sencilla: **instalar el programa, grabar tus señas con la cámara y
-enviar UN archivo pequeño** (`landmarks_TuNombre.csv`) al encargado del equipo.
-**No necesitas mandar fotos.** Solo ese archivito.
+Tu misión: **instalar el entorno, capturar tus señas con la cámara y enviar UN
+archivo pequeño** (`landmarks_TuNombre.csv`) al responsable del equipo.
+No necesitas enviar fotos — solo el archivo CSV de landmarks.
+
+---
+
+## Normas de Propiedad Compartida (XP — Extreme Programming)
+
+Este proyecto sigue el principio de **Collective Code Ownership** de XP:
+
+| Norma | Descripción |
+|-------|------------|
+| **Cualquiera puede cambiar cualquier módulo** | No hay "dueños" individuales de archivos — todos somos responsables del código completo |
+| **Tests antes de mergear** | Antes de hacer `git push`, ejecuta `pytest tests/ -v` y verifica 0 FAIL |
+| **Rama por feature** | Usa `feature/nombre-del-cambio` para cada modificación; nunca commitear directo a `main` |
+| **Pull Request con revisión** | Toda rama necesita aprobación de al menos 1 integrante antes de mergear |
+| **Estilo consistente** | Ejecutar `black src/ tests/` y `flake8 src/ tests/` antes de cada commit |
+| **Commits descriptivos** | Formato: `tipo(módulo): descripción corta`. Ej: `feat(lsp_ui): agregar skip-nav WCAG` |
 
 ---
 
@@ -37,19 +54,18 @@ enviar UN archivo pequeño** (`landmarks_TuNombre.csv`) al encargado del equipo.
 
 ---
 
-## 🟦 PARTE 3 — Descargar el proyecto
+## PARTE 3 — Descargar el proyecto
 
 1. Crea una carpeta fácil de encontrar, por ejemplo en el **Escritorio**.
 2. Entra a esa carpeta, haz **clic derecho** en un espacio vacío.
 3. Elige **"Abrir el terminal"** o **"Git Bash Here"** (sale una ventana negra).
-4. Copia y pega este comando (clic derecho → Pegar) y presiona **Enter**:
+4. Copia y pega este comando y presiona **Enter**:
 
    ```
-   git clone https://github.com/kepler04/IA-Traductor-Senas-LSP-UPN.git
+   git clone https://github.com/Oscar-Rodriguez-2022/Traductor-Senas-IA.git
    ```
 
-5. Espera a que termine. Se creará una carpeta llamada
-   **`IA-Traductor-Senas-LSP-UPN`**.
+5. Espera a que termine. Se creará una carpeta llamada **`Traductor-Senas-IA`**.
 
 ---
 
@@ -64,7 +80,8 @@ enviar UN archivo pequeño** (`landmarks_TuNombre.csv`) al encargado del equipo.
 2. Ahora pega este comando y presiona **Enter** (tarda unos minutos, descarga cosas):
 
    ```
-   pip install opencv-python mediapipe==0.10.21 numpy scikit-learn
+   cd Traductor-Senas-IA
+   pip install -r requirements.txt
    ```
 
 3. Espera a que termine. Cuando veas que aparece de nuevo la línea para escribir,
@@ -74,9 +91,9 @@ enviar UN archivo pequeño** (`landmarks_TuNombre.csv`) al encargado del equipo.
 
 ---
 
-## 🟩 PARTE 5 — Capturar tus señas con la cámara
+## PARTE 5 — Capturar tus señas con la cámara
 
-1. Abre la carpeta **`IA-Traductor-Senas-LSP-UPN`** en tu explorador de archivos.
+1. Abre la carpeta **`Traductor-Senas-IA`** en tu explorador de archivos.
 2. Haz **doble clic** en el archivo **`1_CAPTURAR_dataset.bat`**.
 3. Se abrirá una ventana negra y luego **la ventana de tu cámara**.
 4. El programa te irá pidiendo letra por letra (A, B, C...). Para cada una:
@@ -124,21 +141,28 @@ enviar UN archivo pequeño** (`landmarks_TuNombre.csv`) al encargado del equipo.
 
 ---
 
-## ❓ Si algo sale mal
+## Solución de Problemas Comunes
 
 | Problema | Solución |
 |---|---|
 | `'python' no se reconoce...` o `'pip' no se reconoce...` | No marcaste **"Add Python to PATH"**. Desinstala Python y reinstálalo marcando esa casilla (Parte 1, paso 5). |
 | `'git' no se reconoce...` | No instalaste Git o no reiniciaste la ventana. Cierra la ventana negra, abre una nueva e intenta de nuevo. |
 | La cámara no abre / pantalla negra | Cierra otras apps que usen la cámara (Zoom, Meet, Teams). Revisa que ninguna otra ventana del programa esté abierta. |
-| `AttributeError: module 'mediapipe' has no attribute 'solutions'` | Instalaste mal la versión. Ejecuta: `pip install mediapipe==0.10.21` |
-| El `.bat` no encuentra Python | Abre la ventana negra en la carpeta y ejecuta a mano: `python extraer_landmarks.py` |
+| `AttributeError: module 'mediapipe' has no attribute 'solutions'` | Instalaste la versión incorrecta. Ejecuta: `pip install mediapipe==0.10.21 --force-reinstall` |
+| `ModuleNotFoundError: No module named 'lsp_core'` | Los módulos están en `src/`. Usa siempre los scripts `.bat` o ejecuta desde la raíz del proyecto con `pythonpath = ["src"]`. |
+| El `.bat` no encuentra Python | Abre la terminal en la carpeta del proyecto y ejecuta: `python scripts/extraer_landmarks.py` |
 | Se cierra muy rápido la ventana negra | Ábrela desde una terminal para leer el error, o toma captura y mándala al encargado. |
 
 ---
 
-## 📞 Resumen ultra-corto (si ya instalaste todo)
+## Resumen Rápido (si ya instalaste todo)
 
 1. Doble clic en **`1_CAPTURAR_dataset.bat`** → graba tus señas.
 2. Doble clic en **`COMPANEROS_extraer_landmarks.bat`** → escribe tu nombre.
 3. Envía el archivo **`landmarks_TuNombre.csv`** al encargado.
+4. Para ejecutar la app web localmente: doble clic en **`3_WEB_probar_local.bat`**.
+
+---
+
+*Tutorial para Nuevos Integrantes v2.0 · LSP Vision AI · UPN Sistemas 2026*
+*Cambios v2.0: normas de propiedad compartida XP, rutas src/ actualizadas, URL de repositorio correcta*

@@ -1,11 +1,14 @@
-# Guía de Despliegue — Hugging Face Spaces
+# Guía de Despliegue — Hugging Face Spaces (Docker)
 ## LSP Vision AI · Universidad Privada del Norte · Capstone Project Sistemas 2026
+### Versión: 2.0 · 2026-06-13
 
 Hugging Face Spaces es la plataforma estándar de la industria para publicar proyectos de IA/ML.
 Esta guía cubre el despliegue con **Docker** (modalidad que demuestra competencias DevOps para el Capstone).
+El `Dockerfile` del proyecto ya está configurado con las medidas de seguridad requeridas (usuario no-root, flags de seguridad Streamlit).
 
-> **Demo en la sustentación:** durante la presentación ejecuta la app localmente con `3_WEB_probar_local.bat`
-> para máximo rendimiento. La URL de HF es para demostrar que el sistema está públicamente accesible.
+> **Demo en la sustentación:** durante la presentación ejecuta la app localmente con
+> `streamlit run src/app.py` para máximo rendimiento.
+> La URL de HF sirve para demostrar que el sistema está públicamente accesible.
 
 ---
 
@@ -101,12 +104,12 @@ La app requiere una clave de acceso. Configúrala como secreto en HF para que no
 3. Para generar el valor del hash, ejecuta esto en tu terminal local:
 
 ```bash
-python -c "from lsp_auth import hash_password; print(hash_password('TU_CLAVE_AQUI'))"
+python -c "import sys; sys.path.insert(0,'src'); from lsp_auth import hash_password; print(hash_password('TU_CLAVE_AQUI'))"
 ```
 
 Ejemplo con la clave de demo `UPN2026`:
 ```bash
-python -c "from lsp_auth import hash_password; print(hash_password('UPN2026'))"
+python -c "import sys; sys.path.insert(0,'src'); from lsp_auth import hash_password; print(hash_password('UPN2026'))"
 ```
 
 Copia el hash de 64 caracteres y pégalo como valor del secret `LSP_PASSWORD_HASH`.
@@ -161,7 +164,7 @@ HF reconstruye la imagen Docker automáticamente tras cada push. El proceso tard
 |---------|---------------|----------|
 | Build falla con `mediapipe` | `requirements.txt` no tiene versión fijada | Verificar `mediapipe==0.10.21` en `requirements.txt` |
 | Build falla con `libGL.so.1` | Dockerfile no instala `libgl1` | Verificar que el `Dockerfile` tiene `apt-get install -y libgl1` |
-| App arranca pero cámara no conecta | Solo STUN, sin TURN server | Ya está corregido en `app.py` con `openrelay.metered.ca` |
+| App arranca pero cámara no conecta | Solo STUN, sin TURN server | Ya está corregido en `src/app.py` con `openrelay.metered.ca` |
 | App arranca pero da error 500 | `modelo.pkl` no está en el repo | `git add modelo.pkl && git push` |
 | Login no acepta ninguna clave | Secret `LSP_PASSWORD_HASH` mal configurado | Borrar el secret; la app usará `UPN2026` como fallback |
 | Space se queda en "Building..." | Primera construcción de Docker | Esperar hasta 8 minutos; ver logs para errores |
@@ -211,5 +214,5 @@ Estas evidencias satisfacen los criterios CA-21.1, CA-21.2 y CA-21.3 de la HU-21
 
 ---
 
-*Guía elaborada para el Capstone Project · UPN Sistemas 2026*
-*Plataforma: Hugging Face Spaces (Docker) · Modelo: SVM sobre landmarks MediaPipe*
+*Guía de Despliegue HuggingFace v2.0 · LSP Vision AI · UPN Sistemas 2026*
+*Cambios v2.0: rutas src/ actualizadas, comando hash_password con sys.path, INC-09 resuelto en Dockerfile*

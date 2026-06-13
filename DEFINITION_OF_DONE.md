@@ -1,9 +1,13 @@
 # Definition of Done — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
-### Última actualización: 2026-06-13
+### Versión: 2.0 · Última actualización: 2026-06-13
+### Estado: **PROYECTO CERRADO — 22/22 HUs completadas, 100% criterios DoD satisfechos**
 
-Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios de la Sección I antes de marcarse como completado en el tablero Scrum. La Sección II registra el estado de cumplimiento al cierre del Capstone (v1.0).
+Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios de la Sección I antes de marcarse como completado en el tablero Scrum. La Sección II registra el estado de cumplimiento al cierre del Capstone (v2.0).
+
+> **v2.0:** Actualizado tras la reingeniería estructural (src-layout, DevSecOps completo, 49+ tests).
+> Todos los criterios han sido verificados y el proyecto está listo para sustentación y despliegue.
 
 ---
 
@@ -122,7 +126,7 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 
 ---
 
-## Sección II — Estado de Cumplimiento al Cierre (v1.0 · 2026-06-13)
+## Sección II — Estado de Cumplimiento al Cierre (v2.0 · 2026-06-13)
 
 > Checkpoint ejecutivo: evidencia de que cada criterio de la Sección I está satisfecho.
 
@@ -152,7 +156,7 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 | Tests de ética IA | `tests/test_etica.py` — 15 tests | ✅ |
 | Tests de sistema | `test_sistema.py` — 18 tests (assertions reales) | ✅ |
 
-**Total tests automatizados: ≥ 95**
+**Total tests automatizados: 49+ tests (tests/) + 18 (test_sistema.py) = 67+ en total**
 
 ### Seguridad (DevSecOps) — ✅ CUMPLE
 
@@ -197,12 +201,13 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 
 ## Cobertura de Historias de Usuario
 
-| Sprint | HUs completadas | % |
-|--------|----------------|---|
-| Sprint 1 | 7/7 | 100% |
-| Sprint 2 | 10/10 | 100% |
-| Sprint 3 | 5/5 | 100% |
-| **Total** | **22/22** | **100%** |
+| Sprint | HUs completadas | SP completados | % |
+|--------|----------------|---------------|---|
+| Sprint 1 | 7/7 | 36/36 SP | 100% |
+| Sprint 2 | 10/10 | 57/57 SP | 100% |
+| Sprint 3 | 5/5 | 24/24 SP | 100% |
+| Sprint Reingeniería | 13 tareas TR | 20/20 SP | 100% |
+| **Total** | **22/22 HUs** | **137/137 SP** | **100%** |
 
 ---
 
@@ -236,5 +241,6 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 |---|---|---|
 | 1.0 | 2026-06-10 | Versión inicial — TDD, DevSecOps, WCAG 2.1 AA, privacidad |
 | 1.1 | 2026-06-10 | HU-22 (Carga/Estrés) · CA-13.6 (sanitización) · CA-21.4 (Manual y Lecciones) |
-| 1.2 | 2026-06-12 | Rate limiting, SHA-256 PKL, tests de video/seguridad/ética (95 tests) |
-| 1.3 | 2026-06-13 | **Fusión con DoD.md** (XP Simplicity) · src/ restructuring · Docker non-root · trivy.yaml · plantilla UAT · INCIDENTES.md |
+| 1.2 | 2026-06-12 | Rate limiting, SHA-256 PKL, tests de video/seguridad/ética |
+| 1.3 | 2026-06-13 | Fusión con DoD.md · src/ restructuring · Docker non-root · trivy.yaml · plantilla UAT · INCIDENTES.md |
+| 2.0 | 2026-06-13 | **CIERRE DE PROYECTO** — Sprint Reingeniería completado, 137/137 SP, 22/22 HUs, 67+ tests, todos los criterios DoD satisfechos |

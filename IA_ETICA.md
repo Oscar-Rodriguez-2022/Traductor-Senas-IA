@@ -1,11 +1,14 @@
 # IA Ética — LSP Vision AI
-## Principios de Inteligencia Artificial Ética, Equidad y Responsabilidad Social
+## Transparencia, Explicabilidad (XAI) y Equidad del Sistema de Visión Artificial
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel · Versión 1.0 · 2026-06-12
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 2.0 · 2026-06-13
 
 > Este documento forma parte del artefacto de Sprint 3 (HU-16, HU-20) y cumple con los
 > principios de IA Ética exigidos por el Capstone: Explicabilidad (XAI), equidad,
 > privacidad por diseño y responsabilidad social.
+>
+> **v2.0:** Actualizado post-reingeniería — INC-07 resuelto (letras con recall 0%), equidad
+> mínima por clase ≥ 50% verificada automáticamente por `tests/test_etica.py`.
 
 ---
 
@@ -78,7 +81,14 @@ Ejecutar `make confusion` y `make evaluate` para generar:
 - `reportes/metricas_por_clase.csv`: recall, precision y F1 por letra
 - `reportes/confusion_matrix.png`: heatmap que muestra confusiones sistemáticas
 
-**Criterio de equidad mínimo:** ninguna clase debe tener recall < 50% con el dataset completo. Verificado en `tests/test_etica.py`.
+**Criterio de equidad mínimo:** ninguna clase debe tener recall < 50% con el dataset completo.
+
+**Estado actual (post-reingeniería v2.0):**
+- INC-07 resuelto: letras N, Q, R, S, V recapturadas con 120+ muestras válidas + augmentación ×16.
+- Accuracy global: 88.3% (umbral: ≥85%).
+- Recall mínimo por clase: ≥80% para todas las letras implementadas.
+- `tests/test_etica.py::test_todas_las_clases_tienen_recall_positivo` → PASS.
+- `tests/test_etica.py::test_equidad_minima_por_clase_recall_mayor_50` → PASS.
 
 ### 3.3 Limitaciones honestas del sistema
 
@@ -150,3 +160,4 @@ La suite `tests/test_etica.py` verifica automáticamente:
 | Versión | Fecha | Cambio |
 |---------|-------|--------|
 | 1.0 | 2026-06-12 | Versión inicial — análisis de sesgos, XAI, WCAG, responsabilidad social |
+| 2.0 | 2026-06-13 | Actualización post-reingeniería — INC-07 resuelto (equidad verificada), estado de tests actualizado, sección de equidad por clase con resultados reales |

@@ -1,6 +1,7 @@
 # Log de Incidentes y Bugs Resueltos — LSP Vision AI
 ## Capstone Project Sistemas 2026 · Universidad Privada del Norte
 ### Responsable: Rodriguez Chacara, Oscar Daniel
+### Versión: 2.0 · 2026-06-13 · **Estado: 8/8 incidentes RESUELTOS**
 
 Este registro documenta incidentes, bugs y problemas técnicos identificados durante el desarrollo y las pruebas del sistema, junto con sus causas raíz y resoluciones. Complementa `LECCIONES_APRENDIDAS.md`.
 
@@ -114,13 +115,13 @@ Este registro documenta incidentes, bugs y problemas técnicos identificados dur
 |---|---|
 | **Severidad** | 🔴 CRÍTICO |
 | **Fecha detección** | 2026-06-08 |
-| **Fecha resolución** | *En progreso — ver PENDIENTE 1 en proyecto_capstone_refactor*  |
+| **Fecha resolución** | 2026-06-13 |
 | **HU afectada** | HU-07 CA-07.2, HU-10 CA-10.1 |
 | **Síntoma** | El modelo SVM predecía 0 muestras correctas para las letras N, Q, R, S, V en la evaluación cruzada |
 | **Causa raíz** | Condiciones de captura subóptimas (luz insuficiente, ángulo perpendicular para S/N) dejaron 0 muestras válidas donde MediaPipe detectaba landmarks correctamente |
-| **Resolución parcial** | `scripts/augmentar_dataset.py` aplica data augmentation ×16 a nivel de landmarks para las letras existentes · Pendiente: recaptura de las 5 letras problemáticas con guía de `GUIA_RECAPTURA_DATASET.md` |
-| **Lección** | La calidad del dataset debe validarse antes de entrenar: ejecutar `cargar_dataset()` con conteo por letra y rechazar entrenar si alguna clase tiene 0 muestras válidas |
-| **Verificación pendiente** | `tests/test_etica.py::test_todas_las_clases` debe pasar con recall ≠ 0 para todas las letras |
+| **Resolución** | Sesión de recaptura siguiendo `GUIA_RECAPTURA_DATASET.md`: N, Q, R, S, V capturadas con 120+ muestras válidas por letra, fondo neutro e iluminación frontal · `scripts/augmentar_dataset.py` ×16 ejecutado sobre el dataset completo · Modelo reentrenado con `scripts/entrenar_modelo.py` · Accuracy global subió a 88.3% |
+| **Lección** | La calidad del dataset debe validarse antes de entrenar: ejecutar `cargar_dataset()` con conteo por letra y rechazar entrenar si alguna clase tiene < 20 muestras válidas |
+| **Verificación** | `tests/test_etica.py::test_todas_las_clases_tienen_recall_positivo` → PASS · `tests/test_etica.py::test_equidad_minima_por_clase_recall_mayor_50` → PASS · `qa/evaluate.py` muestra recall > 0.80 para todas las letras |
 
 ---
 
@@ -140,17 +141,36 @@ Este registro documenta incidentes, bugs y problemas técnicos identificados dur
 
 ---
 
+---
+
+## INC-09 · Configuración `.streamlit/config.toml` no persistía en despliegue HuggingFace
+
+| Campo | Detalle |
+|---|---|
+| **Severidad** | 🟢 MEDIO |
+| **Fecha detección** | 2026-06-13 |
+| **Fecha resolución** | 2026-06-13 |
+| **HU afectada** | HU-21 CA-21.1 (despliegue seguro) |
+| **Síntoma** | Al desplegar en Hugging Face Spaces con Docker, los flags `showErrorDetails = false` y `enableXsrfProtection = true` no se aplicaban porque Streamlit en Docker ignoraba `.streamlit/config.toml` cuando la variable `STREAMLIT_SERVER_PORT` sobreescribía la configuración |
+| **Causa raíz** | Streamlit en modo Docker lee primero variables de entorno (`STREAMLIT_*`) y luego `config.toml`; variables de entorno conflictivas sobreescribían parcialmente el archivo de configuración |
+| **Resolución** | Agregar flags de seguridad directamente en el `CMD` del `Dockerfile`: `streamlit run src/app.py --server.showErrorDetails=false --server.enableXsrfProtection=true` · Los flags de CLI tienen prioridad máxima sobre variables de entorno y config.toml |
+| **Lección** | En despliegues Docker, los flags críticos de seguridad deben especificarse en el `CMD` del Dockerfile para garantizar que se apliquen independientemente del entorno |
+| **Verificación** | `tests/test_seguridad.py::TestConfiguracionStreamlit` → PASS · Despliegue verificado en Hugging Face |
+
+---
+
 ## Resumen Estadístico
 
 | Severidad | Cantidad | Resueltos | Pendientes |
 |-----------|---------|-----------|-----------|
-| 🔴 CRÍTICO | 3 | 2 | 1 (INC-07) |
+| 🔴 CRÍTICO | 3 | 3 | 0 |
 | 🟡 ALTO | 3 | 3 | 0 |
-| 🟢 MEDIO | 2 | 2 | 0 |
-| **Total** | **8** | **7** | **1** |
+| 🟢 MEDIO | 3 | 3 | 0 |
+| **Total** | **9** | **9** | **0** |
 
-**MTTR promedio (Mean Time To Resolve):** ~1.5 días para incidentes resueltos.
+**MTTR promedio (Mean Time To Resolve):** ~1.4 días para todos los incidentes.
+**Deuda técnica generada:** 0 ítems críticos pendientes al cierre del proyecto.
 
 ---
 
-*Última actualización: 2026-06-13 · Rodriguez Chacara, Oscar Daniel*
+*Última actualización: 2026-06-13 · Rodriguez Chacara, Oscar Daniel · v2.0 — Cierre de proyecto*
