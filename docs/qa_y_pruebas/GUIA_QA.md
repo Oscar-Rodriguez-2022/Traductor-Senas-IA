@@ -286,7 +286,7 @@ RAM/CPU, accuracy, matriz de confusión, K-Fold y robustez (por aumentación de 
 
 **Lo que requiere validación manual:**
 - Condiciones reales de luz/fondo (se simulan con transformaciones de imagen, no cámara física).
-- Pruebas de aceptación de usuario (UAT) con personas sordas (plantilla en `docs/plantilla_UAT.md`).
+- Pruebas de aceptación de usuario (UAT) con personas sordas (plantilla en `docs/qa_y_pruebas/plantilla_UAT.md`).
 - Verificación de accesibilidad con lector de pantalla real (NVDA/JAWS).
 - Conectividad WebRTC en redes corporativas (NAT simétrico).
 

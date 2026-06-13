@@ -51,8 +51,9 @@ Validar que el sistema cumple los Criterios de Aceptación (CA) definidos en las
 | 2 | Ingresar una clave incorrecta (ej. "abc123") | Aparece mensaje de error con intentos restantes | CA-13.5 | | |
 | 3 | Ingresar la clave correcta "UPN2026" | El sistema muestra la página principal con la cámara | CA-13.2 | | |
 | 4 | Esperar 60 minutos inactivo (simulado: manipular reloj) | El sistema solicita nueva autenticación | CA-13.3 | | |
+| 5 | Ingresar 5 veces seguidas una clave incorrecta | El sistema bloquea el acceso por 5 minutos y muestra mensaje de bloqueo claro | CA-13.7 | | |
 
-**Criterio de aprobación:** 3/4 pasos exitosos.
+**Criterio de aprobación:** 4/5 pasos exitosos.
 
 ---
 
@@ -127,6 +128,7 @@ Validar que el sistema cumple los Criterios de Aceptación (CA) definidos en las
 | 1 | Hacer clic en "¿Cómo funciona el sistema?" | Se expande el panel con el pipeline paso a paso | CA-16.1 | |
 | 2 | Leer cada paso del pipeline | Cada paso tiene una descripción comprensible sin jerga técnica | CA-16.1 | |
 | 3 | Ver la sección de limitaciones | Aparece información honesta sobre las limitaciones del sistema | CA-16.3 | |
+| 4 | Hacer una seña y observar el panel de alternativas XAI | Aparece el panel con el top-5 de letras candidatas y sus porcentajes de confianza | CA-16.2 | |
 
 ---
 
@@ -160,12 +162,12 @@ Validar que el sistema cumple los Criterios de Aceptación (CA) definidos en las
 
 | UAT | Nombre | Criterio aprobación | Resultado | Estado |
 |-----|--------|---------------------|-----------|--------|
-| UAT-01 | Acceso al sistema | 3/4 pasos | /4 | ☐ PASA  ☐ FALLA |
+| UAT-01 | Acceso al sistema | 4/5 pasos | /5 | ☐ PASA  ☐ FALLA |
 | UAT-02 | Detección de mano | 3/4 pasos | /4 | ☐ PASA  ☐ FALLA |
 | UAT-03 | Reconocimiento LSP | ≥ 4/6 letras | /6 | ☐ PASA  ☐ FALLA |
 | UAT-04 | Indicador de confianza | 2/3 condiciones | /3 | ☐ PASA  ☐ FALLA |
 | UAT-05 | Accesibilidad auditiva | Promedio ≥ 3.5/5 | /5 | ☐ PASA  ☐ FALLA |
-| UAT-06 | Explicabilidad IA | 2/3 pasos | /3 | ☐ PASA  ☐ FALLA |
+| UAT-06 | Explicabilidad IA | 3/4 pasos | /4 | ☐ PASA  ☐ FALLA |
 | UAT-07 | Privacidad | 3/3 criterios | /3 | ☐ PASA  ☐ FALLA |
 | UAT-08 | Rendimiento | FPS ≥ 24 | FPS: ___ | ☐ PASA  ☐ FALLA |
 

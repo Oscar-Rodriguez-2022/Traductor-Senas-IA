@@ -92,7 +92,7 @@ O doble clic en `1_CAPTURAR_dataset.bat`.
 
 Para cada letra problemática (N, Q, R, S, V, A):
 
-1. A.py mostrará el aviso: `La letra 'X' ya tiene 500 fotos guardadas.`
+1. `scripts/capturar_dataset.py` mostrará el aviso: `La letra 'X' ya tiene 500 fotos guardadas.`
 2. Escoge la opción **2 — Reemplazar** (borra las fotos antiguas y captura desde cero).
 3. Coloca la mano en la posición correcta según la tabla de la sección anterior.
 4. Presiona cualquier tecla en la ventana de la cámara para iniciar la captura automática.
@@ -137,7 +137,7 @@ Una vez que todas las letras problemáticas tienen muestras, ejecuta:
 O desde la terminal:
 
 ```
-py -3.12 augmentar_dataset.py
+py -3.12 scripts/augmentar_dataset.py
 ```
 
 El script mostrará:

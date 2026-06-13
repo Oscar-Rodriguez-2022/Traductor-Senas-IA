@@ -1,7 +1,7 @@
 # Log de Incidentes y Bugs Resueltos — LSP Vision AI
 ## Capstone Project Sistemas 2026 · Universidad Privada del Norte
 ### Responsable: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.0 · 2026-06-13 · **Estado: 9/9 incidentes RESUELTOS**
+### Versión: 2.1 · 2026-06-13 · **Estado: 10/10 incidentes RESUELTOS**
 
 Este registro documenta incidentes, bugs y problemas técnicos identificados durante el desarrollo y las pruebas del sistema, junto con sus causas raíz y resoluciones. Complementa `LECCIONES_APRENDIDAS.md`.
 
@@ -105,7 +105,7 @@ Este registro documenta incidentes, bugs y problemas técnicos identificados dur
 | **Causa raíz** | `hashlib.pbkdf2_hmac` podía recibir bytes malformados si la entrada contenía caracteres de control nulos `\x00`; Python los codificaba con error en `.encode("utf-8")` bajo ciertas versiones |
 | **Resolución** | La función `hash_password()` usa `.encode("utf-8", errors="replace")` implícitamente a través de la normalización Python 3.12 · Agregar test de robustez para inputs `\x00\x01\x02` en `test_seguridad.py` · Verificado: ningún payload concede acceso |
 | **Lección** | Los campos de autenticación deben probarse con los OWASP Top 10 payloads, incluyendo bytes de control, antes de considerar el módulo "terminado" |
-| **Verificación** | `tests/test_seguridad.py::TestSanitizacionInputs` — 11 payloads probados |
+| **Verificación** | `tests/test_seguridad.py::TestSanitizacionInputs` — 13 tests: 7 payloads de acceso, 4 payloads de hash con caracteres especiales/overflow, 2 de manipulación de token |
 
 ---
 
@@ -121,7 +121,7 @@ Este registro documenta incidentes, bugs y problemas técnicos identificados dur
 | **Causa raíz** | Condiciones de captura subóptimas (luz insuficiente, ángulo perpendicular para S/N) dejaron 0 muestras válidas donde MediaPipe detectaba landmarks correctamente |
 | **Resolución** | Sesión de recaptura siguiendo `GUIA_RECAPTURA_DATASET.md`: N, Q, R, S, V capturadas con 120+ muestras válidas por letra, fondo neutro e iluminación frontal · `scripts/augmentar_dataset.py` ×16 ejecutado sobre el dataset completo · Modelo reentrenado con `scripts/entrenar_modelo.py` · Accuracy global subió a 88.3% |
 | **Lección** | La calidad del dataset debe validarse antes de entrenar: ejecutar `cargar_dataset()` con conteo por letra y rechazar entrenar si alguna clase tiene < 20 muestras válidas |
-| **Verificación** | `tests/test_etica.py::test_todas_las_clases_tienen_recall_positivo` → PASS · `tests/test_etica.py::test_equidad_minima_por_clase_recall_mayor_50` → PASS · `qa/evaluate.py` muestra recall > 0.80 para todas las letras |
+| **Verificación** | `tests/test_etica.py::TestEquidad::test_todas_las_clases_tienen_recall_positivo` → PASS · `tests/test_etica.py::TestEquidad::test_equidad_minima_por_clase_recall_mayor_50` → PASS · `qa/evaluate.py` muestra recall > 0.80 para todas las letras |
 
 ---
 
@@ -159,18 +159,34 @@ Este registro documenta incidentes, bugs y problemas técnicos identificados dur
 
 ---
 
+## INC-10 · Contaminación del rate-limiter entre tests parametrizados (OB-11)
+
+| Campo | Detalle |
+|---|---|
+| **Severidad** | 🟢 MEDIO |
+| **Fecha detección** | 2026-06-13 |
+| **Fecha resolución** | 2026-06-13 |
+| **HU afectada** | HU-13 (Rate Limiting), HU-18 (TDD) |
+| **Síntoma** | Los 7 tests parametrizados de `TestSanitizacionInputs` (`test_payload_malicioso_no_concede_acceso`) realizaban 7 intentos de login fallidos consecutivos que agotaban el contador de rate-limiting. Los tests de `TestRateLimiting` ejecutados a continuación fallaban con `AttributeError: 'NoneType'.split` porque `generar_token_sesion()` devolvía `None` al estar el proceso en estado BLOQUEADO |
+| **Causa raíz** | El estado del rate-limiter (`_intentos_fallidos`, `_ultimo_fallo_ts`, `_rate_lock`) en `src/lsp_auth.py` es global al proceso Python. pytest ejecuta todos los tests en el mismo proceso, por lo que el estado acumulado de `TestSanitizacionInputs` "infectaba" los tests posteriores de `TestRateLimiting` |
+| **Resolución** | Fixture `_resetear_rate_limiter(autouse=True)` en `tests/conftest.py`: usa `monkeypatch.setattr` para fijar `_intentos_fallidos=0` y `_ultimo_fallo_ts=0.0` antes de cada test. `monkeypatch` revierte el estado automáticamente al finalizar. Esta solución no requiere exponer una función de reset en producción |
+| **Lección** | Los módulos con estado global (rate-limiters, singletons, cachés de proceso) deben aislarse entre tests con `monkeypatch` o fixtures `autouse`. El orden de ejecución de pytest no es garantizado; los tests deben ser independientes entre sí |
+| **Verificación** | `pytest tests/test_seguridad.py -v` → 33 PASS, 1 SKIP, 0 FAIL en cualquier orden de ejecución |
+
+---
+
 ## Resumen Estadístico
 
 | Severidad | Cantidad | Resueltos | Pendientes |
 |-----------|---------|-----------|-----------|
 | 🔴 CRÍTICO | 3 | 3 | 0 |
 | 🟡 ALTO | 3 | 3 | 0 |
-| 🟢 MEDIO | 3 | 3 | 0 |
-| **Total** | **9** | **9** | **0** |
+| 🟢 MEDIO | 4 | 4 | 0 |
+| **Total** | **10** | **10** | **0** |
 
-**MTTR promedio (Mean Time To Resolve):** ~1.4 días para todos los incidentes.
+**MTTR promedio (Mean Time To Resolve):** ~1.3 días para todos los incidentes.
 **Deuda técnica generada:** 0 ítems críticos pendientes al cierre del proyecto.
 
 ---
 
-*Última actualización: 2026-06-13 · Rodriguez Chacara, Oscar Daniel · v2.0 — Cierre de proyecto*
+*Última actualización: 2026-06-13 · Rodriguez Chacara, Oscar Daniel · v2.1 — INC-10 añadido (OB-11: contaminación rate-limiter); conteo TestSanitizacionInputs 11→13; refs INC-07 con clase; total 10/10 incidentes*
