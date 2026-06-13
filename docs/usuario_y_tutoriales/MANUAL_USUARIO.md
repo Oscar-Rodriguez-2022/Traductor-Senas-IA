@@ -1,7 +1,7 @@
 # Manual de Usuario — LSP Vision AI
 ## Sistema Interactivo de Visión Artificial para la Comunicación Inclusiva (LSP)
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026-1
-**Versión:** 2.0 · **Fecha:** Junio 2026
+**Versión:** 2.1 · **Fecha:** Junio 2026
 **Autores:** Equipo LSP Vision AI — UPN Ingeniería de Sistemas
 
 ---
@@ -347,7 +347,21 @@ Etapa 5 — Visualización
   con actualización cada 0.4 segundos vía st.fragment de Streamlit.
 ```
 
-### 8.2 Por qué usamos SVM y no una red neuronal profunda
+### 8.2 Panel de alternativas XAI (top-5)
+
+Junto al pipeline, el panel expandible muestra también la **tabla de las 5 letras más probables** con su porcentaje de confianza:
+
+| Posición | Letra | Confianza |
+|---|---|---|
+| 1ª (predicción principal) | A | 87 % |
+| 2ª | S | 6 % |
+| 3ª | E | 4 % |
+| 4ª | T | 2 % |
+| 5ª | M | 1 % |
+
+Esto permite ver **cuánto "dudó" el modelo** entre letras similares. Cuando la primera y la segunda opción están muy cercanas (ej. A 55 %, S 40 %), el borde amarillo ya habrá aparecido en el panel de resultado indicando ambigüedad. Los valores son generados por `explicar_prediccion()` sin coste computacional adicional y verificados en `tests/test_etica.py::TestXAI` (14 tests).
+
+### 8.3 Por qué usamos SVM y no una red neuronal profunda
 
 El SVM con vectores de landmarks es **interpretable por diseño**:
 
@@ -447,5 +461,6 @@ Para reportar problemas técnicos o consultas académicas, dirigirse al equipo d
 
 ---
 
-*Manual de Usuario v2.0 — Junio 2026 · LSP Vision AI · UPN Sistemas*
+*Manual de Usuario v2.1 — Junio 2026 · LSP Vision AI · UPN Sistemas*
+*Cambios v2.1: §8.2 añadido — panel de alternativas XAI top-5 (DT-19, `explicar_prediccion()`)*
 *Cambios v2.0: nuevo pipeline diagram, sección de explicabilidad XAI, tabla de letras LSP, sección de accesibilidad WCAG expandida, preguntas frecuentes ampliadas, estado del sistema*

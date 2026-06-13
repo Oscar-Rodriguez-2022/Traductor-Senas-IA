@@ -60,7 +60,11 @@ desde cualquier dispositivo. Hazlo en el orden indicado.
    - **Branch:** `main`
    - **Main file path:** `src/app.py`
 4. Abre **"Advanced settings"** → **Python version**: elige **3.12** (MediaPipe 0.10.21 no es compatible con 3.13).
-5. En **Secrets** agrega: `PASSWORD_HASH = "<hash generado con lsp_auth.hash_password('UPN2026')>"`
+5. En **Secrets** agrega el hash de contraseña. Genera el valor con:
+   ```
+   python -c "import sys; sys.path.insert(0,'src'); from lsp_auth import hash_password; print(hash_password('UPN2026'))"
+   ```
+   Luego en Secrets escribe: `PASSWORD_HASH = "<resultado del comando anterior>"`
 6. Clic en **"Deploy"** y espera 2-4 minutos.
 7. Te dará una URL pública (ej. `https://traductor-senas-ia.streamlit.app`). Ese es el link para la sustentación.
 
@@ -88,7 +92,7 @@ configurar nada.
 - **Accesibilidad:** muestra también el **link público** para demostrar que está
   desplegada y que cualquiera la puede abrir desde su celular.
 - **Calidad:** abre `reportes/REPORTE_QA.pdf` y la página **"Metricas QA"** de la web
-  para mostrar las pruebas y métricas (mira `GUIA_QA.md`).
+  para mostrar las pruebas y métricas (mira `docs/qa_y_pruebas/GUIA_QA.md`).
 
 ---
 
@@ -105,5 +109,5 @@ configurar nada.
 
 ---
 
-*Tutorial de Despliegue Web v2.0 · LSP Vision AI · UPN Sistemas 2026*
-*Cambios v2.0: rutas actualizadas a src/app.py, sección de Secrets, tabla de errores expandida*
+*Tutorial de Despliegue Web v2.1 · LSP Vision AI · UPN Sistemas 2026*
+*Cambios v2.1: comando de generación de hash en §D, path GUIA_QA.md corregido*

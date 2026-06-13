@@ -74,13 +74,12 @@ Este proyecto sigue el principio de **Collective Code Ownership** de XP:
 1. En la **misma ventana negra**, entra a la carpeta del proyecto pegando esto y Enter:
 
    ```
-   cd IA-Traductor-Senas-LSP-UPN
+   cd Traductor-Senas-IA
    ```
 
 2. Ahora pega este comando y presiona **Enter** (tarda unos minutos, descarga cosas):
 
    ```
-   cd Traductor-Senas-IA
    pip install -r requirements.txt
    ```
 
@@ -164,5 +163,5 @@ Este proyecto sigue el principio de **Collective Code Ownership** de XP:
 
 ---
 
-*Tutorial para Nuevos Integrantes v2.0 · LSP Vision AI · UPN Sistemas 2026*
-*Cambios v2.0: normas de propiedad compartida XP, rutas src/ actualizadas, URL de repositorio correcta*
+*Tutorial para Nuevos Integrantes v2.1 · LSP Vision AI · UPN Sistemas 2026*
+*Cambios v2.1: PARTE 4 — corregido nombre de carpeta (cd Traductor-Senas-IA, no IA-Traductor-Senas-LSP-UPN)*
