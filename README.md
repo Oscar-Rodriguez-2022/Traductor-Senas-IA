@@ -96,9 +96,9 @@ Traductor-Senas-IA/
 │   ├── conftest.py               │  Fixtures compartidos
 │   ├── test_auth.py              │  14 tests — autenticación (HU-13)
 │   ├── test_audit.py             │  9 tests — auditoría (HU-14)
-│   ├── test_seguridad.py         │  20 tests — DevSecOps (3 capas)
+│   ├── test_seguridad.py         │  25 tests — DevSecOps (3 capas)
 │   ├── test_etica.py             │  15 tests — IA ética y equidad (HU-20)
-│   ├── test_video.py             │  11 tests — procesamiento de video (HU-08)
+│   ├── test_video.py             │  12 tests — procesamiento de video (HU-08)
 │   ├── test_integracion.py       │  3 tests — flujo E2E
 │   ├── test_landmarks.py         │  Tests de extracción de landmarks (HU-06)
 │   ├── test_modelo.py            │  Tests de carga y predicción (HU-10)
@@ -118,15 +118,23 @@ Traductor-Senas-IA/
 │   ├── recursos.py               │  RAM/CPU durante 300 s
 │   └── generar_reportes.py       │  Consolida todos los CSV en PDF + HTML
 │
-├── scripts/                      ← Scripts de captura y entrenamiento
+├── scripts/                      ← Scripts de captura, entrenamiento y utilidades
 │   ├── capturar_dataset.py       │  Captura interactiva guiada del dataset LSP
 │   ├── entrenar_modelo.py        │  Entrena SVM desde data/ → modelo.pkl
 │   ├── augmentar_dataset.py      │  Data augmentation ×16 + entrenamiento
 │   ├── entrenar_desde_csv.py     │  Entrena combinando CSVs colaborativos
 │   ├── extraer_landmarks.py      │  Extrae landmarks a CSV para compartir
-│   └── traducir_en_vivo.py       │  Demo offline sin Streamlit
+│   ├── traducir_en_vivo.py       │  Demo offline sin Streamlit
+│   ├── 1_CAPTURAR_dataset.bat    │  Acceso rápido Windows → captura de dataset
+│   ├── 2_TRADUCIR_en_vivo.bat    │  Acceso rápido Windows → demo offline
+│   ├── 3_WEB_probar_local.bat    │  Acceso rápido Windows → servidor local
+│   ├── 4_ENTRENAR_desde_CSV.bat  │  Acceso rápido Windows → entrenamiento CSV
+│   ├── 5_AUGMENTAR_y_ENTRENAR.bat│  Acceso rápido Windows → augmentación + entreno
+│   ├── COMPANEROS_extraer_landmarks.bat │  Extracción para integrantes del equipo
+│   └── QA.bat                    │  Menú interactivo de QA para Windows
 │
 ├── data/                         ← Dataset LSP (subcarpetas a/ … z/ con .png)
+├── landmarks_csv/                ← CSVs colaborativos de landmarks por integrante
 ├── reportes/                     ← Reportes QA generados (CSV, PNG, PDF)
 ├── docs/                         ← Documentación técnica y diagramas
 │   ├── requerimientos.md         │  15 RF + 15 RNF
@@ -138,11 +146,12 @@ Traductor-Senas-IA/
 ├── modelo.pkl                    ← Modelo SVM entrenado (generado localmente)
 ├── Dockerfile                    ← Imagen Docker con usuario no-root (UID 1001)
 ├── Makefile                      ← Automatización de tareas QA
-├── QA.bat                        ← Menú interactivo de QA para Windows
+├── packages.txt                  ← Dependencias de sistema para Streamlit Cloud
 ├── requirements.txt              ← Dependencias de producción
 ├── requirements-dev.txt          ← Dependencias de desarrollo + testing
 ├── pyproject.toml                ← Configuración Black, Pylint, pytest
 ├── setup.cfg                     ← Configuración Flake8 + cobertura
+├── reporte_pruebas.txt           ← Resultados de la suite de tests automatizados
 └── trivy.yaml                    ← Escaneo de vulnerabilidades (CRITICAL+HIGH)
 ```
 
