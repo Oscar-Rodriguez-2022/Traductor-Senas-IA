@@ -1,7 +1,7 @@
 # Plan de Seguridad Integral — LSP Vision AI
 ## Capstone Project Sistemas 2026 · Universidad Privada del Norte
 ### Responsable: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.0 · Fecha: 2026-06-13
+### Versión: 2.1 · Fecha: 2026-06-13
 
 > Este documento describe el modelo de seguridad completo del sistema, organizado en
 > tres capas: Aplicación, Almacenamiento e Infraestructura. Cumple con los requisitos
@@ -58,7 +58,7 @@ lsp_auth.generar_token_sesion(pwd, hash_esperado)
 | **Inputs inválidos en predicción** | ✅ Controlado | `lsp_core.predecir()` valida 42 valores finitos antes de clasificar; lanza `ValueError` en caso de vector inválido. |
 | **`unsafe_allow_html`** | ✅ Controlado | Solo inyecta datos generados por el sistema (letra a-z, número, CSS). Nunca texto libre del usuario. |
 
-**Verificación:** `tests/test_seguridad.py::TestSanitizacionInputs` — 7 tests con payloads OWASP.
+**Verificación:** `tests/test_seguridad.py::TestSanitizacionInputs` — 13 tests: 7 de acceso con payloads OWASP, 4 de hash con caracteres especiales/overflow, 2 de manipulación de token (timestamp y nonce).
 
 ### 1.3 Gestión de Errores
 
@@ -107,7 +107,7 @@ lsp_auth.generar_token_sesion(pwd, hash_esperado)
 
 **Purga automática:** `lsp_audit.purgar_log_antiguo(dias=7)` elimina entradas con más de 7 días.
 
-**Verificación:** `tests/test_seguridad.py::TestAuditLogAnonimato` + `tests/test_audit.py` — 4 tests.
+**Verificación:** `tests/test_seguridad.py::TestAuditLogAnonimato` (4 tests: IP, user-agent, token reversibility, distintas sesiones) + `tests/test_audit.py` (9 tests: campos, formato, purga, retención).
 
 ### 2.3 Integridad del Modelo SVM
 
@@ -119,7 +119,7 @@ lsp_auth.generar_token_sesion(pwd, hash_esperado)
 | **Verificación de integridad** | `lsp_core.verificar_integridad_modelo(path, hash_esperado)` → `hmac.compare_digest()` para comparación segura |
 | **Procedimiento recomendado** | Calcular el hash después del entrenamiento; almacenarlo; verificar antes de cada despliegue |
 
-**Verificación:** `tests/test_seguridad.py::TestIntegridadModelo` — 2 tests.
+**Verificación:** `tests/test_seguridad.py::TestIntegridadModelo` — 7 tests: cálculo hash, determinismo, detección de tampering, archivo inexistente, verificación correcta/incorrecta.
 
 ### 2.4 Frames y Landmarks
 
@@ -129,7 +129,7 @@ lsp_auth.generar_token_sesion(pwd, hash_esperado)
 | Vector de 42 coordenadas (landmarks) | **NO** — usado para predicción inmediata y descartado |
 | Predicción (letra + confianza) | **NO** — solo se muestra en UI; no se escribe a disco |
 
-**Verificación:** `tests/test_seguridad.py::TestPrivacidadPorDiseno` — 2 tests.
+**Verificación:** `tests/test_seguridad.py::TestPrivacidadPorDiseno` — 3 tests: frames no persistidos, sin credenciales en texto plano, audit log sin landmarks biométricos.
 
 ---
 
@@ -197,7 +197,15 @@ trivy image lsp-vision-ai:latest
 | Cualquier API key | Variables de entorno del servidor | ❌ nunca en código |
 
 **Regla absoluta:** ningún secreto en texto plano en el código fuente.
-**Verificación:** `tests/test_seguridad.py::test_no_credenciales_en_texto_plano` — escanea el repo completo.
+
+**Pre-commit hook anti-secretos (DT-20):** `scripts/hooks/pre-commit` — 87 líneas, 3 capas de detección:
+1. **Nombres bloqueados:** archivos con nombres de credenciales (`.env`, `secrets.*`, `*_key.*`, etc.) no pueden incluirse en el commit.
+2. **Patrones en el diff:** detección de `AKIA…` (AWS), `ghp_…` (GitHub PAT), `sk-…` (OpenAI), `password=`, `SECRET=` en el contenido del diff.
+3. **Archivos de config:** escaneo de archivos `.toml`, `.yaml`, `.cfg` y `.ini` del staging area en busca de valores en texto plano.
+
+Instalación en Windows: `scripts/setup_hooks.bat` copia el hook a `.git/hooks/pre-commit` y lo marca ejecutable.
+
+**Verificación en tests:** `tests/test_seguridad.py::TestPrivacidadPorDiseno::test_no_credenciales_en_texto_plano_en_codigo` — escanea el repo completo en busca de patrones de secretos.
 
 ---
 
@@ -244,3 +252,4 @@ El filesystem es **efímero**: al reiniciar el servidor (automático tras inacti
 | 1.1 | 2026-06-10 | Auth HMAC (`lsp_auth`), audit log (`lsp_audit`), `showErrorDetails=false`, XSRF, GDPR documentada |
 | 1.2 | 2026-06-12 | Rate limiting anti-fuerza-bruta (`MAX_INTENTOS=5`, `BLOQUEO=300s`); verificación SHA-256 del modelo PKL; `tests/test_seguridad.py` con 20 tests por capas |
 | 2.0 | 2026-06-13 | **PLAN DE SEGURIDAD INTEGRAL** — Docker non-root, `.dockerignore`, `trivy.yaml`, INC-09 resuelto (flags Docker), todos los controles verificados y documentados; 9/9 incidentes cerrados |
+| 2.1 | 2026-06-13 | Conteos reales de tests (Sanitización 13, IntegridadModelo 7, PrivacidadPorDiseno 3, AuditLog 4+9); §3.5 pre-commit hook DT-20 (3 capas); nombre de test corregido a `TestPrivacidadPorDiseno::test_no_credenciales_en_texto_plano_en_codigo` |

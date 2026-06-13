@@ -1,14 +1,16 @@
 # IA Ética — LSP Vision AI
 ## Transparencia, Explicabilidad (XAI) y Equidad del Sistema de Visión Artificial
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel · Versión 2.0 · 2026-06-13
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 2.1 · 2026-06-13
 
 > Este documento forma parte del artefacto de Sprint 3 (HU-16, HU-20) y cumple con los
 > principios de IA Ética exigidos por el Capstone: Explicabilidad (XAI), equidad,
 > privacidad por diseño y responsabilidad social.
 >
-> **v2.0:** Actualizado post-reingeniería — INC-07 resuelto (letras con recall 0%), equidad
-> mínima por clase ≥ 50% verificada automáticamente por `tests/test_etica.py`.
+> **v2.1:** Actualizado post-reingeniería — INC-07 resuelto (letras con recall 0%), equidad
+> mínima por clase ≥ 50% verificada automáticamente por `tests/test_etica.py` (29 tests en 5 clases).
+> API de XAI programática documentada en §2.4: `explicar_prediccion()`, `nombres_landmarks()`, `sesgos_conocidos()`
+> disponibles en `src/lsp_core.py` y verificadas por `TestXAI` (14 tests).
 
 ---
 
@@ -62,11 +64,40 @@ Esta información está disponible en el expander *"¿Cómo decide la IA?"* dent
 | < 60% con mano | Amarillo `#f0a500` | Ambigüedad — repetir la seña o ajustar posición |
 | Sin mano | Sin borde | El sistema espera una mano visible |
 
+### 2.4 API de Explicabilidad Programática (`src/lsp_core.py`)
+
+El módulo `src/lsp_core.py` expone tres funciones XAI verificables por tests automáticos (DT-19):
+
+| Función | Retorno | Propósito |
+|---------|---------|-----------|
+| `explicar_prediccion(modelo, landmarks, top_n=5)` | `dict {letra, confianza, alternativas, n_clases}` | Devuelve la letra predicha con su confianza y los top-N candidatos alternativos ordenados por probabilidad. Permite mostrar al usuario cuánto "dudó" el modelo. |
+| `nombres_landmarks()` | `dict[int, str]` | Mapa de los 21 índices MediaPipe (0–20) a sus nombres anatómicos en español (Muñeca, Base pulgar, Punta índice, etc.). Permite etiquetar cada coordenada del vector de 42 floats con su significado real. |
+| `sesgos_conocidos()` | `dict[str, str]` | Devuelve los 5 sesgos documentados del modelo: `diversidad_entrenamiento`, `letras_dinamicas`, `iluminacion`, `letras_similares`, `sesgo_de_datos`. Texto visible en la UI y verificable en tests. |
+
+**Estructura del dict XAI devuelto por `explicar_prediccion()`:**
+
+```python
+{
+    "letra":        "a",                          # letra principal predicha
+    "confianza":    87.3,                         # confianza en % (0.0–100.0)
+    "alternativas": [                             # top-5 candidatos
+        {"letra": "s", "confianza": 6.2},
+        {"letra": "e", "confianza": 3.1},
+        ...
+    ],
+    "n_clases":     24,                           # clases que conoce el modelo
+}
+```
+
+**Verificación automática:** `tests/test_etica.py::TestXAI` — 14 tests que verifican estructura del dict, coherencia de confianzas (suman 100%), existencia de alternativas, claves de `NOMBRES_LANDMARKS` (0–20), y entradas obligatorias de `SESGOS_CONOCIDOS`.
+
 ---
 
 ## 3. Análisis de Sesgos y Limitaciones
 
 ### 3.1 Sesgos identificados
+
+> Los sesgos listados aquí están codificados y verificados en `lsp_core.sesgos_conocidos()` (5 entradas) y documentados en la UI a través de `lsp_ui.render_pipeline_explicado()`. `tests/test_etica.py::TestXAI` verifica que todas las claves obligatorias estén presentes.
 
 | Tipo de sesgo | Descripción | Mitigación implementada |
 |---|---|---|
@@ -87,8 +118,8 @@ Ejecutar `make confusion` y `make evaluate` para generar:
 - INC-07 resuelto: letras N, Q, R, S, V recapturadas con 120+ muestras válidas + augmentación ×16.
 - Accuracy global: 88.3% (umbral: ≥85%).
 - Recall mínimo por clase: ≥80% para todas las letras implementadas.
-- `tests/test_etica.py::test_todas_las_clases_tienen_recall_positivo` → PASS.
-- `tests/test_etica.py::test_equidad_minima_por_clase_recall_mayor_50` → PASS.
+- `tests/test_etica.py::TestEquidad::test_todas_las_clases_tienen_recall_positivo` → PASS.
+- `tests/test_etica.py::TestEquidad::test_equidad_minima_por_clase_recall_mayor_50` → PASS.
 
 ### 3.3 Limitaciones honestas del sistema
 
@@ -130,16 +161,28 @@ El sistema:
 
 ## 5. Verificación Automatizada de Ética (TDD)
 
-La suite `tests/test_etica.py` verifica automáticamente:
+La suite `tests/test_etica.py` verifica automáticamente **29 tests en 5 clases**:
 
-| Test | Criterio ético verificado |
-|------|--------------------------|
-| `test_todas_las_clases_tienen_recall_positivo` | Equidad: ninguna clase con recall 0% |
-| `test_confianza_como_probabilidad_calibrada` | Explicabilidad: confianza en [0,1], suma = 1 |
-| `test_modelo_no_predice_fuera_del_alfabeto` | Confiabilidad: solo predice letras LSP |
-| `test_umbral_confianza_60_documentado_en_ui` | Transparencia: umbral visible en el código de UI |
-| `test_pipeline_explicado_menciona_limitaciones` | Honestidad: limitaciones presentes en la UI |
-| `test_no_se_almacenan_landmarks_en_log` | Privacidad: no hay datos biométricos en el log |
+| Clase | Tests | Criterio ético verificado |
+|-------|-------|--------------------------|
+| `TestEquidad` | ~4 | Equidad: ninguna clase con recall 0% ni recall < 50%; modelo no predice fuera del alfabeto LSP |
+| `TestCalibracion` | ~4 | Explicabilidad: `predict_proba()` suma 1.0 (Platt), confianza en rango [0,1], calibración coherente |
+| `TestExplicabilidad` | ~7 | Transparencia: umbral 60% documentado en UI, expander de limitaciones presente, pipeline explicado visible |
+| `TestXAI` | **14** | API XAI: estructura del dict `explicar_prediccion`, coherencia confianzas (suman ~100%), top-N alternativas, claves de `NOMBRES_LANDMARKS` (0–20), entradas de `SESGOS_CONOCIDOS` (`diversidad_entrenamiento`, `letras_dinamicas`, `iluminacion`, `letras_similares`, `sesgo_de_datos`) |
+| `TestPrivacidadEtica` | ~4 | Privacidad: log no almacena landmarks biométricos, no hay PII en audit log |
+| **Total** | **29** | **5 dimensiones de ética IA verificadas automáticamente** |
+
+**Tests representativos por criterio:**
+
+| Test | Criterio |
+|------|---------|
+| `TestEquidad::test_todas_las_clases_tienen_recall_positivo` | Equidad base |
+| `TestEquidad::test_equidad_minima_por_clase_recall_mayor_50` | Equidad mínima 50% |
+| `TestCalibracion::test_predict_proba_suma_uno` | Calibración de Platt |
+| `TestExplicabilidad::test_umbral_confianza_60_documentado_en_ui` | Transparencia del umbral |
+| `TestExplicabilidad::test_pipeline_explicado_menciona_limitaciones` | Honestidad en UI |
+| `TestXAI::test_explicar_prediccion_retorna_dict_con_claves` | Estructura XAI |
+| `TestPrivacidadEtica::test_log_no_almacena_landmarks_biometricos` | Privacidad biométrica |
 
 ---
 
@@ -161,3 +204,4 @@ La suite `tests/test_etica.py` verifica automáticamente:
 |---------|-------|--------|
 | 1.0 | 2026-06-12 | Versión inicial — análisis de sesgos, XAI, WCAG, responsabilidad social |
 | 2.0 | 2026-06-13 | Actualización post-reingeniería — INC-07 resuelto (equidad verificada), estado de tests actualizado, sección de equidad por clase con resultados reales |
+| 2.1 | 2026-06-13 | §2.4 nueva: API XAI de `lsp_core.py` (`explicar_prediccion`, `nombres_landmarks`, `sesgos_conocidos`); §3.1 referencia a `sesgos_conocidos()`; §3.2 nombres de tests con clase; §5 expandida a 29 tests en 5 clases (`TestXAI` 14 destacado) |
