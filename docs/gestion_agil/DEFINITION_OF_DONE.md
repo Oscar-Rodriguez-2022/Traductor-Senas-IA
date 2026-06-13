@@ -1,12 +1,12 @@
 # Definition of Done — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.0 · Última actualización: 2026-06-13
+### Versión: 2.1 · Última actualización: 2026-06-13
 ### Estado: **PROYECTO CERRADO — 22/22 HUs completadas, 100% criterios DoD satisfechos**
 
-Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios de la Sección I antes de marcarse como completado en el tablero Scrum. La Sección II registra el estado de cumplimiento al cierre del Capstone (v2.0).
+Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios de la Sección I antes de marcarse como completado en el tablero Scrum. La Sección II registra el estado de cumplimiento al cierre del Capstone (v2.1).
 
-> **v2.0:** Actualizado tras la reingeniería estructural (src-layout, DevSecOps completo, 49+ tests).
+> **v2.1:** Actualizado tras la reingeniería estructural y actividades post-cierre (src-layout, DevSecOps completo, ~114 tests, pre-commit hook anti-secretos, reorganización de `docs/`).
 > Todos los criterios han sido verificados y el proyecto está listo para sustentación y despliegue.
 
 ---
@@ -43,7 +43,8 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 
 | Criterio | Verificación |
 |---|---|
-| Sin credenciales en código fuente | `git log --all -S "password"` no devuelve coincidencias en texto plano |
+| Sin credenciales en código fuente | `git log --all -S "password"` sin coincidencias en texto plano · pre-commit hook activo en `.git/hooks/` |
+| Pre-commit hook anti-secretos instalado | `scripts/hooks/pre-commit` ejecutable; instalado vía `scripts/setup_hooks.bat` |
 | Tokens de sesión con firma HMAC | `lsp_auth.verificar_token()` rechaza tokens manipulados (test incluido) |
 | Rate limiting anti-fuerza-bruta | `MAX_INTENTOS=5`, `BLOQUEO_SEGUNDOS=300` verificados en `test_seguridad.py` |
 | Integridad del modelo PKL | `calcular_hash_modelo` + `verificar_integridad_modelo` con HMAC-compare_digest |
@@ -79,9 +80,10 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 | Explicabilidad del pipeline visible en UI | Expander con tabla de confianza y pipeline paso a paso |
 | Limitaciones y sesgos documentados en UI | Sección "Limitaciones conocidas" en el expander de la app |
 | Documento `IA_ETICA.md` completo | Principios, análisis de sesgos, métricas de equidad, plan de mejora |
-| Equidad por clase (recall ≠ 0 para ninguna letra) | `tests/test_etica.py::test_todas_las_clases` |
-| Calibración de confianza (Platt) | `tests/test_etica.py::test_predict_proba_suma_uno` |
-| Privacidad de datos biométricos | `tests/test_etica.py::test_log_no_almacena_landmarks` |
+| Equidad por clase (recall ≠ 0 para ninguna letra) | `tests/test_etica.py::TestEquidad::test_todas_las_clases_tienen_recall_positivo` |
+| Calibración de confianza (Platt) | `tests/test_etica.py::TestCalibracion::test_predict_proba_suma_uno` |
+| XAI: explicar_prediccion, nombres_landmarks, sesgos_conocidos | `tests/test_etica.py::TestXAI` (14 tests) |
+| Privacidad de datos biométricos | `tests/test_etica.py::TestPrivacidadEtica::test_log_no_almacena_landmarks_biometricos` |
 
 ---
 
@@ -100,19 +102,19 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 
 | Criterio | Archivo |
 |---|---|
-| Historias de Usuario con AC actualizados | `HISTORIAS_USUARIO.md` (22 HUs, Gherkin, MoSCoW) |
-| Requerimientos (15 RF + 15 RNF) | `docs/requerimientos.md` |
+| Historias de Usuario con AC actualizados | `docs/gestion_agil/HISTORIAS_USUARIO.md` (22 HUs, Gherkin, MoSCoW) |
+| Requerimientos (15 RF + 15 RNF) | `docs/gestion_agil/requerimientos.md` |
 | Arquitectura modular (diagramas Mermaid) | `docs/arquitectura/COMPONENTES.md` |
 | Modelo de datos incremental por sprint | `docs/arquitectura/MODELO_DATOS.md` |
-| Matriz de trazabilidad HU↔Código↔Test | `MATRIZ_TRAZABILIDAD.md` |
+| Matriz de trazabilidad HU↔Código↔Test | `docs/gestion_agil/MATRIZ_TRAZABILIDAD.md` |
 | Guía de instalación y ejecución vigente | `README.md` |
-| Análisis de seguridad actualizado | `SEGURIDAD.md` |
-| Guía de calidad y pruebas | `GUIA_QA.md` |
-| Manual de Usuario Preliminar | `MANUAL_USUARIO.md` |
-| Registro de Lecciones Aprendidas | `LECCIONES_APRENDIDAS.md` |
-| Plantilla UAT con criterios de aceptación | `docs/plantilla_UAT.md` |
-| IA Ética y equidad | `IA_ETICA.md` |
-| Log de incidentes y bugs resueltos | `INCIDENTES.md` |
+| Análisis de seguridad actualizado | `docs/seguridad_y_etica/SEGURIDAD.md` |
+| Guía de calidad y pruebas | `docs/qa_y_pruebas/GUIA_QA.md` |
+| Manual de Usuario Preliminar | `docs/usuario_y_tutoriales/MANUAL_USUARIO.md` |
+| Registro de Lecciones Aprendidas | `docs/cierre/LECCIONES_APRENDIDAS.md` |
+| Plantilla UAT con criterios de aceptación | `docs/qa_y_pruebas/plantilla_UAT.md` |
+| IA Ética y equidad | `docs/seguridad_y_etica/IA_ETICA.md` |
+| Log de incidentes y bugs resueltos | `docs/qa_y_pruebas/INCIDENTES.md` |
 
 ---
 
@@ -152,17 +154,18 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 | Tests de integración | `tests/test_integracion.py` — 3 tests E2E | ✅ |
 | Tests de carga / estrés | `qa/benchmark.py`, `qa/fps_test.py`, `qa/stress_test.py` | ✅ |
 | Tests de video | `tests/test_video.py` — 11 tests | ✅ |
-| Tests de seguridad | `tests/test_seguridad.py` — 20 tests | ✅ |
-| Tests de ética IA | `tests/test_etica.py` — 15 tests | ✅ |
-| Tests de sistema | `test_sistema.py` — 18 tests (assertions reales) | ✅ |
+| Tests de seguridad | `tests/test_seguridad.py` — 34 tests (33 PASS + 1 SKIP) · 4 clases: Sanitización, RateLimiting, AuditLog, IntegridadPKL | ✅ |
+| Tests de ética IA | `tests/test_etica.py` — 29 tests · 5 clases: Equidad, Calibración, Explicabilidad, XAI (14), PrivacidadEtica | ✅ |
+| Tests de sistema | `tests/test_sistema.py` — 18 tests (assertions reales contra lsp_core/lsp_auth/sklearn) | ✅ |
 
-**Total tests automatizados: 49+ tests (tests/) + 18 (test_sistema.py) = 67+ en total**
+**Total tests automatizados: ~114 tests recolectados por pytest en `tests/`**
 
 ### Seguridad (DevSecOps) — ✅ CUMPLE
 
 | Criterio | Estado |
 |---|---|
-| Sin credenciales en código | ✅ `test_seguridad.py::test_no_credenciales` |
+| Sin credenciales en código | ✅ `TestPrivacidadPorDiseno::test_no_credenciales_en_texto_plano_en_codigo` |
+| Pre-commit hook anti-secretos | ✅ `scripts/hooks/pre-commit` (3 capas: nombre, contenido diff, config files) |
 | Tokens HMAC-SHA256 | ✅ 14 tests de firma y expiración |
 | Rate limiting anti-fuerza-bruta | ✅ `MAX_INTENTOS=5`, `BLOQUEO_SEGUNDOS=300` |
 | Integridad del modelo PKL | ✅ `calcular_hash_modelo` + `verificar_integridad_modelo` |
@@ -191,11 +194,12 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 
 | Criterio | Estado |
 |---|---|
-| Explicabilidad del pipeline en UI | ✅ Expander con tabla de confianza |
-| Sesgos documentados | ✅ `IA_ETICA.md` + sección en UI |
-| Equidad por clase | ✅ `tests/test_etica.py::test_todas_las_clases` |
-| Calibración de confianza | ✅ `tests/test_etica.py::test_predict_proba_suma_uno` |
-| Privacidad de landmarks | ✅ `tests/test_etica.py::test_log_no_almacena_landmarks` |
+| Explicabilidad del pipeline en UI | ✅ Expander con tabla top-5 alternativas y pipeline paso a paso |
+| Sesgos documentados en UI y código | ✅ `sesgos_conocidos()` en `lsp_core` + sección en UI + `docs/seguridad_y_etica/IA_ETICA.md` |
+| Equidad por clase | ✅ `TestEquidad::test_todas_las_clases_tienen_recall_positivo` |
+| Calibración de confianza | ✅ `TestCalibracion::test_predict_proba_suma_uno` |
+| XAI verificable por tests | ✅ `TestXAI` — 14 tests: estructura, coherencia, alternativas, NOMBRES_LANDMARKS, SESGOS_CONOCIDOS |
+| Privacidad de landmarks | ✅ `TestPrivacidadEtica::test_log_no_almacena_landmarks_biometricos` |
 
 ---
 
@@ -243,4 +247,5 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 | 1.1 | 2026-06-10 | HU-22 (Carga/Estrés) · CA-13.6 (sanitización) · CA-21.4 (Manual y Lecciones) |
 | 1.2 | 2026-06-12 | Rate limiting, SHA-256 PKL, tests de video/seguridad/ética |
 | 1.3 | 2026-06-13 | Fusión con DoD.md · src/ restructuring · Docker non-root · trivy.yaml · plantilla UAT · INCIDENTES.md |
-| 2.0 | 2026-06-13 | **CIERRE DE PROYECTO** — Sprint Reingeniería completado, 137/137 SP, 22/22 HUs, 67+ tests, todos los criterios DoD satisfechos |
+| 2.0 | 2026-06-13 | **CIERRE DE PROYECTO** — Sprint Reingeniería completado, 137/137 SP, 22/22 HUs, todos los criterios DoD satisfechos |
+| 2.1 | 2026-06-13 | Conteos reales de tests (34 seguridad, 29 ética, ~114 total) · Pre-commit hook añadido a criterios de Seguridad · Rutas de docs/ actualizadas a subcarpetas temáticas · Referencias a tests con nombres de clase/método exactos |

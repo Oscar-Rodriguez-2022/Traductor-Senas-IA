@@ -1,7 +1,7 @@
 # Documento de Requerimientos — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
-### Versión: 1.0 · Fecha: 2026-06-12
+### Versión: 1.1 · Fecha: 2026-06-13
 
 > Este documento cumple con **CA-01.1** (≥15 RF y ≥15 RNF, cada uno con código,
 > tipo, nombre y descripción) y **CA-01.2** (revisado y validado por el líder técnico).
@@ -34,8 +34,8 @@ seguridad (DevSecOps) y principios de IA ética.
 | **RF-11** | Entrenamiento del modelo desde dataset | El sistema debe permitir entrenar el clasificador SVM a partir de imágenes PNG organizadas en `data/<letra>/`, guardando el modelo resultante como `modelo.pkl`. |
 | **RF-12** | Construcción colaborativa del dataset | El sistema debe permitir que múltiples integrantes del equipo exporten sus landmarks a CSV y que el modelo se entrene desde esos archivos combinados. |
 | **RF-13** | Aumento de datos (data augmentation) | El sistema debe aplicar transformaciones geométricas (rotaciones, escala, ruido) a los vectores de landmarks para multiplicar el dataset × 16 sin capturar imágenes adicionales. |
-| **RF-14** | Explicabilidad del pipeline de IA | La interfaz debe contener una sección que explique al usuario cómo funciona el sistema (captura → detección → extracción → clasificación → resultado) con indicadores visuales accesibles. |
-| **RF-15** | Captura colaborativa del dataset | El script de captura (`A.py`) debe evitar sobreescribir las imágenes de otros integrantes usando índices autoincrementales, permitiendo que todos contribuyan a la misma carpeta. |
+| **RF-14** | Explicabilidad del pipeline de IA | La interfaz debe contener una sección que explique al usuario cómo funciona el sistema (captura → detección → extracción → clasificación → resultado) con indicadores visuales accesibles. `src/lsp_core.py` expone `explicar_prediccion()` (dict con letra, confianza y top-5 alternativas), `nombres_landmarks()` (mapa anatómico de 21 puntos en español) y `sesgos_conocidos()` (5 limitaciones documentadas del modelo) como API de XAI verificable por `tests/test_etica.py::TestXAI`. |
+| **RF-15** | Captura colaborativa del dataset | El script de captura (`scripts/capturar_dataset.py`) debe evitar sobreescribir las imágenes de otros integrantes usando índices autoincrementales, permitiendo que todos contribuyan a la misma carpeta. |
 
 ---
 
@@ -47,11 +47,11 @@ seguridad (DevSecOps) y principios de IA ética.
 | **RNF-02** | Latencia extremo a extremo | El tiempo entre la realización de la seña y la visualización del resultado en el panel debe ser inferior a **2 segundos** en condiciones normales de red y hardware. |
 | **RNF-03** | Latencia por etapa de pipeline | Ninguna etapa del pipeline (captura, detección, extracción, clasificación, renderizado) debe superar **200 ms**, validado por `qa/benchmark.py`. |
 | **RNF-04** | Exactitud del modelo | El clasificador SVM debe alcanzar una exactitud mínima de **85%** sobre el conjunto de prueba, validado por `qa/evaluate.py`. |
-| **RNF-05** | Seguridad — Autenticación fuerte | Los tokens de sesión deben usar firma HMAC-SHA256. Las contraseñas deben hashearse con PBKDF2-HMAC-SHA256 con mínimo 260 000 iteraciones (OWASP 2023). No se almacenan credenciales en el repositorio. |
+| **RNF-05** | Seguridad — Autenticación fuerte | Los tokens de sesión deben usar firma HMAC-SHA256. Las contraseñas deben hashearse con PBKDF2-HMAC-SHA256 con mínimo 260 000 iteraciones (OWASP 2023). Rate limiting anti-fuerza-bruta: bloqueo automático tras `MAX_INTENTOS=5` intentos fallidos consecutivos por `BLOQUEO_SEGUNDOS=300` s. No se almacenan credenciales en el repositorio; el pre-commit hook (`scripts/hooks/pre-commit`, 3 capas de detección) bloquea secretos antes de cada commit. |
 | **RNF-06** | Privacidad por diseño (GDPR Art. 25) | Ningún frame de video ni vector de landmarks debe persistirse a disco. Los IDs de sesión en el log de auditoría deben ser hash SHA-256[:8] no reversibles. |
 | **RNF-07** | Accesibilidad WCAG 2.1 AA | La interfaz debe cumplir nivel AA: contraste ≥4.5:1, aria-live en el resultado, role="progressbar" con aria-valuenow, skip-nav (WCAG 2.4.1), emojis decorativos con aria-hidden. |
 | **RNF-08** | Disponibilidad y despliegue | El sistema debe poder desplegarse en Streamlit Cloud y como contenedor Docker sin cambios de código, usando únicamente `requirements.txt` y `packages.txt`. |
-| **RNF-09** | Portabilidad | El sistema debe funcionar en Python 3.10+ en Windows, Linux y macOS, con soporte en entornos sin GPU mediante MediaPipe CPU-mode. |
+| **RNF-09** | Portabilidad | El sistema debe funcionar en Python 3.12 en Windows, Linux y macOS, con soporte en entornos sin GPU mediante MediaPipe CPU-mode. (MediaPipe 0.10.21 no es compatible con Python 3.13; versión mínima soportada y probada: 3.12.) |
 | **RNF-10** | Mantenibilidad — Arquitectura modular | El código debe distribuirse en módulos con responsabilidad única (`lsp_core`, `lsp_auth`, `lsp_audit`, `lsp_ui`, `lsp_video`) sin dependencias circulares. |
 | **RNF-11** | Calidad de código | Cada módulo debe obtener score Pylint ≥7.5/10. El código debe estar formateado con Black (max-line-length: 120). Flake8 debe reportar 0 errores. |
 | **RNF-12** | Cobertura de pruebas (TDD) | Los módulos `lsp_auth` y `lsp_audit` deben tener cobertura ≥90%. El módulo `lsp_core` debe tener cobertura ≥96%, validado por `pytest --cov`. |
@@ -103,3 +103,4 @@ seguridad (DevSecOps) y principios de IA ética.
 | Versión | Fecha | Cambio |
 |---------|-------|--------|
 | 1.0 | 2026-06-12 | Versión inicial — 15 RF + 15 RNF con trazabilidad HU |
+| 1.1 | 2026-06-13 | RF-14: funciones XAI (`explicar_prediccion`, `nombres_landmarks`, `sesgos_conocidos`); RF-15: `A.py` → `scripts/capturar_dataset.py`; RNF-05: rate limiting + pre-commit hook; RNF-09: Python 3.12 (no 3.13) |

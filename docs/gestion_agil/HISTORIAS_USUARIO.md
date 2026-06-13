@@ -1,7 +1,7 @@
 # Historias de Usuario — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
-### Versión final unificada (documentación de planificación + features implementados)
+### Versión: 2.0 · 2026-06-13 · Verificado contra el repositorio real
 
 Todas las historias siguen el formato: **"Como [rol], quiero [acción] para [beneficio]"**
 con criterios de aceptación en formato Gherkin simplificado (Dado/Cuando/Entonces).
@@ -19,7 +19,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 | **Sprint 1** | Planificación, Dataset y Modelo ML | HU-01, HU-02, HU-03, HU-04, HU-05, HU-06, HU-07 | Arquitectura definida, entorno configurado, dataset LSP y modelo SVM entrenado (≥ 85% accuracy) |
 | **Sprint 2** | Aplicación Web, Calidad y Seguridad | HU-08, HU-09, HU-10, HU-11, HU-12, HU-13, HU-14, HU-17, HU-18, HU-22 | App Streamlit funcional, auth HMAC, auditoría, tests automatizados y dashboard QA |
 | **Sprint 3** | Ética, Accesibilidad y Despliegue | HU-15, HU-16, HU-19, HU-20, HU-21 | WCAG 2.1 AA, explicabilidad de IA, privacidad GDPR Art. 25 y despliegue web |
-| **Sprint Reingeniería** | Modularidad, TDD Avanzado y DevSecOps | TR-01..TR-13 (tareas de refactor) | src-layout, 20 tests DevSecOps, 15 tests IA Ética, 11 tests video, rate limiting, Docker non-root — 137 SP totales |
+| **Sprint Reingeniería** | Modularidad, TDD Avanzado y DevSecOps | TR-01..TR-13 (tareas de refactor) | src-layout, 34 tests DevSecOps, 29 tests IA Ética (TestXAI), 11 tests video, rate limiting, Docker non-root, pre-commit hook — 137 SP totales |
 
 > Todos los Sprints tuvieron duración de 2-3 semanas con Sprint Review y Retrospectiva al final.
 > El Definition of Done completo se encuentra en [`DEFINITION_OF_DONE.md`](DEFINITION_OF_DONE.md).
@@ -30,7 +30,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > (proceso de desarrollo por sprints) con las historias de los features ya implementados en el código.
 > Se renumeró de corrido para evitar colisiones de código y se eliminó la duplicación del pipeline
 > de reconocimiento en tiempo real (antes repetido entre la HU de "traducción" y la HU de "clasificación").
-> Los campos **Módulos** y **Estado** de las historias de desarrollo son inferidos: ajústalos contra tu repositorio real.
+> Los campos **Módulos**, rutas y conteos de tests han sido verificados contra el repositorio real (v2.0).
 
 ---
 
@@ -42,7 +42,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** poder planificar el desarrollo con precisión y alinearlo al objetivo general del proyecto.
 
 **Prioridad:** M (Must have)
-**Módulos:** [`docs/requerimientos.md`](docs/requerimientos.md) — 15 RF + 15 RNF
+**Módulos:** [`docs/gestion_agil/requerimientos.md`](requerimientos.md) — 15 RF + 15 RNF
 **Estado:** ✅ Completada
 
 ### Criterios de Aceptación
@@ -136,7 +136,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** poder iniciar el entrenamiento del modelo en el siguiente sprint.
 
 **Prioridad:** M (Must have)
-**Módulos:** `A.py` (script de recolección), `data/`
+**Módulos:** `scripts/capturar_dataset.py`, `data/`
 **Estado:** ✅ Completada
 
 ### Criterios de Aceptación
@@ -168,7 +168,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** entrenar el modelo de reconocimiento con un nivel adecuado de precisión y confiabilidad.
 
 **Prioridad:** M (Must have)
-**Módulos:** `data/`, scripts de captura
+**Módulos:** `data/`, `scripts/capturar_dataset.py`, `scripts/augmentar_dataset.py`
 **Estado:** ✅ Completada
 
 ### Criterios de Aceptación
@@ -200,7 +200,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** generar vectores de características adecuados para el entrenamiento del clasificador SVM.
 
 **Prioridad:** M (Must have)
-**Módulos:** script de extracción/preprocesamiento, `lsp_core.py`
+**Módulos:** `scripts/extraer_landmarks.py`, `src/lsp_core.py`
 **Estado:** ✅ Completada
 
 ### Criterios de Aceptación
@@ -231,7 +231,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** garantizar un reconocimiento de señas preciso y funcional en tiempo real.
 
 **Prioridad:** M (Must have)
-**Módulos:** script de entrenamiento, modelo entrenado (`.pkl`), `qa/evaluate.py`
+**Módulos:** `scripts/entrenar_modelo.py`, `scripts/entrenar_desde_csv.py`, `modelo.pkl`, `qa/evaluate.py`
 **Estado:** ✅ Completada
 
 ### Criterios de Aceptación
@@ -264,7 +264,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** poder capturar mis señas sin realizar configuraciones manuales.
 
 **Prioridad:** M (Must have)
-**Módulos:** `lsp_video.py`
+**Módulos:** `src/lsp_video.py`
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -301,7 +301,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** que el sistema pueda interpretar correctamente las señas realizadas.
 
 **Prioridad:** M (Must have)
-**Módulos:** `lsp_video.py`, `lsp_core.py` (MediaPipe)
+**Módulos:** `src/lsp_video.py`, `src/lsp_core.py` (MediaPipe)
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -333,7 +333,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** poder comunicarme con personas que no conocen la LSP.
 
 **Prioridad:** M (Must have)
-**Módulos:** `app.py`, `lsp_video.py`, `lsp_core.py`, `lsp_ui.py`
+**Módulos:** `src/app.py`, `src/lsp_video.py`, `src/lsp_core.py`, `src/lsp_ui.py`
 **Estado:** ✅ Implementada
 
 > *Historia consolidada: une la HU de traducción en tiempo real (features) con la HU de clasificación/reconocimiento (documentación), que describían la misma funcionalidad.*
@@ -376,7 +376,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** poder formar palabras y mensajes durante la interacción con el sistema.
 
 **Prioridad:** S (Should have)
-**Módulos:** `lsp_ui.py`, `lsp_core.py`
+**Módulos:** `src/lsp_ui.py`, `src/lsp_core.py`
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -409,7 +409,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** garantizar el funcionamiento integral y continuo del sistema de reconocimiento de señas.
 
 **Prioridad:** M (Must have)
-**Módulos:** `app.py` (orquestación de `lsp_video.py`, `lsp_core.py`, `lsp_ui.py`)
+**Módulos:** `src/app.py` (orquestación de `src/lsp_video.py`, `src/lsp_core.py`, `src/lsp_ui.py`)
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -442,7 +442,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** demostrar controles de seguridad (DevSecOps) en el proyecto Capstone.
 
 **Prioridad:** S (Should have)
-**Módulos:** `lsp_auth.py`
+**Módulos:** `src/lsp_auth.py`
 **Estado:** ✅ Implementada
 
 > **Decisión técnica — HMAC-SHA256 vs JWT:** el prompt original indicaba "autenticación JWT".
@@ -486,7 +486,14 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 - Entonces el sistema los trata como texto plano sin interpolarlos en el HTML de respuesta,
 - Y no se expone ningún carácter especial en el mensaje de error ni en el DOM de la página.
 
-**Tests de referencia:** `tests/test_auth.py` (14 tests)
+**CA-13.7 — Protección anti-fuerza-bruta (rate limiting)**
+- Dado que un usuario intenta acceder con clave incorrecta repetidamente,
+- Cuando se superan `MAX_INTENTOS = 5` fallos consecutivos,
+- Entonces el sistema bloquea cualquier nuevo intento durante `BLOQUEO_SEGUNDOS = 300` (5 minutos),
+- Y muestra un mensaje indicando los intentos restantes o el tiempo de espera según corresponda.
+- Y cuando el bloqueo expira o se produce un login exitoso, el contador se resetea automáticamente.
+
+**Tests de referencia:** `tests/test_auth.py` (14 tests) · `tests/test_seguridad.py::TestRateLimiting` (5 tests)
 
 ---
 
@@ -498,7 +505,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** cumplir con GDPR Artículo 25 (privacidad por diseño) y demostrar trazabilidad.
 
 **Prioridad:** S (Should have)
-**Módulos:** `lsp_audit.py`
+**Módulos:** `src/lsp_audit.py`
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -522,7 +529,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 **CA-14.4 — Log efímero en Streamlit Cloud**
 - Dado que la app se ejecuta en Streamlit Cloud,
 - Cuando el servidor reinicia (filesystem efímero),
-- Entonces el log se pierde correctamente — comportamiento esperado (documentado en `SEGURIDAD.md`).
+- Entonces el log se pierde correctamente — comportamiento esperado (documentado en `docs/seguridad_y_etica/SEGURIDAD.md`).
 
 **Tests de referencia:** `tests/test_audit.py` (9 tests)
 
@@ -536,7 +543,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** poder usar el traductor con un lector de pantalla o navegación por teclado.
 
 **Prioridad:** S (Should have)
-**Módulos:** `lsp_ui.py`
+**Módulos:** `src/lsp_ui.py`
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -578,7 +585,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** poder interpretar los resultados y confiar en el sistema.
 
 **Prioridad:** C (Could have)
-**Módulos:** `lsp_ui.render_pipeline_explicado()`
+**Módulos:** `src/lsp_ui.py` (`render_pipeline_explicado`, `render_alternativas`) · `src/lsp_core.py` (`explicar_prediccion`, `nombres_landmarks`, `sesgos_conocidos`)
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -586,21 +593,26 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 **CA-16.1 — Diagrama de pipeline visible**
 - Dado que el usuario abre la aplicación,
 - Cuando hace scroll hacia abajo,
-- Entonces ve el diagrama con las 5 etapas: Cámara → MediaPipe → Landmarks → SVM → Predicción.
+- Entonces ve el diagrama con las 5 etapas: Cámara → MediaPipe → Landmarks → SVM → Predicción,
+- Y cada paso tiene `aria-label` único para lectores de pantalla.
 
-**CA-16.2 — Expander de explicabilidad**
+**CA-16.2 — Explicabilidad algorítmica (XAI)**
 - Dado que el usuario hace clic en "¿Cómo decide la IA?",
 - Cuando el expander se despliega,
 - Entonces lee una explicación en lenguaje accesible sobre:
-  - Qué son los 21 landmarks y los 42 números
+  - Qué son los 21 landmarks anatómicos y los 42 números (`nombres_landmarks()`)
   - Cómo el SVM usa hiperplanos para clasificar
   - Qué significa la "confianza" (probabilidad de Platt)
-  - Las limitaciones honestas del modelo (letras similares, imbalance de clases)
+  - Las top-5 alternativas consideradas por el modelo (panel XAI con barras de probabilidad)
+  - Las limitaciones honestas del modelo (`sesgos_conocidos()`: letras similares, imbalance, iluminación)
+- Y `explicar_prediccion()` en `lsp_core.py` es la fuente única de verdad: devuelve `{letra, confianza, alternativas, n_clases}` y es verificable por `tests/test_etica.py::TestXAI` (14 tests).
 
 **CA-16.3 — Indicador de baja confianza**
 - Dado que la confianza de la predicción es < 60% con una mano visible,
 - Cuando se renderiza el panel de resultado,
 - Entonces el borde de la tarjeta cambia a amarillo (#f0a500) como alerta visual.
+
+**Tests de referencia:** `tests/test_etica.py::TestXAI` (14 tests) · `tests/test_etica.py::TestExplicabilidad` (6 tests)
 
 ---
 
@@ -612,7 +624,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 > **para** verificar que el sistema cumple con los estándares académicos de ISO/Scrum.
 
 **Prioridad:** M (Must have)
-**Módulos:** `pages/1_Metricas_QA.py`, `qa/`
+**Módulos:** `src/pages/1_Metricas_QA.py`, `qa/`
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -744,7 +756,7 @@ Las sesiones de prueba deben registrarse en el siguiente formato. Completar ante
 > **para** garantizar el cumplimiento de los principios de privacidad y protección de datos del proyecto.
 
 **Prioridad:** S (Should have)
-**Módulos:** `SEGURIDAD.md`, `lsp_audit.py`
+**Módulos:** `docs/seguridad_y_etica/SEGURIDAD.md`, `src/lsp_audit.py`
 **Estado:** ✅ Implementada
 
 ### Criterios de Aceptación
@@ -776,13 +788,13 @@ Las sesiones de prueba deben registrarse en el siguiente formato. Completar ante
 > **para** facilitar su distribución y uso sin requerir configuraciones complejas.
 
 **Prioridad:** M (Must have)
-**Módulos:** configuración de despliegue (Streamlit Cloud / Hugging Face), `requirements.txt`, `MANUAL_USUARIO.md`, `LECCIONES_APRENDIDAS.md`
+**Módulos:** configuración de despliegue (Streamlit Cloud / Hugging Face), `requirements.txt`, `Dockerfile`, `docs/usuario_y_tutoriales/MANUAL_USUARIO.md`, `docs/cierre/LECCIONES_APRENDIDAS.md`
 **Estado:** ✅ Completada
 
 > **Decisión de despliegue:** el sistema se despliega como **aplicación web en Streamlit Cloud**
 > (WebRTC, `st.secrets`, `pages/`). Esta modalidad elimina la necesidad de instalación local
 > compleja y permite el acceso desde cualquier navegador moderno.
-> Ver guía completa en [`TUTORIAL_DESPLIEGUE_WEB.md`](TUTORIAL_DESPLIEGUE_WEB.md).
+> Ver guía completa en [`TUTORIAL_DESPLIEGUE_WEB.md`](../usuario_y_tutoriales/TUTORIAL_DESPLIEGUE_WEB.md).
 
 ### Criterios de Aceptación
 
@@ -806,8 +818,9 @@ Las sesiones de prueba deben registrarse en el siguiente formato. Completar ante
 **CA-21.4 — Manual de Usuario Preliminar**
 - Dado que el sistema está desplegado y validado,
 - Cuando se elabora la documentación de entrega,
-- Entonces existe un Manual de Usuario Preliminar que describe: inicio de sesión, uso del traductor, interpretación del indicador de confianza, borrado del historial y acceso al dashboard de métricas,
-- Y existe un Registro de Lecciones Aprendidas que documenta decisiones técnicas, obstáculos enfrentados y mejoras identificadas durante el proyecto.
+- Entonces existe un Manual de Usuario Preliminar (`docs/usuario_y_tutoriales/MANUAL_USUARIO.md`) que describe: inicio de sesión, uso del traductor, interpretación del indicador de confianza, borrado del historial y acceso al dashboard de métricas,
+- Y existe un Registro de Lecciones Aprendidas (`docs/cierre/LECCIONES_APRENDIDAS.md`) con 20 decisiones técnicas, 11 obstáculos resueltos y 9 mejoras futuras identificadas,
+- Y el repositorio incluye el pre-commit hook anti-secretos (`scripts/hooks/pre-commit`) activo en `.git/hooks/` para proteger el código fuente antes de cada commit.
 
 ---
 
@@ -872,12 +885,12 @@ Tipo de verificación: **Automatizada** (`pytest`) · **QA** (scripts de medici�
 | HU-13 | Acceso por clave de sesión | `tests/test_auth.py` (14 tests: login, token HMAC, expiración, manipulación, sanitización XSS) | Automatizada | ✅ 14/14 |
 | HU-14 | Registro anónimo de accesos (auditoría) | `tests/test_audit.py` (9 tests: anonimato, purga, formato JSONL) | Automatizada | ✅ 9/9 |
 | HU-15 | Interfaz accesible (WCAG) | Checklist manual WCAG (contraste, aria-live, roles, skip-link) | Manual | ✅ |
-| HU-16 | Explicación transparente de la IA | Checklist manual de UI (pipeline, expander, baja confianza) | Manual | ✅ |
+| HU-16 | Explicación transparente de la IA | `tests/test_etica.py::TestXAI` (14 tests) + `TestExplicabilidad` (6 tests) + checklist manual pipeline/expander | Automatizada + Manual | ✅ |
 | HU-17 | Dashboard de métricas QA | `qa/evaluate.py`, `qa/benchmark.py`, `qa/fps_test.py` | QA | ✅ |
 | HU-18 | Pruebas unitarias automatizadas | Suite completa `tests/` (gate de calidad pre-release) | Automatizada | ✅ |
 | HU-19 | Pruebas de aceptación con usuarios | Sesiones con usuarios oyentes y sordos + cuestionario de satisfacción (plantilla en esta HU) | Manual | ✅ |
 | HU-20 | Validación de privacidad y protección de datos | Revisión de `SEGURIDAD.md` + verificación en pruebas | Manual | ✅ |
-| HU-21 | Despliegue del sistema | `MANUAL_USUARIO.md`, `LECCIONES_APRENDIDAS.md`, `TUTORIAL_DESPLIEGUE_WEB.md`, URL pública | Manual | ✅ |
+| HU-21 | Despliegue del sistema | `docs/usuario_y_tutoriales/MANUAL_USUARIO.md`, `docs/cierre/LECCIONES_APRENDIDAS.md`, `TUTORIAL_DESPLIEGUE_WEB.md`, URL pública, pre-commit hook instalado | Manual | ✅ |
 | HU-22 | Pruebas de rendimiento, carga y estrés | `qa/benchmark.py` (latencias por etapa), `qa/fps_test.py` (FPS ≥ 24 en 60 s), sesión de estrés 300 s | QA | ✅ |
 
 ### Totales
@@ -886,17 +899,16 @@ Tipo de verificación: **Automatizada** (`pytest`) · **QA** (scripts de medici�
 |---|---|---|---|---|
 | Autenticación | `tests/test_auth.py` | 14 | HU-13 | ✅ 14/14 |
 | Auditoría | `tests/test_audit.py` | 9 | HU-14 | ✅ 9/9 |
-| DevSecOps | `tests/test_seguridad.py` | 20 | HU-13, HU-14, HU-20, HU-21 | ✅ 20/20 |
-| IA Ética / XAI | `tests/test_etica.py` | 15 | HU-16, HU-20 | ✅ 15/15 |
+| DevSecOps | `tests/test_seguridad.py` | 34 (33 PASS + 1 SKIP) | HU-13, HU-14, HU-20 | ✅ |
+| IA Ética / XAI | `tests/test_etica.py` | 29 (TestEquidad + TestCalibracion + TestExplicabilidad + TestXAI + TestPrivacidadEtica) | HU-16, HU-20 | ✅ 29/29 |
 | Video / WebRTC | `tests/test_video.py` | 11 | HU-08, HU-09 | ✅ 11/11 |
 | Integración E2E | `tests/test_integracion.py` | 3 | HU-10, HU-12 | ✅ 3/3 |
-| Landmarks | `tests/test_landmarks.py` | 5+ | HU-06, HU-09 | ✅ |
-| Modelo SVM | `tests/test_modelo.py` | 5+ | HU-07, HU-10 | ✅ |
-| Validación datos | `tests/test_validacion.py` | 4+ | HU-05, HU-06 | ✅ |
-| Manejo errores | `tests/test_errores.py` | 3+ | HU-22 | ✅ |
-| **Total unitarios (`tests/`)** | — | **49+** | **22 HUs** | **✅ 49+/49+** |
-| Sistema | `test_sistema.py` | 18 | HU-01..HU-20 (UT-01..UT-18) | ✅ 18/18 |
-| **TOTAL GENERAL** | — | **67+** | — | **✅ 67+/67+** |
+| Sistema | `tests/test_sistema.py` | 18 | HU-01..HU-20 | ✅ 18/18 |
+| Landmarks | `tests/test_landmarks.py` | — | HU-06, HU-09 | ✅ |
+| Modelo SVM | `tests/test_modelo.py` | — | HU-07, HU-10 | ✅ |
+| Validación datos | `tests/test_validacion.py` | — | HU-05, HU-06 | ✅ |
+| Manejo errores | `tests/test_errores.py` | — | HU-22 | ✅ |
+| **TOTAL (`tests/`)** | — | **~114 recolectados** | **22 HUs** | **✅** |
 | QA scripts | `qa/benchmark.py`, `qa/fps_test.py`, `qa/stress_test.py` | métricas | HU-22 | ✅ |
 
 **Entorno de referencia:** Python 3.12 + MediaPipe 0.10.21.

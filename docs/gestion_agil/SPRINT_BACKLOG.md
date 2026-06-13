@@ -1,16 +1,18 @@
 # Sprint Backlog — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.0 · Última actualización: 2026-06-13 · **Estado: CIERRE DE PROYECTO — 137/137 SP completados**
+### Versión: 2.1 · Última actualización: 2026-06-13 · **Estado: CIERRE DE PROYECTO — 137/137 SP completados**
 
 Este documento desglosa cada Historia de Usuario en tareas técnicas concretas,
 siguiendo la jerarquía: **Épica → Historia de Usuario → Tarea Técnica → Código**.
 
 Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 
-> **Nota de cierre (v2.0):** Tras la reingeniería estructural (INC-08 resuelto), todos los SP se
+> **Nota de cierre (v2.1):** Tras la reingeniería estructural (INC-08 resuelto), todos los SP se
 > marcaron como completados. Se agregó la Fase de Reingeniería como Sprint adicional de calidad.
 > Los 7 SP que figuraban pendientes en v1.x (HU-19, HU-21) fueron cerrados en la sprint review final.
+> Conteos de tests actualizados: `test_seguridad.py` 34, `test_etica.py` 29 (+ funciones XAI DT-19).
+> Actividades post-cierre (sin impacto en SP) documentadas en la sección "Actividades Post-Cierre".
 
 ---
 
@@ -58,7 +60,7 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 
 | # | Tarea técnica | Responsable | SP | Estado |
 |---|---------------|-------------|----|--------|
-| T-04.1 | Implementar script `A.py` con captura guiada de frames por letra | Oscar Daniel | 2 | ✅ |
+| T-04.1 | Implementar script `scripts/capturar_dataset.py` con captura guiada de frames por letra | Oscar Daniel | 2 | ✅ |
 | T-04.2 | Configurar umbral de confianza de detección ≥ 0.7 para descartar frames ruidosos | Oscar Daniel | 0.5 | ✅ |
 | T-04.3 | Capturar mínimo 100 imágenes de 5 letras iniciales del alfabeto LSP | Equipo | 1.5 | ✅ |
 | T-04.4 | Organizar dataset en carpetas `data/<letra>/` y verificar en 2 equipos distintos | Oscar Daniel | 1 | ✅ |
@@ -293,7 +295,7 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 
 ## Sprint de Reingeniería — Modularidad, TDD y DevSecOps
 
-**Objetivo:** Resolver INC-08 (src-layout), completar suite de tests DevSecOps, auditoría GDPR y módulos accesibles.
+**Objetivo:** Resolver INC-08 (src-layout), completar suite de tests DevSecOps (34 tests, DT-20) y ética IA con XAI (29 tests, DT-19), auditoría GDPR y módulos accesibles.
 
 **Duración:** 5 días hábiles · **Capacidad:** 20 SP (no planificados en release original — ciclo de mejora de calidad XP)
 
@@ -305,13 +307,24 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 | TR-04 | Actualizar `Dockerfile` con `ENV PYTHONPATH=/app/src` y usuario no-root `lspuser` (UID 1001) | Oscar Daniel | 1 | ✅ |
 | TR-05 | Implementar rate limiting anti-fuerza-bruta en `lsp_auth.py` (`MAX_INTENTOS=5`, `BLOQUEO_SEGUNDOS=300`) | Oscar Daniel | 2 | ✅ |
 | TR-06 | Implementar verificación de integridad `modelo.pkl` con SHA-256 (`calcular_hash_modelo`, `verificar_integridad_modelo`) | Oscar Daniel | 1 | ✅ |
-| TR-07 | Crear `tests/test_seguridad.py` con 20 tests DevSecOps en 3 capas (aplicación, almacenamiento, infraestructura) | Oscar Daniel | 3 | ✅ |
-| TR-08 | Crear `tests/test_etica.py` con 15 tests de IA ética: equidad por clase, XAI, privacidad | Oscar Daniel | 2 | ✅ |
+| TR-07 | Crear `tests/test_seguridad.py` con 34 tests DevSecOps en 6 clases: `TestSanitizacionInputs` (13), `TestRateLimiting` (5), `TestAuditLogAnonimato` (4), `TestIntegridadModelo` (7), `TestConfiguracionStreamlit` (2), `TestPrivacidadPorDiseno` (3) | Oscar Daniel | 3 | ✅ |
+| TR-08 | Implementar funciones XAI en `src/lsp_core.py` (DT-19): `explicar_prediccion()`, `nombres_landmarks()`, `sesgos_conocidos()`; crear `tests/test_etica.py` con 29 tests en 5 clases: `TestEquidad`, `TestCalibracion`, `TestExplicabilidad`, `TestXAI` (14), `TestPrivacidadEtica` | Oscar Daniel | 2 | ✅ |
 | TR-09 | Resolver INC-05: implementar `threading.Lock` en `Traductor` para thread-safety | Oscar Daniel | 1 | ✅ |
 | TR-10 | Resolver INC-07: recaptura y augmentación de letras con dataset insuficiente | Equipo | 2 | ✅ |
 | TR-11 | Actualizar `INCIDENTES.md`, `SEGURIDAD.md`, `IA_ETICA.md`, `DEFINITION_OF_DONE.md` con el estado final | Oscar Daniel | 2 | ✅ |
 | TR-12 | Ejecutar suite QA completa (`make all`) y validar 0 FAIL, pylint ≥ 7.5, flake8 limpio | Oscar Daniel | 1 | ✅ |
 | TR-13 | Sprint Review final con demostración ante el docente | Equipo | 1 | ✅ |
+
+---
+
+## Actividades Post-Cierre
+
+> Realizadas después del cierre formal del Sprint Reingeniería. No generan SP adicionales ni modifican el total de 137 SP.
+
+| # | Actividad | Responsable | Commit | Estado |
+|---|-----------|-------------|--------|--------|
+| PC-01 | Reorganizar `docs/` en 6 subcarpetas temáticas (`arquitectura/`, `cierre/`, `gestion_agil/`, `qa_y_pruebas/`, `seguridad_y_etica/`, `usuario_y_tutoriales/`) y actualizar todas las referencias internas | Oscar Daniel | `60d6ccd` | ✅ |
+| PC-02 | Implementar pre-commit hook anti-secretos (DT-20): `scripts/hooks/pre-commit` (87 líneas, 3 capas de detección: nombres bloqueados, patrones en diff AKIA/ghp_/sk-, archivos de config) + instalador `scripts/setup_hooks.bat` | Oscar Daniel | `6799d20` | ✅ |
 
 ---
 
@@ -331,6 +344,6 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 
 ---
 
-*Documento de gestión ágil v2.0 · Capstone Project UPN Sistemas 2026*
+*Documento de gestión ágil v2.1 · Capstone Project UPN Sistemas 2026*
 *Herramienta complementaria: GitHub Projects (tablero Kanban con estas tareas por columna)*
-*Actualización v2.0: Sprint de Reingeniería agregado, todos los SP cerrados a 2026-06-13*
+*Actualización v2.1: conteos de tests corregidos (seguridad 34, ética 29), XAI DT-19 en TR-08, actividades post-cierre DT-20, `A.py` → `scripts/capturar_dataset.py`*

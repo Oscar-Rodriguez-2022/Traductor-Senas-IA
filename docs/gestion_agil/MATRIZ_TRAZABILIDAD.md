@@ -1,7 +1,7 @@
 # Matriz de Trazabilidad — LSP Vision AI
 ## Mapeo: Historia de Usuario → Módulo de Código → Prueba → Estado
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Versión: 2.0 · Fecha: 2026-06-13 · **Estado: CIERRE — 22/22 HUs completadas**
+### Versión: 2.1 · Fecha: 2026-06-13 · **Estado: CIERRE — 22/22 HUs completadas**
 
 > Esta matriz vincula cada función/componente principal del código fuente con las
 > Historias de Usuario (HU), sus Criterios de Aceptación (CA) y los tests que
@@ -15,10 +15,10 @@
 | Dimensión | Total | Cubiertos | Cobertura |
 |---|---|---|---|
 | Historias de Usuario | 22 | 22 | **100%** |
-| Criterios de Aceptación | 66+ | 66+ | **100%** |
+| Criterios de Aceptación | 67+ | 67+ | **100%** |
 | Módulos de código | 6 | 6 | **100%** |
 | Archivos de test | 11 | 11 | **100%** |
-| Tests automatizados | 49+ | 49+ | **100%** |
+| Tests automatizados | ~114 | ~114 | **100%** |
 
 ---
 
@@ -36,6 +36,9 @@
 | `imagenes_disponibles(folder)` | HU-04 | CA-04.2 (organización en `data/<letra>/`) | `tests/test_validacion.py::test_imagenes_disponibles` | ✅ |
 | `calcular_hash_modelo(path)` | HU-21 (Seguridad) | — integridad PKL SHA-256 | `tests/test_seguridad.py::TestIntegridadModelo` | ✅ |
 | `verificar_integridad_modelo(path, hash)` | HU-21 (Seguridad) | — validación antes de cargar | `tests/test_seguridad.py::TestIntegridadModelo` | ✅ |
+| `explicar_prediccion(modelo, landmarks, top_n)` | HU-16 | CA-16.2 (dict `{letra, confianza, alternativas, n_clases}`, top-5 candidatos XAI) | `tests/test_etica.py::TestXAI` (14 tests) | ✅ |
+| `nombres_landmarks()` | HU-16 | CA-16.2 (`NOMBRES_LANDMARKS`: mapa 0–20 → nombre anatómico en español) | `tests/test_etica.py::TestXAI` | ✅ |
+| `sesgos_conocidos()` | HU-16, HU-20 | CA-16.2 (`SESGOS_CONOCIDOS`: 5 sesgos documentados: iluminación, letras dinámicas, similares, datos, diversidad) | `tests/test_etica.py::TestXAI` | ✅ |
 | `close_hands()` | HU-22 | CA-22.3 (libera recursos MediaPipe) | `tests/test_errores.py::test_close_hands_libera_recursos` | ✅ |
 
 ---
@@ -60,7 +63,7 @@
 | `generar_token_sesion(pwd, hash)` | HU-13 | CA-13.2 (token formato `ts.nonce.firma`) | `tests/test_auth.py::test_generar_token_formato_correcto` | ✅ |
 | `verificar_token(token)` | HU-13 | CA-13.3 (rechaza expirados/manipulados) | `tests/test_auth.py::test_token_expirado`, `test_token_manipulado` | ✅ |
 | `login_requerido(st_state)` | HU-13 | CA-13.4 (guard de acceso), CA-13.5 (redirige sin auth) | `tests/test_auth.py::test_login_requerido_*` | ✅ |
-| `esta_bloqueado()` | HU-13 (Rate Limiting) | — bloqueo tras 5 intentos, 300 s | `tests/test_seguridad.py::TestRateLimiting` | ✅ |
+| `esta_bloqueado()` | HU-13 | CA-13.7 (bloqueo tras MAX_INTENTOS=5 consecutivos, BLOQUEO_SEGUNDOS=300, reset en éxito/expiración) | `tests/test_seguridad.py::TestRateLimiting` (5 tests) | ✅ |
 | `_firmar(ts_str, nonce)` | HU-13 | CA-13.6 (HMAC resistente a XSS) | `tests/test_auth.py::test_firma_resiste_inyeccion_xss` | ✅ |
 | `_render_login(st, st_state)` | HU-13, HU-15 | CA-13.2 (formulario funcional), CA-15.1 (accesibilidad) | `tests/test_auth.py::test_render_login_*` | ✅ |
 
@@ -131,6 +134,8 @@
 | `scripts/capturar_dataset.py` | HU-04, HU-05 | CA-04.3 (sin sobrescribir datos ajenos) | Ejecución manual | ✅ |
 | `scripts/extraer_landmarks.py` | HU-05 | CA-05.2 (exporta CSV portátil) | Ejecución manual | ✅ |
 | `scripts/traducir_en_vivo.py` | HU-10 | CA-10.2 (demo offline sin Streamlit) | Ejecución manual | ✅ |
+| `scripts/hooks/pre-commit` | HU-21 | CA-21.4 (anti-secretos: capa 1 nombres bloqueados, capa 2 patrones en diff, capa 3 archivos de config) | Verificación en `.git/hooks/pre-commit` | ✅ |
+| `scripts/setup_hooks.bat` | HU-21 | CA-21.4 (instalador Windows del hook; copia y marca ejecutable) | Ejecución manual | ✅ |
 
 ---
 
@@ -150,23 +155,23 @@
 
 ---
 
-## 10. Suite de Tests (`tests/` + `test_sistema.py`)
+## 10. Suite de Tests (`tests/`)
 
 | Archivo | Tests | HUs cubiertas | Cobertura |
 |---------|-------|--------------|-----------|
 | `tests/conftest.py` | Fixtures | Todas | Soporte |
 | `tests/test_auth.py` | 14 | HU-13 | ✅ ≥90% lsp_auth |
 | `tests/test_audit.py` | 9 | HU-14 | ✅ ≥90% lsp_audit |
-| `tests/test_seguridad.py` | 20 | HU-13, HU-14, HU-20, HU-21 | ✅ DevSecOps 3 capas |
-| `tests/test_etica.py` | 15 | HU-16, HU-20 | ✅ IA Ética y XAI |
-| `tests/test_video.py` | 11 | HU-08, HU-09 | ✅ Thread-safety |
+| `tests/test_seguridad.py` | **34** | HU-13, HU-14, HU-20, HU-21 | ✅ 6 clases: Sanitización (13), RateLimiting (5), AuditLogAnonimato (4), IntegridadPKL (7), ConfigStreamlit (2), PrivacidadDiseño (3) |
+| `tests/test_etica.py` | **29** | HU-16, HU-20 | ✅ 5 clases: Equidad, Calibración, Explicabilidad, XAI (14), PrivacidadEtica |
+| `tests/test_video.py` | **12** | HU-08, HU-09 | ✅ 3 clases: Inicialización (4), Recv (6), ThreadSafety (2) |
 | `tests/test_integracion.py` | 3 | HU-10, HU-12 | ✅ Flujo E2E |
-| `tests/test_landmarks.py` | 5+ | HU-06, HU-09 | ✅ ≥96% lsp_core |
-| `tests/test_modelo.py` | 5+ | HU-07, HU-10 | ✅ |
-| `tests/test_validacion.py` | 4+ | HU-05, HU-06 | ✅ |
-| `tests/test_errores.py` | 3+ | HU-22 | ✅ |
-| `test_sistema.py` | 18 | HU-01..HU-20 | ✅ UT-01..UT-18 |
-| **Total** | **49+** | **22 HUs** | ✅ |
+| `tests/test_landmarks.py` | **6** | HU-06, HU-09 | ✅ ≥96% lsp_core |
+| `tests/test_modelo.py` | 5 | HU-07, HU-10 | ✅ |
+| `tests/test_validacion.py` | **9** | HU-05, HU-06 | ✅ |
+| `tests/test_errores.py` | **4** | HU-22 | ✅ |
+| `tests/test_sistema.py` | 18 | HU-01..HU-20 | ✅ UT-01..UT-18 |
+| **Total** | **~114** | **22 HUs** | ✅ |
 
 ---
 
@@ -189,10 +194,10 @@
 | HU-13 | — | — | ✅ | — | — | ✅ | ✅ | — | `test_auth.py` | ✅ |
 | HU-14 | — | — | — | ✅ | — | ✅ | ✅ | — | `test_audit.py` | ✅ |
 | HU-15 | — | — | — | — | ✅ | — | — | — | `test_etica.py` | ✅ |
-| HU-16 | — | — | — | — | ✅ | ✅ | — | — | `test_etica.py` | ✅ |
+| HU-16 | ✅ | — | — | — | ✅ | ✅ | — | — | `test_etica.py` | ✅ |
 | HU-17 | — | — | — | ✅ | ✅ | — | ✅ | ✅ | — | ✅ |
 | HU-18 | — | — | — | — | — | — | — | — | ✅ (suite completa) | ✅ |
-| HU-19 | — | — | — | — | — | — | — | — | `docs/plantilla_UAT.md` | ✅ |
+| HU-19 | — | — | — | — | — | — | — | — | `docs/qa_y_pruebas/plantilla_UAT.md` | ✅ |
 | HU-20 | — | — | — | ✅ | — | — | — | — | `test_seguridad.py` | ✅ |
 | HU-21 | — | — | — | — | — | — | — | — | `Dockerfile` | ✅ |
 | HU-22 | — | ✅ | — | — | — | — | ✅ | ✅ | `test_video.py` | ✅ |
@@ -207,3 +212,4 @@
 |---------|-------|--------|
 | 1.0 | 2026-06-12 | Versión inicial — trazabilidad de 8 módulos, 22 HUs, 49+ tests |
 | 2.0 | 2026-06-13 | Actualización post-reingeniería: `src/`-layout, `scripts/`, estado ✅ en todas las HUs, tabla de cobertura por módulo completa |
+| 2.1 | 2026-06-13 | XAI functions en §1 (DT-19: `explicar_prediccion`, `nombres_landmarks`, `sesgos_conocidos`); CA-13.7 rate limiting; pre-commit hook en §8 (DT-20); conteos reales de tests (seguridad 34, ética 29, video 12, validacion 9, total ~114); `test_sistema.py` → `tests/test_sistema.py`; HU-16 lsp_core ✅; path UAT corregido |

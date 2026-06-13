@@ -1,6 +1,6 @@
 # Registro de Lecciones Aprendidas — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.0 · 2026-06-13
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.1 · 2026-06-13
 
 > **Estado: CIERRE DE PROYECTO** — 22 Historias de Usuario completadas · 137 SP totales.
 > 3 sprints regulares + 1 Sprint de Reingeniería = retrospectiva técnica integral.
@@ -140,11 +140,12 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 
 ### Decisiones técnicas
 
-#### DT-09: Separación de artefactos de arquitectura en `docs/`
-**Decisión:** crear la carpeta `docs/` con `requerimientos.md` (15 RF + 15 RNF), `docs/arquitectura/COMPONENTES.md` (diagramas Mermaid) y `docs/arquitectura/MODELO_DATOS.md` (modelo de datos incremental).
-**Motivación:** las HU-01 y HU-02 referenciaban `docs/requerimientos.md` y `docs/arquitectura/` que no existían. Los evaluadores y futuros integrantes necesitan encontrar la documentación en rutas predecibles.
-**Resultado:** trazabilidad completa CA-01.1 (15 RF + 15 RNF), CA-02.1/02.2/02.3 (diagramas de componentes y casos de uso) verificables mediante links en `HISTORIAS_USUARIO.md`.
-**Lección:** los artefactos de documentación referenciados en las HUs deben existir como archivos reales desde el Sprint en que se crea la HU. Un link roto es evidencia de deuda técnica de documentación.
+#### DT-09: Separación y reorganización de artefactos de documentación en `docs/`
+**Decisión (Fase Cierre):** crear la carpeta `docs/` con `requerimientos.md` (15 RF + 15 RNF), `docs/arquitectura/COMPONENTES.md` y `docs/arquitectura/MODELO_DATOS.md`.
+**Decisión (Post-Reingeniería):** reorganizar `docs/` en seis subcarpetas temáticas: `arquitectura/`, `gestion_agil/`, `qa_y_pruebas/`, `seguridad_y_etica/`, `usuario_y_tutoriales/` y `cierre/`.
+**Motivación:** con más de 15 archivos `.md` en la raíz de `docs/`, la navegación del repositorio se volvía confusa para evaluadores externos. La reorganización temática sigue el mismo principio de separación de responsabilidades aplicado en el código fuente.
+**Resultado:** estructura navegable por dominio; todos los tutoriales, reportes QA, documentos de seguridad y ética y artefactos de gestión ágil tienen una ubicación predecible.
+**Lección:** los artefactos de documentación referenciados en las HUs deben existir en rutas predecibles desde el Sprint en que se crea la HU. Cuando el número de artefactos supera ~8, organizar por temática en lugar de por tipo de archivo facilita la revisión externa.
 
 #### DT-10: Reemplazo de tests-stub por assertions reales (XP — Honestidad)
 **Decisión:** reescribir los 18 tests en `test_sistema.py` que usaban `assertTrue(True)` y variables hardcoded (`precision_obtenida = 0.87; assertGreaterEqual(precision_obtenida, 0.85)`).
@@ -165,7 +166,7 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 **Lección:** los archivos binarios generados durante el desarrollo (modelos, librerías) son parte de la cadena de suministro del software. Calcular y distribuir sus hashes es una práctica de DevSecOps de bajo costo y alto impacto.
 
 #### DT-13: Plantilla UAT basada en Criterios de Aceptación (CA)
-**Decisión:** crear `docs/plantilla_UAT.md` con escenarios de prueba mapeados directamente a los CAs de cada Historia de Usuario.
+**Decisión:** crear `docs/qa_y_pruebas/plantilla_UAT.md` con escenarios de prueba mapeados directamente a los CAs de cada Historia de Usuario.
 **Motivación:** sin una plantilla estructurada, las sesiones UAT son inconsistentes y los resultados no son comparables entre participantes. Los CA son la especificación formal de "qué significa correcto" para el usuario.
 **Resultado:** 8 escenarios UAT con criterios binarios de aprobación, cuestionario SUS, tabla de resultados y espacio para observaciones libres.
 **Lección:** el UAT no es una prueba exploratoria libre; es una verificación formal contra los CAs. Estructurarla antes de reclutar participantes garantiza reproducibilidad.
@@ -229,6 +230,12 @@ Al cerrar la Fase de Cierre Académico, el análisis de deuda técnica identific
 **Resultado:** panel XAI en la UI (tabla de alternativas con barras de probabilidad y aviso de ambigüedad cuando la diferencia entre primeras opciones es < 10%), `TestXAI` con 14 tests, `sesgos_conocidos()` como diccionario auditable por tests. Cobertura del principio XAI end-to-end: desde el modelo hasta la interfaz.
 **Lección:** la explicabilidad algorítmica debe expresarse como código verificable, no solo como documentación o texto en la UI. Un `dict` de sesgos retornado por una función pública permite que tests detecten si un sesgo fue eliminado accidentalmente del sistema.
 
+#### DT-20: Pre-commit hook anti-secretos como primera línea de defensa en el repositorio
+**Decisión:** agregar un hook de Git (`scripts/hooks/pre-commit`) que escanea cada `git commit` en busca de tres categorías de secretos: (1) archivos bloqueados por nombre (`secrets.toml`, `.env`, `*.pem`, `*.key`, `id_rsa`, `audit_log.jsonl`), (2) patrones de contenido en el diff (`api_key`, `token`, `APP_PASSWORD`, claves privadas PEM, tokens AWS `AKIA…`, GitHub `ghp_…`, OpenAI `sk-…`) y (3) claves en texto plano dentro de archivos de configuración (`.toml`, `.env`, `.cfg`, `.yaml`). Se incluye `scripts/setup_hooks.bat` como instalador de un clic para Windows.
+**Motivación:** Trivy (DT-16) escanea la imagen Docker, pero no detecta secretos que ya entraron al historial de Git. Un commit con `secrets.toml` o una `api_key` hardcodeada expone credenciales en el repositorio aunque luego se eliminen del árbol (el objeto Git permanece). El pre-commit hook bloquea la fuga en el punto de origen, antes del `git push`.
+**Resultado:** hook de 87 líneas en `/bin/sh` compatible con Git Bash en Windows; bloquea el commit con exit-code 1 y muestra instrucciones de rescate (`git rm --cached`, `--no-verify` solo si se está seguro). Instalación en un paso: `scripts\setup_hooks.bat`.
+**Lección:** las tres capas de seguridad de código fuente son complementarias y no sustituibles entre sí: `.gitignore` evita que los archivos lleguen al staging, el pre-commit hook bloquea lo que escapa al `.gitignore`, y Trivy audita lo que ya está en la imagen. Implementar solo una o dos de las capas deja vectores abiertos.
+
 ### Obstáculos
 
 #### OB-09: Imports `import lsp_core` fallaban en CI con módulos en raíz
@@ -272,8 +279,9 @@ Al cerrar la Fase de Cierre Académico, el análisis de deuda técnica identific
 | Sprint 2 | HMAC vs JWT · Anonimización SHA-256 · TDD para seguridad | Latencia de pipeline · WebRTC en Streamlit Cloud | +1 día |
 | Sprint 3 | ARIA en `lsp_ui` · Explicabilidad como UI obligatoria | Contrastes insuficientes · Coordinación UAT | +1 día |
 | Fase Cierre Académico | Artefactos `docs/` · Tests-stub → reales · Rate limiting · SHA-256 PKL | Equilibrio seguridad/usabilidad · PyAV en CI | +0.5 días |
-| Sprint Reingeniería | `src/`-layout · Docker non-root · Trivy · 34+29 tests DevSecOps+ética · DT-18 INC-07 · XAI functions | Imports CI · config.toml Docker · contaminación rate-limiter entre tests | +0 días (planificado) |
-| **Total** | **19 decisiones documentadas** | **11 obstáculos resueltos** | **+5.5 días** |
+| Sprint Reingeniería | `src/`-layout · Docker non-root · Trivy · 34+29 tests DevSecOps+ética · DT-18 INC-07 · XAI functions · pre-commit hook | Imports CI · config.toml Docker · contaminación rate-limiter entre tests | +0 días (planificado) |
+| Post-Reingeniería | Reorganización `docs/` en subcarpetas temáticas | — | +0 días |
+| **Total** | **20 decisiones documentadas** | **11 obstáculos resueltos** | **+5.5 días** |
 
 > Los días de trabajo extra de Sprints 1–3 fueron absorbidos por la holgura planificada en los sprints.
 > La Fase de Cierre Académico y el Sprint de Reingeniería fueron planificados explícitamente para
@@ -304,8 +312,9 @@ Las mejoras más impactantes del proceso de ingeniería, en orden de retorno sob
 | 1.5 | 2026-06-12 | Fase de Cierre Académico agregada — Trazabilidad y cierre Capstone (DT-09 a DT-13, OB-07 a OB-08) |
 | 2.0 | 2026-06-13 | Sprint Reingeniería (DT-14 a DT-18, OB-09 a OB-10), MJ-03 cerrado, retrospectiva técnica integral |
 | 3.0 | 2026-06-13 | Corrección estructura de sprints (3 regulares, no 4) · "Sprint 4" renombrado a "Fase de Cierre Académico" · DT-19 (XAI: `explicar_prediccion`) · OB-11 (contaminación rate-limiter entre tests) · MJ-09 añadido · Conteos de tests actualizados (34+29) · Resumen ejecutivo actualizado |
+| 3.1 | 2026-06-13 | DT-20 (pre-commit hook anti-secretos) · DT-09 ampliado con reorganización de `docs/` en subcarpetas temáticas · DT-13 ruta corregida a `docs/qa_y_pruebas/plantilla_UAT.md` · Resumen ejecutivo actualizado (20 DTs) |
 
 ---
 
-*Registro de Lecciones Aprendidas v3.0 · LSP Vision AI · UPN Sistemas 2026*
-*19 decisiones técnicas documentadas · 11 obstáculos resueltos · Proyecto cerrado 2026-06-13*
+*Registro de Lecciones Aprendidas v3.1 · LSP Vision AI · UPN Sistemas 2026*
+*20 decisiones técnicas documentadas · 11 obstáculos resueltos · Proyecto cerrado 2026-06-13*

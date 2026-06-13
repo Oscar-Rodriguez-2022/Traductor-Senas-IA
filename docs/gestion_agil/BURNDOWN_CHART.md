@@ -1,7 +1,7 @@
 # Burndown Charts — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.0 · 2026-06-13 · **Estado: PROYECTO CERRADO — Línea real llegó a 0 SP**
+### Versión: 2.1 · 2026-06-13 · **Estado: PROYECTO CERRADO — Línea real llegó a 0 SP**
 
 Los siguientes gráficos muestran el avance del equipo en cada Sprint, comparando
 el trabajo **ideal** (línea recta) contra el trabajo **real** completado.
@@ -208,8 +208,22 @@ xychart-beta
 
 **Retrospectiva Sprint de Reingeniería:**
 - La refactorización al src-layout (INC-08) fue la tarea más impactante: resolvió todos los problemas de imports en CI y portabilidad de pytest.
-- Los 20 tests de `test_seguridad.py` se escribieron siguiendo estrictamente TDD: primero el test rojo, luego el código verde.
-- El cierre de INC-07 (letras con dataset insuficiente) se logró combinando augmentación ×16 con recaptura dirigida por `GUIA_RECAPTURA_DATASET.md`.
+- `test_seguridad.py` inició con 20 tests TDD (TR-07) y creció a **34 tests** (33 PASS + 1 SKIP) al incorporar `TestRateLimiting` expandida y `TestIntegridadModelo`. `test_etica.py` inició con 15 tests (TR-08) y creció a **29 tests** al añadir la suite `TestXAI` para verificar `explicar_prediccion()`, `nombres_landmarks()` y `sesgos_conocidos()` (DT-19).
+- El cierre de INC-07 (letras con dataset insuficiente) se logró combinando augmentación ×16 con recaptura dirigida por `docs/qa_y_pruebas/GUIA_RECAPTURA_DATASET.md`.
+- **OB-11 (post-sprint):** Los tests parametrizados de `TestSanitizacionInputs` contaminaban el estado del rate-limiter entre tests. Se resolvió con fixture `_resetear_rate_limiter(autouse=True)` y `monkeypatch` — mismo patrón de aislamiento de `TestRateLimiting`. Resultado: 33 PASS + 1 SKIP estables.
+
+---
+
+## Actividades Post-Cierre
+
+Tras el cierre formal del Sprint de Reingeniería, se realizaron dos actividades adicionales de consolidación que no estaban planificadas como tareas TR pero son parte del repositorio final entregable:
+
+| Actividad | Commit | Descripción |
+|-----------|--------|-------------|
+| Reorganización `docs/` | `60d6ccd` | Restructurar los 15+ archivos `.md` de `docs/` en 6 subcarpetas temáticas: `arquitectura/`, `gestion_agil/`, `qa_y_pruebas/`, `seguridad_y_etica/`, `usuario_y_tutoriales/` y `cierre/` |
+| Pre-commit hook anti-secretos | `6799d20` | Agregar `scripts/hooks/pre-commit` (87 líneas, `/bin/sh`) con 3 capas de detección: archivos bloqueados por nombre, patrones de contenido en el diff (API keys, tokens AWS/GitHub/OpenAI, claves privadas PEM) y claves en texto plano en archivos de configuración. Instalador `scripts/setup_hooks.bat` de un clic para Windows |
+
+> Estas actividades no tienen SP asignados en el backlog formal; corresponden al trabajo de entregabilidad del repositorio para sustentación.
 
 ---
 
@@ -238,6 +252,6 @@ LÍNEA REAL: llegó a 0 en todos los sprints — proyecto completo
 
 ---
 
-*Documento de gestión ágil v2.0 · Capstone Project UPN Sistemas 2026*
+*Documento de gestión ágil v2.1 · Capstone Project UPN Sistemas 2026*
 *Herramienta de gestión: GitHub Projects (tablero Kanban por Sprint)*
-*Actualización v2.0: Sprint de Reingeniería agregado; todos los gráficos actualizados a cierre total*
+*Actualización v2.1: Retrospectiva Sprint Reingeniería corregida (34+29 tests reales) · OB-11 documentado · Sección Actividades Post-Cierre añadida (DT-19 XAI, DT-20 pre-commit hook, reorganización docs/)*
