@@ -82,6 +82,9 @@ Frame WebRTC (320×240) → cv2.cvtColor BGR→RGB → MediaPipe Hands
 ```
 Traductor-Senas-IA/
 │
+├── .streamlit/
+│   └── config.toml               ← Configuración de tema, servidor y XSRF de Streamlit
+│
 ├── src/                          ← Código fuente de la aplicación web
 │   ├── app.py                    │  Orquestador principal Streamlit + WebRTC
 │   ├── lsp_core.py               │  Núcleo ML: carga modelo, landmarks, predicción
@@ -143,6 +146,22 @@ Traductor-Senas-IA/
 │   │   └── MODELO_DATOS.md       │  Modelo de datos incremental
 │   └── plantilla_UAT.md          │  Plantilla de User Acceptance Testing
 │
+├── BURNDOWN_CHART.md             ← Burndown Charts release + 3 sprints
+├── DEFINITION_OF_DONE.md         ← Criterios DoD v2.0: TDD, DevSecOps, WCAG, 22 HUs
+├── GUIA_QA.md                    ← Estándares TDD y suite de 13 fases de medición
+├── GUIA_RECAPTURA_DATASET.md     ← Recaptura de letras con dataset insuficiente
+├── HISTORIAS_USUARIO.md          ← 22 HUs (HU-01..HU-22) con Gherkin y MoSCoW
+├── IA_ETICA.md                   ← Principios XAI, análisis de sesgos, responsabilidad social
+├── INCIDENTES.md                 ← 8 bugs registrados con causa raíz y hotfix
+├── LECCIONES_APRENDIDAS.md       ← Retrospectiva técnica de 4 sprints
+├── MANUAL_USUARIO.md             ← Manual preliminar de usuario v1.1
+├── MATRIZ_TRAZABILIDAD.md        ← Mapeo HU ↔ módulo ↔ test
+├── SEGURIDAD.md                  ← Plan de Seguridad Integral v1.2
+├── SPRINT_BACKLOG.md             ← Desglose de tareas (3 sprints, 117 SP)
+├── TUTORIAL_DESPLIEGUE_WEB.md    ← Despliegue en Streamlit Community Cloud
+├── TUTORIAL_EQUIPO.md            ← Normas de propiedad compartida y flujo Git
+├── TUTORIAL_HUGGINGFACE.md       ← Despliegue en Hugging Face Spaces con Docker
+│
 ├── modelo.pkl                    ← Modelo SVM entrenado (generado localmente)
 ├── Dockerfile                    ← Imagen Docker con usuario no-root (UID 1001)
 ├── Makefile                      ← Automatización de tareas QA
@@ -152,6 +171,7 @@ Traductor-Senas-IA/
 ├── pyproject.toml                ← Configuración Black, Pylint, pytest
 ├── setup.cfg                     ← Configuración Flake8 + cobertura
 ├── reporte_pruebas.txt           ← Resultados de la suite de tests automatizados
+├── .dockerignore                 ← Archivos excluidos de la imagen Docker
 └── trivy.yaml                    ← Escaneo de vulnerabilidades (CRITICAL+HIGH)
 ```
 
