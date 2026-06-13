@@ -12,7 +12,7 @@ PY ?= python
 
 .PHONY: help test coverage coverage-all security sistema run \
         benchmark fps stress evaluate confusion crossval robustez recursos report \
-        lint format quality all clean
+        lint format quality all clean hooks
 
 help:
 	@echo "Objetivos disponibles:"
@@ -36,6 +36,7 @@ help:
 	@echo "  make quality     - pylint (score de calidad)"
 	@echo "  make all         - Ejecuta todo y genera reportes"
 	@echo "  make clean       - Elimina __pycache__, .pytest_cache, htmlcov, .coverage"
+	@echo "  make hooks       - Instala git hooks en .git/hooks/ (ejecutar al clonar)"
 
 test:
 	$(PY) -m pytest tests/
@@ -90,3 +91,8 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null; \
 	rm -rf .pytest_cache htmlcov .coverage
 	@echo "Artefactos temporales eliminados."
+
+hooks:
+	cp scripts/hooks/pre-commit .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	@echo "Hook pre-commit instalado. Cada commit escaneara secretos automaticamente."
