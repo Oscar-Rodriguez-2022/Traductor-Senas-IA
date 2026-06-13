@@ -30,6 +30,20 @@ import lsp_core
 class TestSanitizacionInputs:
     """CA-13.6 — Inputs maliciosos se tratan como texto plano, nunca ejecutados."""
 
+    @pytest.fixture(autouse=True)
+    def _resetear_rate_limiter(self, monkeypatch):
+        """Aisla el estado del rate-limiter entre tests de esta clase.
+
+        Sin este fixture, los 7 payloads parametrizados saturan el contador
+        de intentos fallidos y bloquean los tests de token manipulation que
+        siguen en la misma clase, haciéndolos fallar con AttributeError.
+        """
+        monkeypatch.setattr(lsp_auth, "_intentos_fallidos", 0)
+        monkeypatch.setattr(lsp_auth, "_ultimo_fallo_ts", 0.0)
+        yield
+        monkeypatch.setattr(lsp_auth, "_intentos_fallidos", 0)
+        monkeypatch.setattr(lsp_auth, "_ultimo_fallo_ts", 0.0)
+
     @pytest.mark.parametrize("payload", [
         "<script>alert('xss')</script>",
         "javascript:void(0)",

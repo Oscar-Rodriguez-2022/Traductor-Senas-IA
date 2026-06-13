@@ -13,8 +13,9 @@ Trazabilidad de Historias de Usuario:
   HU-08 CA-08.4 — Rendimiento mínimo de captura                        (fps con EMA)
   HU-09 CA-09.1 — Detección de 21 landmarks con MediaPipe              (recv: hands.process)
   HU-09 CA-09.2 — Visualización del skeleton sobre el video            (recv: draw_landmarks)
-  HU-10 CA-10.2 — Predicción y confianza actualizadas por frame        (recv → lsp_core.predecir)
+  HU-10 CA-10.2 — Predicción y confianza actualizadas por frame        (recv → lsp_core.explicar_prediccion)
   HU-10 CA-10.3 — Indicador de confianza (rojo/amarillo) disponible    (self.confianza para lsp_ui)
+  HU-16 CA-16.2 — Alternativas XAI disponibles para la UI              (self.alternativas top-5)
   HU-22 CA-22.1 — FPS sostenidos ≥24 en 60 s                          (self.fps con EMA, α=0.2)
 """
 import os
@@ -68,6 +69,7 @@ class Traductor(VideoProcessorBase):
         self.letra = "-"
         self.confianza = 0.0
         self.mano = False
+        self.alternativas: list = []   # HU-16 CA-16.2: top-5 predicciones XAI
         self._t_prev = time.time()
         self.fps = 0.0
 
@@ -94,6 +96,7 @@ class Traductor(VideoProcessorBase):
         results = self.hands.process(rgb_small)
 
         letra, conf, mano = "-", 0.0, False
+        alternativas_frame: list = []
 
         if results.multi_hand_landmarks:
             mano = True
@@ -108,9 +111,14 @@ class Traductor(VideoProcessorBase):
                                  for coord in (lm.x, lm.y)]
                     if lsp_core.landmarks_validos(landmarks):
                         try:
-                            letra, conf = lsp_core.predecir(self._modelo, landmarks)
+                            # HU-16 CA-16.2: usar explicar_prediccion en lugar de predecir
+                            # para capturar las alternativas XAI sin coste adicional
+                            xai = lsp_core.explicar_prediccion(self._modelo, landmarks)
+                            letra = xai["letra"]
+                            conf = xai["confianza"]
+                            alternativas_frame = xai["alternativas"]
                         except Exception:
-                            pass
+                            alternativas_frame = []
 
         # FPS con suavizado EMA
         ahora = time.time()
@@ -120,6 +128,7 @@ class Traductor(VideoProcessorBase):
 
         with self.lock:
             self.letra, self.confianza, self.mano = letra, conf, mano
+            self.alternativas = alternativas_frame
             self.fps = fps_actual
 
         # Badge "EN VIVO"

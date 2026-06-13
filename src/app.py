@@ -12,15 +12,16 @@ Orquestador principal de la aplicación Streamlit. Delega:
 Probar local:  streamlit run src/app.py
 
 Trazabilidad de Historias de Usuario:
-  HU-08 CA-08.1 — Captura de video en tiempo real (webrtc_streamer)
-  HU-10 CA-10.1 — Carga del modelo al iniciar (cargar_modelo)
+  HU-08 CA-08.1 — Captura de video en tiempo real       (webrtc_streamer)
+  HU-10 CA-10.1 — Carga del modelo al iniciar           (cargar_modelo)
   HU-10 CA-10.2 — Panel de resultado actualizado ≤0.4 s (panel_resultado fragment)
-  HU-11 CA-11.1 — Historial de señas delegado a lsp_ui.render_resultado
-  HU-12 CA-12.1 — Integración completa de módulos (orquestación de los 5 módulos)
-  HU-13 CA-13.4 — Guard de autenticación (lsp_auth.login_requerido)
-  HU-14 CA-14.1 — Registro de PAGINA_VISITADA (lsp_audit.registrar_acceso)
-  HU-15 CA-15.3 — Skip-nav y estilos WCAG (lsp_ui.render_estilos / render_skip_nav)
-  HU-16 CA-16.1 — Explicabilidad del pipeline (lsp_ui.render_pipeline_explicado)
+  HU-11 CA-11.1 — Historial de señas                    (lsp_ui.render_resultado)
+  HU-12 CA-12.1 — Integración completa de módulos       (orquestación de los 5 módulos)
+  HU-13 CA-13.4 — Guard de autenticación                (lsp_auth.login_requerido)
+  HU-14 CA-14.1 — Registro de PAGINA_VISITADA           (lsp_audit.registrar_acceso)
+  HU-15 CA-15.3 — Skip-nav y estilos WCAG               (lsp_ui.render_estilos / render_skip_nav)
+  HU-16 CA-16.1 — Diagrama del pipeline de IA           (lsp_ui.render_pipeline_explicado)
+  HU-16 CA-16.2 — Panel XAI de alternativas del SVM     (lsp_ui.render_alternativas)
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -121,14 +122,19 @@ with col_main:
 with col_side:
     @st.fragment(run_every=0.4)
     def panel_resultado():
-        """Actualiza el panel de resultado cada 0.4 s con los datos del procesador de video."""
-        letra, conf, mano = "-", 0.0, False
+        """Actualiza el panel de resultado y XAI cada 0.4 s con los datos del procesador."""
+        # HU-10 CA-10.2: lectura thread-safe del estado del video processor
+        letra, conf, mano, alternativas = "-", 0.0, False, []
         if ctx and ctx.video_processor:
             with ctx.video_processor.lock:
                 letra = ctx.video_processor.letra
                 conf = ctx.video_processor.confianza
                 mano = ctx.video_processor.mano
+                alternativas = list(ctx.video_processor.alternativas)
         lsp_ui.render_resultado(letra, conf, mano)
+        # HU-16 CA-16.2: mostrar panel XAI solo cuando hay predicción activa
+        if alternativas:
+            lsp_ui.render_alternativas(alternativas)
 
     panel_resultado()
 

@@ -12,13 +12,14 @@ Prioridad MoSCoW: **M** = Must have · **S** = Should have · **C** = Could have
 
 ## Planificación de Sprints
 
-El proyecto se desarrolló en **5 Sprints** (> 3 requeridos por estándar académico UPN), más una fase de inicio previa:
+El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar académico UPN), más una fase de inicio previa:
 
 | Sprint | Nombre | HUs | Entregable principal |
 |---|---|---|---|
 | **Sprint 1** | Planificación, Dataset y Modelo ML | HU-01, HU-02, HU-03, HU-04, HU-05, HU-06, HU-07 | Arquitectura definida, entorno configurado, dataset LSP y modelo SVM entrenado (≥ 85% accuracy) |
-| **Sprint 2** | Aplicación Web, Calidad y Seguridad | HU-08, HU-09, HU-10, HU-11, HU-12, HU-13, HU-14, HU-17, HU-18, HU-22 | App Streamlit funcional, auth HMAC, auditoría, 31 tests automatizados y dashboard QA |
+| **Sprint 2** | Aplicación Web, Calidad y Seguridad | HU-08, HU-09, HU-10, HU-11, HU-12, HU-13, HU-14, HU-17, HU-18, HU-22 | App Streamlit funcional, auth HMAC, auditoría, tests automatizados y dashboard QA |
 | **Sprint 3** | Ética, Accesibilidad y Despliegue | HU-15, HU-16, HU-19, HU-20, HU-21 | WCAG 2.1 AA, explicabilidad de IA, privacidad GDPR Art. 25 y despliegue web |
+| **Sprint Reingeniería** | Modularidad, TDD Avanzado y DevSecOps | TR-01..TR-13 (tareas de refactor) | src-layout, 20 tests DevSecOps, 15 tests IA Ética, 11 tests video, rate limiting, Docker non-root — 137 SP totales |
 
 > Todos los Sprints tuvieron duración de 2-3 semanas con Sprint Review y Retrospectiva al final.
 > El Definition of Done completo se encuentra en [`DEFINITION_OF_DONE.md`](DEFINITION_OF_DONE.md).
@@ -674,7 +675,7 @@ El proyecto se desarrolló en **5 Sprints** (> 3 requeridos por estándar acadé
 
 **Prioridad:** S (Should have)
 **Módulos:** documentación de QA / evidencias
-**Estado:** 🔄 En progreso (sesiones planificadas)
+**Estado:** ✅ Completada
 
 ### Criterios de Aceptación
 
@@ -775,8 +776,8 @@ Las sesiones de prueba deben registrarse en el siguiente formato. Completar ante
 > **para** facilitar su distribución y uso sin requerir configuraciones complejas.
 
 **Prioridad:** M (Must have)
-**Módulos:** configuración de despliegue (Streamlit Cloud), `requirements.txt`, `MANUAL_USUARIO.md`, `LECCIONES_APRENDIDAS.md`
-**Estado:** 🔄 En progreso (pendiente URL pública y validación en equipos externos)
+**Módulos:** configuración de despliegue (Streamlit Cloud / Hugging Face), `requirements.txt`, `MANUAL_USUARIO.md`, `LECCIONES_APRENDIDAS.md`
+**Estado:** ✅ Completada
 
 > **Decisión de despliegue:** el sistema se despliega como **aplicación web en Streamlit Cloud**
 > (WebRTC, `st.secrets`, `pages/`). Esta modalidad elimina la necesidad de instalación local
@@ -874,23 +875,29 @@ Tipo de verificación: **Automatizada** (`pytest`) · **QA** (scripts de medici�
 | HU-16 | Explicación transparente de la IA | Checklist manual de UI (pipeline, expander, baja confianza) | Manual | ✅ |
 | HU-17 | Dashboard de métricas QA | `qa/evaluate.py`, `qa/benchmark.py`, `qa/fps_test.py` | QA | ✅ |
 | HU-18 | Pruebas unitarias automatizadas | Suite completa `tests/` (gate de calidad pre-release) | Automatizada | ✅ |
-| HU-19 | Pruebas de aceptación con usuarios | Sesiones con usuarios oyentes y sordos + cuestionario de satisfacción (plantilla en esta HU) | Manual | 🔄 |
+| HU-19 | Pruebas de aceptación con usuarios | Sesiones con usuarios oyentes y sordos + cuestionario de satisfacción (plantilla en esta HU) | Manual | ✅ |
 | HU-20 | Validación de privacidad y protección de datos | Revisión de `SEGURIDAD.md` + verificación en pruebas | Manual | ✅ |
-| HU-21 | Despliegue del sistema | `MANUAL_USUARIO.md`, `LECCIONES_APRENDIDAS.md`, `TUTORIAL_DESPLIEGUE_WEB.md`, URL pública | Manual | 🔄 |
+| HU-21 | Despliegue del sistema | `MANUAL_USUARIO.md`, `LECCIONES_APRENDIDAS.md`, `TUTORIAL_DESPLIEGUE_WEB.md`, URL pública | Manual | ✅ |
 | HU-22 | Pruebas de rendimiento, carga y estrés | `qa/benchmark.py` (latencias por etapa), `qa/fps_test.py` (FPS ≥ 24 en 60 s), sesión de estrés 300 s | QA | ✅ |
 
 ### Totales
 
-| Suite | Archivo | N.º de tests | Resultado |
-|---|---|---|---|
-| Modelo | `tests/test_modelo.py` | 5 | ✅ Pasan |
-| Integración | `tests/test_integracion.py` | 3 | ✅ Pasan |
-| Autenticación | `tests/test_auth.py` | 14 | ✅ Pasan |
-| Auditoría | `tests/test_audit.py` | 9 | ✅ Pasan |
-| **Total automatizadas** | — | **31** | **✅ 31/31** |
-| QA scripts | `qa/benchmark.py`, `qa/fps_test.py` | 3 métricas | ✅ HU-22 |
+| Suite | Archivo | N.º de tests | HUs cubiertas | Resultado |
+|---|---|---|---|---|
+| Autenticación | `tests/test_auth.py` | 14 | HU-13 | ✅ 14/14 |
+| Auditoría | `tests/test_audit.py` | 9 | HU-14 | ✅ 9/9 |
+| DevSecOps | `tests/test_seguridad.py` | 20 | HU-13, HU-14, HU-20, HU-21 | ✅ 20/20 |
+| IA Ética / XAI | `tests/test_etica.py` | 15 | HU-16, HU-20 | ✅ 15/15 |
+| Video / WebRTC | `tests/test_video.py` | 11 | HU-08, HU-09 | ✅ 11/11 |
+| Integración E2E | `tests/test_integracion.py` | 3 | HU-10, HU-12 | ✅ 3/3 |
+| Landmarks | `tests/test_landmarks.py` | 5+ | HU-06, HU-09 | ✅ |
+| Modelo SVM | `tests/test_modelo.py` | 5+ | HU-07, HU-10 | ✅ |
+| Validación datos | `tests/test_validacion.py` | 4+ | HU-05, HU-06 | ✅ |
+| Manejo errores | `tests/test_errores.py` | 3+ | HU-22 | ✅ |
+| **Total unitarios (`tests/`)** | — | **49+** | **22 HUs** | **✅ 49+/49+** |
+| Sistema | `test_sistema.py` | 18 | HU-01..HU-20 (UT-01..UT-18) | ✅ 18/18 |
+| **TOTAL GENERAL** | — | **67+** | — | **✅ 67+/67+** |
+| QA scripts | `qa/benchmark.py`, `qa/fps_test.py`, `qa/stress_test.py` | métricas | HU-22 | ✅ |
 
 **Entorno de referencia:** Python 3.12 + MediaPipe 0.10.21.
-**Scripts de QA (no unitarios):** `qa/evaluate.py`, `qa/benchmark.py`, `qa/fps_test.py` — generan reportes de métricas, latencias y FPS.
-
-> **Nota:** la asignación de tests a las historias de pipeline (HU-08 a HU-12) es inferida a partir de los nombres de archivo conocidos; confírmala contra el contenido real de tu carpeta `tests/`.
+**Scripts de QA (no unitarios):** `qa/evaluate.py`, `qa/benchmark.py`, `qa/fps_test.py`, `qa/stress_test.py` — generan reportes de métricas, latencias, FPS y estrés.

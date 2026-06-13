@@ -1,7 +1,7 @@
 # Sprint Backlog — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.0 · Última actualización: 2026-06-13 · **Estado: CIERRE DE PROYECTO — 117/117 SP completados**
+### Versión: 2.0 · Última actualización: 2026-06-13 · **Estado: CIERRE DE PROYECTO — 137/137 SP completados**
 
 Este documento desglosa cada Historia de Usuario en tareas técnicas concretas,
 siguiendo la jerarquía: **Épica → Historia de Usuario → Tarea Técnica → Código**.

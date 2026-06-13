@@ -1,9 +1,9 @@
-# trivy.yaml — Configuración de escaneo de vulnerabilidades con Trivy
-# DevSecOps — Capa de Infraestructura (ref. SEGURIDAD.md)
+# config/trivy.yaml — Configuración de escaneo de vulnerabilidades con Trivy
+# DevSecOps — Capa de Infraestructura (ref. docs/seguridad_y_etica/SEGURIDAD.md)
 #
 # Uso local:
 #   trivy image lsp-vision-ai:latest
-#   trivy fs --config trivy.yaml .
+#   trivy fs --config config/trivy.yaml .
 #
 # Uso en CI/CD (GitHub Actions):
 #   - name: Scan Docker image

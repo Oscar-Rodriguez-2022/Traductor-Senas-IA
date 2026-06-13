@@ -1,13 +1,29 @@
 # Registro de Lecciones Aprendidas — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel · Versión 2.0 · 2026-06-13
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.0 · 2026-06-13
 
 > **Estado: CIERRE DE PROYECTO** — 22 Historias de Usuario completadas · 137 SP totales.
-> 4 sprints regulares + 1 Sprint de Reingeniería = retrospectiva técnica integral.
+> 3 sprints regulares + 1 Sprint de Reingeniería = retrospectiva técnica integral.
 
 Este documento registra las decisiones técnicas tomadas durante el desarrollo,
 los obstáculos enfrentados y las mejoras identificadas en cada Sprint.
 Sirve como referencia para futuros proyectos de visión artificial y sistemas web con IA.
+
+**Estructura de sprints (oficial — ver HISTORIAS_USUARIO.md y SPRINT_BACKLOG.md):**
+
+| Sprint | Nombre oficial |
+|---|---|
+| Sprint 1 | Planificación, Dataset y Modelo ML |
+| Sprint 2 | Aplicación Web, Calidad y Seguridad |
+| Sprint 3 | Ética, Accesibilidad y Despliegue |
+| *(Fase adicional)* | Trazabilidad, Documentación y Cierre Académico |
+| Sprint Reingeniería | Modularidad, TDD Avanzado y DevSecOps |
+
+> La **Fase de Cierre Académico** (documentada aquí como DT-09 a DT-13, OB-07 a OB-08)
+> corresponde al trabajo de entregables finales (Tareas A/B/C) realizado entre el Sprint 3
+> y el Sprint de Reingeniería. No estaba planificada como un sprint numerado en el backlog
+> original, pero se documenta aquí como fase separada por la cantidad y relevancia de sus
+> decisiones técnicas.
 
 ---
 
@@ -18,7 +34,7 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 #### DT-01: Landmarks en lugar de píxeles en bruto para el clasificador
 **Decisión:** usar los 21 puntos clave (landmarks) de MediaPipe como vector de entrada al SVM en lugar de pasar imágenes completas.
 **Motivación:** los modelos que procesan matrices de píxeles (CNN, SVM sobre imagen) requerían tiempos de entrenamiento de 30+ minutos en las laptops del equipo, con baja generalización ante cambios de iluminación o fondo.
-**Resultado:** el entrenamiento se redujo a menos de 3 segundos y la accuracy en validación alcanzó 92.9%, con mejor resistencia a variaciones de fondo porque los landmarks son independientes del color del pixel.
+**Resultado:** el entrenamiento se redujo a menos de 3 segundos y la accuracy en validación alcanzó 92.9%, con mejor resistencia a variaciones de fondo porque los landmarks son independientes del color del píxel.
 **Lección:** la reducción dimensional geométrica (pasar de millones de píxeles a 42 coordenadas) es una estrategia efectiva para proyectos con hardware limitado y alta variabilidad visual.
 
 #### DT-02: Padding de 30 px en el recorte de la ROI
@@ -41,7 +57,7 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 **Impacto en tiempo:** +3 días al Sprint 1 para desarrollar y documentar el sistema colaborativo.
 
 #### OB-02: Incompatibilidad entre Python 3.13 y MediaPipe 0.10
-**Problema:** al configurar el entorno con Python 3.13 (versión más reciente en ese momento), MediaPipe lanzaba errores de importación por módulos binarios incompatibles.
+**Problema:** al configurar el entorno con Python 3.13 (versión más reciente en ese momento), MediaPipe lanzaba errores de importación por módulos binarios incompatibles (`mp.solutions` no disponible en 0.10.35).
 **Solución:** downgrade a Python 3.12, que es la versión LTS compatible con MediaPipe 0.10.21 y scikit-learn 1.x.
 **Lección:** en proyectos con dependencias de visión artificial (OpenCV, MediaPipe), fijar la versión de Python en `requirements.txt` o `pyproject.toml` desde el primer día para evitar divergencias entre entornos del equipo.
 
@@ -73,7 +89,7 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 
 #### OB-03: Latencia inicial del pipeline por resolución de captura
 **Problema:** en las primeras versiones, el pipeline procesaba frames a resolución completa (1280×720), lo que causaba latencias de 80–120 ms solo en el paso de MediaPipe.
-**Solución:** reducir la resolución de procesamiento a 640×480 y activar el modo rápido de MediaPipe (`model_complexity=0`). La resolución de visualización se mantiene alta para la UX.
+**Solución:** reducir la resolución de procesamiento a 320×240 y activar el modo rápido de MediaPipe (`model_complexity=0`). La resolución de visualización se mantiene alta para la UX.
 **Resultado:** latencia del paso MediaPipe reducida a ~15 ms. Pipeline completo: ~18 ms/predicción.
 **Lección:** en sistemas de visión en tiempo real, separar la resolución de procesamiento de la resolución de visualización es una optimización de alto impacto y bajo costo de implementación.
 
@@ -115,7 +131,12 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 
 ---
 
-## Sprint 4 — Trazabilidad, Calidad y Cierre de Capstone
+## Fase de Cierre Académico — Trazabilidad, Documentación y Entregables
+
+> Esta fase no estaba planificada como un sprint numerado en el SPRINT_BACKLOG original.
+> Corresponde al trabajo de entregables académicos finales (Tareas A/B/C) ejecutado entre
+> el cierre del Sprint 3 y el inicio del Sprint de Reingeniería. Se documenta aquí por
+> la relevancia de sus decisiones técnicas para el proyecto.
 
 ### Decisiones técnicas
 
@@ -167,7 +188,7 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 
 ### Contexto
 
-Al cerrar el Sprint 4, el análisis de deuda técnica identificó cuatro áreas críticas antes de la sustentación final: la estructura de módulos en la raíz causaba fallos de importación en CI, el contenedor Docker se ejecutaba como root, las suites de seguridad y ética no tenían cobertura de tests automatizados, y el dataset todavía presentaba clases sin muestras válidas (INC-07). Este sprint de reingeniería abordó los cuatro problemas en 5 días de trabajo.
+Al cerrar la Fase de Cierre Académico, el análisis de deuda técnica identificó cuatro áreas críticas antes de la sustentación final: la estructura de módulos en la raíz causaba fallos de importación en CI, el contenedor Docker se ejecutaba como root, las suites de seguridad y ética no tenían cobertura de tests automatizados, y el dataset todavía presentaba clases sin muestras válidas (INC-07). Este sprint de reingeniería abordó los cuatro problemas en 5 días de trabajo.
 
 ### Decisiones técnicas
 
@@ -189,17 +210,24 @@ Al cerrar el Sprint 4, el análisis de deuda técnica identificó cuatro áreas 
 **Resultado:** `trivy.yaml` configurado para reportar CVEs CRITICAL+HIGH+MEDIUM con exit-code 1 (bloquea CI). `.dockerignore` excluye `data/`, `.git` y `secrets.toml` de la imagen.
 **Lección:** las herramientas de SCA (Software Composition Analysis) como Trivy son parte indispensable del pipeline CI/CD moderno, especialmente en proyectos con Docker.
 
-#### DT-17: Suites de tests DevSecOps (20 + 15 = 35 tests nuevos)
-**Decisión:** crear `tests/test_seguridad.py` (20 tests en 4 clases) y `tests/test_etica.py` (15 tests en 3 clases) antes de implementar los controles que verifican.
+#### DT-17: Suites de tests DevSecOps y ética creadas con TDD
+**Decisión:** crear `tests/test_seguridad.py` (4 clases: sanitización, rate limiting, audit log, integridad PKL) y `tests/test_etica.py` (3 clases: equidad, calibración, explicabilidad) antes de implementar los controles que verifican.
 **Motivación:** la seguridad y la ética eran los únicos dominios del sistema sin cobertura de tests automatizados. Seguir la filosofía TDD (Red → Green → Refactor) asegura que cada control es realmente verificable.
-**Resultado:** 20/20 tests de seguridad PASS (sanitización, rate limiting, HMAC, tokens, integridad PKL) y 15/15 tests de ética PASS (equidad por clase, XAI, privacidad, honestidad de limitaciones).
-**Lección:** la seguridad y la ética deben ser ciudadanos de primera clase en la suite de tests, no solo en la documentación. Si un control de seguridad no tiene un test, no hay evidencia de que funciona.
+**Resultado inicial:** 20 tests de seguridad PASS y 15 tests de ética PASS en el momento de creación.
+**Resultado actual:** `test_seguridad.py` creció a **34 tests** (33 PASS + 1 SKIP) con la adición de `TestRateLimiting` expandida y `TestIntegridadModelo`; `test_etica.py` creció a **29 tests** (+ 14 `TestXAI`) al incorporar la suite de explicabilidad algorítmica.
+**Lección:** la seguridad y la ética deben ser ciudadanos de primera clase en la suite de tests, no solo en la documentación. Un módulo de seguridad sin tests no tiene evidencia verificable de que funciona.
 
 #### DT-18: Resolución INC-07 — Recaptura y augmentation ×16 (letras N, Q, R, S, V)
 **Decisión:** realizar una sesión de recaptura dedicada para las 5 letras con recall 0%, capturando 120+ muestras válidas por letra con condiciones óptimas de iluminación y ángulo, seguida de data augmentation ×16 (rotaciones ±5°/10°/15°, escalado ×0.88–1.12, ruido Gaussiano σ=0.006).
 **Motivación:** el modelo con letras sin muestras violaba el principio de equidad (IA Ética): el sistema entrenado con esas letras no podría reconocerlas nunca, afectando desproporcionadamente a los usuarios que usan esas señas.
 **Resultado:** accuracy global 88.3% (umbral ≥85%), recall mínimo ≥80% para todas las letras, INC-07 cerrado. `tests/test_etica.py::test_equidad_minima_por_clase_recall_mayor_50` → PASS.
 **Lección:** el desequilibrio de clases en visión artificial no se resuelve solo con augmentation; primero se necesitan muestras reales de calidad. El augmentation amplifica muestras buenas, no corrige la ausencia de detección de MediaPipe.
+
+#### DT-19: Funciones XAI como capa de explicabilidad en `lsp_core` (HU-16 CA-16.2)
+**Decisión:** añadir `explicar_prediccion()`, `nombres_landmarks()` y `sesgos_conocidos()` en `lsp_core.py` como fuente única de verdad para la explicabilidad del sistema. La UI (`render_alternativas()` en `lsp_ui.py`) lee de estas funciones; los tests (`TestXAI` en `test_etica.py`) también las verifican directamente.
+**Motivación:** la explicabilidad existía solo como texto estático en el expander de la UI. Convertirla en funciones verificables permite que tests automatizados detecten regressions en la honestidad del sistema (ej. si se elimina un sesgo documentado). Además, `Traductor.recv()` ahora llama `explicar_prediccion()` en lugar de `predecir()`, capturando las top-5 alternativas del SVM sin coste adicional.
+**Resultado:** panel XAI en la UI (tabla de alternativas con barras de probabilidad y aviso de ambigüedad cuando la diferencia entre primeras opciones es < 10%), `TestXAI` con 14 tests, `sesgos_conocidos()` como diccionario auditable por tests. Cobertura del principio XAI end-to-end: desde el modelo hasta la interfaz.
+**Lección:** la explicabilidad algorítmica debe expresarse como código verificable, no solo como documentación o texto en la UI. Un `dict` de sesgos retornado por una función pública permite que tests detecten si un sesgo fue eliminado accidentalmente del sistema.
 
 ### Obstáculos
 
@@ -212,6 +240,11 @@ Al cerrar el Sprint 4, el análisis de deuda técnica identificó cuatro áreas 
 **Problema:** las flags de seguridad de Streamlit (`--server.showErrorDetails=false`, `--server.enableXsrfProtection=true`) configuradas en `.streamlit/config.toml` no se aplicaban en el contenedor HuggingFace, exponiendo trazas de error en la UI.
 **Solución:** mover las flags al CMD del Dockerfile con prioridad CLI sobre el archivo de configuración. El orden de precedencia de Streamlit es: CLI flags > variables de entorno > config.toml.
 **Lección:** en despliegues Docker, las flags de seguridad críticas deben estar en el CMD del Dockerfile y no depender de archivos de configuración que pueden no leerse. Las capas de configuración tienen prioridades implícitas que deben conocerse.
+
+#### OB-11: Contaminación del rate-limiter entre tests de la misma clase
+**Problema:** los 7 payloads parametrizados de `TestSanitizacionInputs.test_payload_malicioso_no_concede_acceso` incrementaban `_intentos_fallidos` en cada ejecución. Al llegar a `MAX_INTENTOS=5`, el sistema quedaba bloqueado, haciendo que `test_token_manipulado_en_timestamp_rechazado` y `test_token_manipulado_en_nonce_rechazado` recibieran `None` y fallaran con `AttributeError: 'NoneType' object has no attribute 'split'`.
+**Solución:** añadir fixture `_resetear_rate_limiter(autouse=True)` en `TestSanitizacionInputs`, con `monkeypatch` para aislar el estado de módulo entre cada test — el mismo patrón que ya usaba `TestRateLimiting`. Resultado: 33 PASS + 1 SKIP en `test_seguridad.py`.
+**Lección:** el estado de módulo (variables globales en Python) compartido entre tests crea dependencias de orden de ejecución que producen fallos intermitentes y difíciles de diagnosticar. Toda clase de tests que ejercite código con estado de módulo debe tener un fixture `autouse` que lo aísle.
 
 ---
 
@@ -227,22 +260,24 @@ Al cerrar el Sprint 4, el análisis de deuda técnica identificó cuatro áreas 
 | MJ-06 | Aplicación móvil nativa con TensorFlow Lite | Para usuarios que no tienen acceso a una laptop, una app Android/iOS con el modelo optimizado ampliaría el alcance. | Baja |
 | MJ-07 | Exportar historial de texto en formato accesible | Permitir descargar el texto acumulado en .txt o .pdf para que el usuario lo comparta. | Media |
 | MJ-08 | Dashboard de progreso de aprendizaje | Mostrar estadísticas de sesión (letras más y menos reconocidas) para que los usuarios practiquen las señas con mayor dificultad. | Baja |
+| MJ-09 | XAI cuantitativo con importancia de features por letra | La capa XAI actual muestra probabilidades del SVM. Con un SVM lineal o LIME se podría mostrar qué landmarks (ej. punta del índice) fueron determinantes para cada predicción específica. | Media |
 
 ---
 
 ## Resumen ejecutivo
 
-| Sprint | Decisiones clave | Obstáculos principales | Días extra |
-|--------|-----------------|----------------------|------------|
-| Sprint 1 | Landmarks vs. píxeles · Padding ROI · Filtro de calidad en captura | Desequilibrio de clases · Incompatibilidad Python 3.13 | +3 días |
+| Sprint / Fase | Decisiones clave | Obstáculos principales | Días extra |
+|---|---|---|---|
+| Sprint 1 | Landmarks vs. píxeles · Padding ROI · Filtro calidad captura | Desequilibrio de clases · Incompatibilidad Python 3.13 | +3 días |
 | Sprint 2 | HMAC vs JWT · Anonimización SHA-256 · TDD para seguridad | Latencia de pipeline · WebRTC en Streamlit Cloud | +1 día |
-| Sprint 3 | ARIA en `lsp_ui` · Explicabilidad como UI obligatoria | Contrastes insuficientes · Coordinación de usuarios UAT | +1 día |
-| Sprint 4 | Artefactos `docs/` · Tests-stub → reales · Rate limiting · SHA-256 PKL | Equilibrio seguridad/usabilidad · PyAV en CI | +0.5 días |
-| Sprint Reingeniería | `src/`-layout · Docker non-root · Trivy DevSecOps · 35 tests nuevos · INC-07 resuelto | Imports CI raíz · config.toml Docker | +0 días (planificado) |
-| **Total** | **18 decisiones documentadas** | **10 obstáculos resueltos** | **+5.5 días** |
+| Sprint 3 | ARIA en `lsp_ui` · Explicabilidad como UI obligatoria | Contrastes insuficientes · Coordinación UAT | +1 día |
+| Fase Cierre Académico | Artefactos `docs/` · Tests-stub → reales · Rate limiting · SHA-256 PKL | Equilibrio seguridad/usabilidad · PyAV en CI | +0.5 días |
+| Sprint Reingeniería | `src/`-layout · Docker non-root · Trivy · 34+29 tests DevSecOps+ética · DT-18 INC-07 · XAI functions | Imports CI · config.toml Docker · contaminación rate-limiter entre tests | +0 días (planificado) |
+| **Total** | **19 decisiones documentadas** | **11 obstáculos resueltos** | **+5.5 días** |
 
-> Los días de trabajo extra de Sprints 1–4 fueron absorbidos por la holgura planificada en los sprints.
-> El Sprint de Reingeniería fue planificado explícitamente para cerrar deuda técnica antes de la sustentación.
+> Los días de trabajo extra de Sprints 1–3 fueron absorbidos por la holgura planificada en los sprints.
+> La Fase de Cierre Académico y el Sprint de Reingeniería fueron planificados explícitamente para
+> cerrar deuda técnica y entregar los artefactos finales antes de la sustentación.
 
 ---
 
@@ -257,18 +292,20 @@ Las mejoras más impactantes del proceso de ingeniería, en orden de retorno sob
 3. **Protocolo de captura con umbral de calidad 0.7** — la calidad del dataset supera en impacto a cualquier ajuste de hiperparámetros del modelo.
 4. **Data augmentation ×16 como multiplicador de varianza** — transforma muestras bien capturadas en diversidad de posiciones, sin reemplazar la necesidad de muestras reales de calidad.
 5. **Separación de resolución de procesamiento y visualización** — la decisión más simple con el mayor impacto en latencia: de 100 ms a 18 ms en el pipeline completo.
+6. **XAI como código verificable** — expresar la explicabilidad en funciones (`explicar_prediccion`, `sesgos_conocidos`) en lugar de solo texto en la UI permite detectar regresiones en la honestidad del sistema mediante tests automatizados.
 
 ---
 
 ## Historial de Versiones
 
 | Versión | Fecha | Cambio |
-|---------|-------|--------|
+|---|---|---|
 | 1.0 | 2026-06-10 | Versión inicial — Sprints 1, 2 y 3 (DT-01 a DT-08, OB-01 a OB-06) |
-| 1.5 | 2026-06-12 | Sprint 4 agregado — Trazabilidad y cierre Capstone (DT-09 a DT-13, OB-07 a OB-08) |
-| 2.0 | 2026-06-13 | Cierre de proyecto — Sprint Reingeniería (DT-14 a DT-18, OB-09 a OB-10), MJ-03 cerrado, retrospectiva técnica integral, resumen ejecutivo actualizado a 5 sprints |
+| 1.5 | 2026-06-12 | Fase de Cierre Académico agregada — Trazabilidad y cierre Capstone (DT-09 a DT-13, OB-07 a OB-08) |
+| 2.0 | 2026-06-13 | Sprint Reingeniería (DT-14 a DT-18, OB-09 a OB-10), MJ-03 cerrado, retrospectiva técnica integral |
+| 3.0 | 2026-06-13 | Corrección estructura de sprints (3 regulares, no 4) · "Sprint 4" renombrado a "Fase de Cierre Académico" · DT-19 (XAI: `explicar_prediccion`) · OB-11 (contaminación rate-limiter entre tests) · MJ-09 añadido · Conteos de tests actualizados (34+29) · Resumen ejecutivo actualizado |
 
 ---
 
-*Registro de Lecciones Aprendidas v2.0 · LSP Vision AI · UPN Sistemas 2026*
-*18 decisiones técnicas documentadas · 10 obstáculos resueltos · Proyecto cerrado 2026-06-13*
+*Registro de Lecciones Aprendidas v3.0 · LSP Vision AI · UPN Sistemas 2026*
+*19 decisiones técnicas documentadas · 11 obstáculos resueltos · Proyecto cerrado 2026-06-13*

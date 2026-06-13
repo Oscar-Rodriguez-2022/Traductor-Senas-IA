@@ -1,7 +1,7 @@
 # Log de Incidentes y Bugs Resueltos — LSP Vision AI
 ## Capstone Project Sistemas 2026 · Universidad Privada del Norte
 ### Responsable: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.0 · 2026-06-13 · **Estado: 8/8 incidentes RESUELTOS**
+### Versión: 2.0 · 2026-06-13 · **Estado: 9/9 incidentes RESUELTOS**
 
 Este registro documenta incidentes, bugs y problemas técnicos identificados durante el desarrollo y las pruebas del sistema, junto con sus causas raíz y resoluciones. Complementa `LECCIONES_APRENDIDAS.md`.
 

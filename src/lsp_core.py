@@ -2,20 +2,23 @@
 lsp_core.py — Núcleo reutilizable y TESTEABLE del Traductor LSP.
 
 Centraliza la lógica que antes estaba incrustada en A.py / app.py / B.py:
-carga del modelo, extracción de landmarks, validación y predicción.
+carga del modelo, extracción de landmarks, validación, predicción y
+explicabilidad algorítmica (XAI).
 Tanto la app como la suite de pruebas (tests/) y los scripts de QA (qa/)
 importan desde aquí, evitando duplicar código y permitiendo medir calidad.
 
 Trazabilidad de Historias de Usuario:
-  HU-06 CA-06.1 — Extracción de landmarks  (extraer_landmarks, extraer_landmarks_de_archivo)
-  HU-06 CA-06.2 — Normalización de landmarks (coordenadas en [0,1] de MediaPipe)
-  HU-06 CA-06.3 — Integridad de datos       (landmarks_validos, cargar_dataset descarta None)
-  HU-07 CA-07.1 — División para entrenamiento (cargar_dataset devuelve X, y)
-  HU-07 CA-07.3 — Persistencia del modelo    (cargar_modelo desde modelo.pkl)
-  HU-09 CA-09.1 — Detección 21 landmarks     (_get_hands, extraer_landmarks)
-  HU-10 CA-10.1 — Carga correcta del modelo  (cargar_modelo con FileNotFoundError explícito)
-  HU-10 CA-10.2 — Predicción en tiempo real  (predecir → letra + confianza%)
-  HU-22 CA-22.3 — Liberación de recursos     (close_hands limpia _hands_cache)
+  HU-06 CA-06.1 — Extracción de landmarks      (extraer_landmarks, extraer_landmarks_de_archivo)
+  HU-06 CA-06.2 — Normalización de landmarks   (coordenadas en [0,1] de MediaPipe)
+  HU-06 CA-06.3 — Integridad de datos          (landmarks_validos, cargar_dataset descarta None)
+  HU-07 CA-07.1 — División para entrenamiento  (cargar_dataset devuelve X, y)
+  HU-07 CA-07.3 — Persistencia del modelo      (cargar_modelo desde modelo.pkl)
+  HU-09 CA-09.1 — Detección 21 landmarks       (_get_hands, extraer_landmarks)
+  HU-10 CA-10.1 — Carga correcta del modelo    (cargar_modelo con FileNotFoundError explícito)
+  HU-10 CA-10.2 — Predicción en tiempo real    (predecir → letra + confianza%)
+  HU-16 CA-16.2 — Explicabilidad XAI           (explicar_prediccion, nombres_landmarks, sesgos_conocidos)
+  HU-16 CA-16.2 — Honestidad sobre sesgos      (sesgos_conocidos documenta limitaciones)
+  HU-22 CA-22.3 — Liberación de recursos       (close_hands limpia _hands_cache)
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -300,3 +303,130 @@ def close_hands() -> None:
         except Exception:
             pass
     _hands_cache.clear()
+
+
+# ───────────────────────── Explicabilidad (XAI) ─────────────────────────
+# HU-16 CA-16.2 — El sistema debe explicar en lenguaje accesible cómo la IA
+# toma sus decisiones, documentar sesgos conocidos y mostrar alternativas
+# consideradas por el modelo, permitiendo al usuario calibrar su confianza.
+
+# Nombres anatómicos de los 21 puntos clave de MediaPipe Hands (índice → nombre).
+# Usados por render_alternativas() para contextualizar la explicación al usuario.
+NOMBRES_LANDMARKS: dict[int, str] = {
+    0: "Muñeca",
+    1: "Base pulgar",       2: "Nudillo pulgar",   3: "Falange pulgar",    4: "Punta pulgar",
+    5: "Base índice",       6: "Nudillo índice",   7: "Falange índice",    8: "Punta índice",
+    9: "Base medio",        10: "Nudillo medio",   11: "Falange medio",    12: "Punta medio",
+    13: "Base anular",      14: "Nudillo anular",  15: "Falange anular",   16: "Punta anular",
+    17: "Base meñique",     18: "Nudillo meñique", 19: "Falange meñique",  20: "Punta meñique",
+}
+
+# Sesgos documentados del modelo — honestidad XAI (HU-16 CA-16.2).
+# Cada entrada describe una limitación real del sistema con lenguaje accesible.
+SESGOS_CONOCIDOS: dict[str, str] = {
+    "diversidad_entrenamiento": (
+        "El modelo fue entrenado con datos de 4 personas del equipo UPN (Trujillo, Perú). "
+        "La precisión puede variar con otras manos, tonos de piel, tamaños o ángulos distintos."
+    ),
+    "letras_dinamicas": (
+        "J y Z requieren movimiento y no están soportadas en esta versión estática. "
+        "El sistema solo reconoce señas de posición fija."
+    ),
+    "iluminacion": (
+        "El rendimiento se degrada con iluminación insuficiente (< 200 lux) o contraluz directo. "
+        "Condiciones óptimas: luz difusa frontal."
+    ),
+    "letras_similares": (
+        "Confusión conocida entre letras de geometría similar: A/S/E (mano cerrada), "
+        "B/F (dedos extendidos), G/Q (apunte horizontal). "
+        "El indicador amarillo avisa cuando la confianza es baja."
+    ),
+    "sesgo_de_datos": (
+        "Algunas letras pueden tener menos muestras de entrenamiento que otras, "
+        "lo que puede hacer que el modelo las reconozca con menor precisión. "
+        "El Dashboard de Métricas QA muestra el recall por clase."
+    ),
+}
+
+
+def explicar_prediccion(modelo, landmarks, top_n: int = 5) -> dict:
+    """
+    Genera una explicación XAI de la predicción: distribución de confianza por clase.
+
+    Implementa transparencia algorítmica (HU-16 CA-16.2): el usuario puede ver
+    las alternativas evaluadas por el SVM, no solo la letra ganadora, lo que
+    permite entender la certeza de la predicción y detectar ambigüedades.
+
+    Args:
+        modelo: Clasificador scikit-learn con predict_proba() y classes_.
+        landmarks: Lista o array de 42 floats normalizados (x0,y0,…,x20,y20).
+        top_n: Número de alternativas a incluir (por defecto 5).
+
+    Returns:
+        dict con:
+            - letra (str): Letra principal predicha.
+            - confianza (float): Confianza en % de la letra principal (0–100).
+            - alternativas (list[dict]): top_n entradas {letra, confianza} ordenadas
+              de mayor a menor confianza.
+            - n_clases (int): Total de clases en el modelo.
+
+    Raises:
+        ValueError: Si landmarks no supera landmarks_validos().
+    """
+    if not landmarks_validos(landmarks):
+        raise ValueError("Vector de landmarks inválido (se esperaban 42 valores).")
+    vector = np.asarray(landmarks, dtype=float).reshape(1, -1)
+
+    if not hasattr(modelo, "predict_proba"):
+        letra = str(modelo.predict(vector)[0])
+        return {
+            "letra": letra,
+            "confianza": 100.0,
+            "alternativas": [{"letra": letra, "confianza": 100.0}],
+            "n_clases": len(modelo.classes_),
+        }
+
+    probas = modelo.predict_proba(vector)[0]
+    indices = np.argsort(probas)[::-1]
+    top_n = min(top_n, len(modelo.classes_))
+    alternativas = [
+        {
+            "letra": str(modelo.classes_[i]),
+            "confianza": round(float(probas[i]) * 100, 1),
+        }
+        for i in indices[:top_n]
+    ]
+    return {
+        "letra": alternativas[0]["letra"],
+        "confianza": alternativas[0]["confianza"],
+        "alternativas": alternativas,
+        "n_clases": len(modelo.classes_),
+    }
+
+
+def nombres_landmarks() -> dict:
+    """
+    Devuelve los nombres anatómicos de los 21 puntos clave de MediaPipe Hands.
+
+    Permite contextualizar las explicaciones XAI: el usuario entiende que el
+    sistema mide posiciones de partes reales de la mano, no píxeles abstractos.
+
+    Returns:
+        dict[int, str]: Mapa de índice (0–20) a nombre anatómico en español.
+    """
+    return dict(NOMBRES_LANDMARKS)
+
+
+def sesgos_conocidos() -> dict:
+    """
+    Retorna los sesgos y limitaciones documentadas del modelo LSP Vision AI.
+
+    Honestidad XAI (HU-16 CA-16.2): documentar explícitamente las limitaciones
+    permite al usuario calibrar su confianza y tomar decisiones informadas.
+    Esta función es la fuente única de verdad — la UI la llama para renderizar
+    la sección de limitaciones sin duplicar texto.
+
+    Returns:
+        dict[str, str]: Identificador del sesgo → descripción accesible en español.
+    """
+    return dict(SESGOS_CONOCIDOS)

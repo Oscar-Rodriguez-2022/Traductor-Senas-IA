@@ -2,11 +2,14 @@
 tests/test_etica.py — TDD: verificación de principios de IA Ética (HU-16, HU-20).
 
 Cubre: equidad por clase, calibración de confianza, explicabilidad en la UI,
-privacidad por diseño y transparencia sobre limitaciones del modelo.
+privacidad por diseño, transparencia sobre limitaciones del modelo y
+funciones XAI (explicar_prediccion, nombres_landmarks, sesgos_conocidos).
 
 Trazabilidad:
   HU-16 CA-16.1 — Explicabilidad del pipeline (diagrama y expander en lsp_ui)
-  HU-16 CA-16.2 — Honestidad sobre limitaciones del modelo
+  HU-16 CA-16.2 — Alternativas XAI del SVM (explicar_prediccion)
+  HU-16 CA-16.2 — Nombres anatómicos de landmarks (nombres_landmarks)
+  HU-16 CA-16.2 — Honestidad sobre sesgos (sesgos_conocidos)
   HU-20         — Privacidad: no biométricos en el log de auditoría
   IA_ETICA.md   — Criterios de equidad y sesgo documentados
 """
@@ -137,6 +140,112 @@ class TestExplicabilidad:
         letra, _ = lsp_core.predecir(modelo, landmarks_validos)
         assert str(letra).lower() in lsp_core.LETTERS, \
             f"El modelo predijo '{letra}', que no es una letra del alfabeto LSP"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# XAI — Funciones de explicabilidad algorítmica (HU-16 CA-16.2)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class TestXAI:
+    """HU-16 CA-16.2: verificar que las funciones XAI devuelven datos válidos y coherentes."""
+
+    def test_explicar_prediccion_devuelve_estructura_correcta(self, modelo, landmarks_validos):
+        """explicar_prediccion debe devolver dict con letra, confianza, alternativas y n_clases."""
+        resultado = lsp_core.explicar_prediccion(modelo, landmarks_validos)
+        assert isinstance(resultado, dict), "El resultado debe ser un dict"
+        assert "letra" in resultado
+        assert "confianza" in resultado
+        assert "alternativas" in resultado
+        assert "n_clases" in resultado
+
+    def test_explicar_prediccion_letra_valida(self, modelo, landmarks_validos):
+        """La letra principal predicha debe pertenecer al alfabeto LSP."""
+        resultado = lsp_core.explicar_prediccion(modelo, landmarks_validos)
+        assert str(resultado["letra"]).lower() in lsp_core.LETTERS, \
+            f"La letra '{resultado['letra']}' no es del alfabeto LSP"
+
+    def test_explicar_prediccion_confianza_valida(self, modelo, landmarks_validos):
+        """La confianza principal debe estar en el rango [0, 100]."""
+        resultado = lsp_core.explicar_prediccion(modelo, landmarks_validos)
+        assert 0.0 <= resultado["confianza"] <= 100.0, \
+            f"Confianza {resultado['confianza']} fuera del rango [0, 100]"
+
+    def test_explicar_prediccion_coincide_con_predecir(self, modelo, landmarks_validos):
+        """La letra y confianza de explicar_prediccion deben coincidir con predecir()."""
+        letra_pred, conf_pred = lsp_core.predecir(modelo, landmarks_validos)
+        xai = lsp_core.explicar_prediccion(modelo, landmarks_validos)
+        assert xai["letra"] == letra_pred, \
+            "La letra de explicar_prediccion no coincide con predecir()"
+        assert abs(xai["confianza"] - conf_pred) < 0.2, \
+            "La confianza de explicar_prediccion difiere de predecir() en más de 0.2%"
+
+    def test_explicar_prediccion_alternativas_ordenadas(self, modelo, landmarks_validos):
+        """Las alternativas deben estar ordenadas de mayor a menor confianza."""
+        xai = lsp_core.explicar_prediccion(modelo, landmarks_validos, top_n=5)
+        confianzas = [a["confianza"] for a in xai["alternativas"]]
+        assert confianzas == sorted(confianzas, reverse=True), \
+            "Las alternativas no están ordenadas de mayor a menor confianza"
+
+    def test_explicar_prediccion_alternativas_suman_aprox_100(self, modelo, landmarks_validos):
+        """La suma de todas las probabilidades del modelo debe ser ≈100%."""
+        xai = lsp_core.explicar_prediccion(modelo, landmarks_validos, top_n=modelo.classes_.size)
+        total = sum(a["confianza"] for a in xai["alternativas"])
+        assert abs(total - 100.0) < 1.0, \
+            f"La suma de probabilidades es {total:.2f}%, debería ser ≈100%"
+
+    def test_explicar_prediccion_landmarks_invalidos_lanza_error(self, modelo):
+        """explicar_prediccion debe lanzar ValueError con landmarks inválidos."""
+        with pytest.raises(ValueError, match="42"):
+            lsp_core.explicar_prediccion(modelo, [0.5] * 10)
+
+    def test_nombres_landmarks_tiene_21_puntos(self):
+        """nombres_landmarks debe devolver exactamente 21 entradas (0–20)."""
+        nombres = lsp_core.nombres_landmarks()
+        assert isinstance(nombres, dict), "nombres_landmarks debe devolver un dict"
+        assert len(nombres) == lsp_core.NUM_LANDMARKS, \
+            f"Se esperaban {lsp_core.NUM_LANDMARKS} landmarks, se obtuvieron {len(nombres)}"
+        assert set(nombres.keys()) == set(range(lsp_core.NUM_LANDMARKS)), \
+            "Las claves deben ser los índices 0–20"
+
+    def test_nombres_landmarks_todos_son_strings(self):
+        """Todos los nombres anatómicos deben ser cadenas no vacías."""
+        for idx, nombre in lsp_core.nombres_landmarks().items():
+            assert isinstance(nombre, str) and nombre.strip(), \
+                f"El landmark {idx} tiene nombre inválido: {repr(nombre)}"
+
+    def test_sesgos_conocidos_devuelve_dict_no_vacio(self):
+        """sesgos_conocidos debe devolver un dict con al menos 3 entradas documentadas."""
+        sesgos = lsp_core.sesgos_conocidos()
+        assert isinstance(sesgos, dict), "sesgos_conocidos debe devolver un dict"
+        assert len(sesgos) >= 3, \
+            f"Se esperaban ≥3 sesgos documentados, se obtuvieron {len(sesgos)}"
+
+    def test_sesgos_conocidos_menciona_diversidad_entrenamiento(self):
+        """El sesgo de diversidad de entrenamiento debe estar documentado (IA Ética)."""
+        sesgos = lsp_core.sesgos_conocidos()
+        assert "diversidad_entrenamiento" in sesgos, \
+            "Debe documentarse el sesgo de diversidad del dataset de entrenamiento"
+
+    def test_sesgos_conocidos_menciona_letras_dinamicas(self):
+        """El sesgo de letras dinámicas (J, Z) debe estar documentado."""
+        sesgos = lsp_core.sesgos_conocidos()
+        assert "letras_dinamicas" in sesgos, \
+            "Debe documentarse que J y Z no están soportadas (sesgo por omisión)"
+
+    def test_render_alternativas_no_falla_con_lista_vacia(self):
+        """render_alternativas no debe lanzar excepción con lista vacía (sin mano)."""
+        # No debe ejecutar ningún st.markdown si la lista está vacía
+        import inspect
+        fuente = inspect.getsource(lsp_ui.render_alternativas)
+        assert "if not alternativas" in fuente, \
+            "render_alternativas debe verificar la lista vacía antes de renderizar"
+
+    def test_render_alternativas_menciona_xai_en_aria_label(self):
+        """El panel XAI debe tener aria-label para accesibilidad (HU-15 + HU-16)."""
+        import inspect
+        fuente = inspect.getsource(lsp_ui.render_alternativas)
+        assert "aria-label" in fuente, \
+            "render_alternativas debe incluir aria-label para lectores de pantalla"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

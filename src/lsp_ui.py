@@ -11,16 +11,18 @@ Extrae todo el HTML/CSS de app.py aplicando correcciones WCAG 2.1 AA:
 - Indicador visual de baja confianza (< 60%) en borde amarillo
 
 Trazabilidad de Historias de Usuario:
-  HU-10 CA-10.3 — Indicador de confianza rojo/amarillo     (render_resultado: borde por umbral)
-  HU-11 CA-11.1 — Panel de historial de señas              (render_resultado: sección historial)
-  HU-12 CA-12.2 — Controles e interfaz responden al usuario (render_topbar, render_hero)
-  HU-12 CA-12.3 — Estado del sistema visible               (render_estado_sistema)
-  HU-15 CA-15.1 — aria-live="polite" en resultado          (render_resultado: atributo ARIA)
-  HU-15 CA-15.2 — Contraste de texto ≥4.5:1               (render_estilos: #6b6b6b, #767676)
-  HU-15 CA-15.3 — Skip-nav funcional (WCAG 2.4.1)          (render_skip_nav)
-  HU-16 CA-16.1 — Explicabilidad del pipeline de IA        (render_pipeline_explicado)
-  HU-16 CA-16.2 — Emojis decorativos con aria-hidden       (render_pipeline_explicado: aria-hidden)
-  HU-17 CA-17.1 — Estadísticas del sistema al usuario      (render_estadisticas)
+  HU-10 CA-10.3 — Indicador de confianza rojo/amarillo      (render_resultado: borde por umbral)
+  HU-11 CA-11.1 — Panel de historial de señas               (render_resultado: sección historial)
+  HU-12 CA-12.2 — Controles e interfaz responden al usuario  (render_topbar, render_hero)
+  HU-12 CA-12.3 — Estado del sistema visible                 (render_estado_sistema)
+  HU-15 CA-15.1 — aria-live="polite" en resultado            (render_resultado: atributo ARIA)
+  HU-15 CA-15.2 — Contraste de texto ≥4.5:1                 (render_estilos: #6b6b6b, #767676)
+  HU-15 CA-15.3 — Skip-nav funcional (WCAG 2.4.1)            (render_skip_nav)
+  HU-16 CA-16.1 — Diagrama del pipeline de IA                (render_pipeline_explicado)
+  HU-16 CA-16.2 — Alternativas XAI del SVM al usuario        (render_alternativas)
+  HU-16 CA-16.2 — Sesgos documentados en lenguaje accesible  (render_pipeline_explicado: expander)
+  HU-16 CA-16.2 — Emojis decorativos con aria-hidden         (render_pipeline_explicado: aria-hidden)
+  HU-17 CA-17.1 — Estadísticas del sistema al usuario        (render_estadisticas)
 """
 import streamlit as st
 
@@ -335,41 +337,143 @@ def render_pipeline_explicado() -> None:
     )
 
     with st.expander("¿Cómo decide la IA? — Explicabilidad y limitaciones del sistema"):
+        # HU-16 CA-16.2: fuente única de sesgos desde lsp_core.sesgos_conocidos()
+        try:
+            import lsp_core
+            _sesgos = lsp_core.sesgos_conocidos()
+        except Exception:
+            _sesgos = {}
+
+        _items_sesgo = "\n".join(
+            f"- **{k.replace('_', ' ').capitalize()}:** {v}"
+            for k, v in _sesgos.items()
+        ) if _sesgos else "- Sin información de sesgos disponible."
+
         st.markdown(
-            """
+            f"""
 **Representación geométrica de la mano**
 
-MediaPipe Hands detecta 21 puntos anatómicos (muñeca, nudillos y puntas de cada dedo).
-Cada punto tiene coordenadas X e Y normalizadas entre 0 y 1, relativas al borde de la imagen.
-El sistema trabaja con **42 números**, no con píxeles — esto es lo que permite que funcione
+MediaPipe Hands detecta **21 puntos anatómicos** (muñeca, nudillos y puntas de cada dedo).
+Cada punto tiene coordenadas X e Y normalizadas entre 0 y 1 relativas al borde de la imagen.
+El sistema trabaja con **42 números** — no con píxeles — lo que le permite funcionar
 en cualquier resolución y con fondos variables.
+
+El panel *"¿Qué otras letras consideró la IA?"* muestra estos 42 números convertidos en
+probabilidades para cada letra, permitiéndote ver la certeza de cada decisión.
 
 **Clasificación por Máquina de Vectores de Soporte (SVM)**
 
 El SVM aprendió **hiperplanos** que separan los vectores de 42 valores correspondientes a
-cada letra de la LSP. Durante la predicción, calcula a qué clase pertenece el vector midiendo
-la distancia a esos hiperplanos. La **confianza** es la probabilidad de Platt: *P(clase | vector) × 100*.
+cada letra de la LSP. Durante la predicción, calcula a qué clase pertenece el vector
+midiendo la distancia a esos hiperplanos. La **confianza** es la probabilidad de Platt:
+*P(clase | vector) × 100* — aparece en el panel de alternativas XAI.
 
 **Indicadores de confianza**
 
-| Borde | Significado |
-|-------|-------------|
+| Borde del panel | Significado |
+|-----------------|-------------|
 | 🔴 Rojo (≥ 60%) | Alta seguridad — la letra está bien reconocida |
 | 🟡 Amarillo (< 60%) | Ambigüedad — repite la seña o ajusta la posición |
 | Sin borde | No hay mano visible |
 
 **⚠️ Limitaciones y sesgos conocidos (IA Ética)**
 
-El modelo puede equivocarse en los siguientes casos:
-- **Letras similares:** B/E, A/S, G/Q comparten vectores de landmarks parecidos.
-- **Sesgo de entrenamiento:** el modelo fue entrenado con datos del equipo UPN (4 personas). La precisión puede variar con otras manos, tonos de piel o condiciones de iluminación.
-- **Letras dinámicas:** J y Z requieren movimiento y no están soportadas en esta versión.
-- **Iluminación deficiente:** poca luz o contraluz reduce la capacidad de MediaPipe para detectar landmarks.
+El modelo puede equivocarse. Los sesgos documentados son:
 
-El borde **amarillo** está diseñado para avisar antes de que el sistema cometa un error.
+{_items_sesgo}
+
+El borde **amarillo** y el aviso en el panel XAI están diseñados para avisar
+antes de que el sistema cometa un error visible.
 Para un análisis detallado de equidad por clase, consulta el Dashboard de Métricas QA.
 """
         )
+
+
+# ─────────────────────────────── Alternativas XAI ─────────────────────────────
+def render_alternativas(alternativas: list) -> None:
+    """
+    Renderiza el panel XAI de alternativas: top-5 letras consideradas por el SVM.
+
+    Implementa el principio de transparencia algorítmica (HU-16 CA-16.2):
+    el usuario ve qué otras letras evaluó el modelo antes de decidir, lo que
+    le permite entender la certeza de la predicción y cuándo la seña es ambigua.
+    Si las dos primeras opciones están muy cercanas (< 10% de diferencia), la
+    nota al pie lo indica para que el usuario repita la seña.
+
+    Args:
+        alternativas: Lista de dicts {letra, confianza} ordenada de mayor a menor
+            confianza. Vacía si no hay mano detectada o la predicción falló.
+    """
+    if not alternativas:
+        return
+
+    filas_html = ""
+    for i, alt in enumerate(alternativas):
+        pct = alt["confianza"]
+        # Primera opción: rojo institucional; resto: naranja si ≥30%, gris si no
+        if i == 0:
+            color = "#E30613"
+            peso = "800"
+        elif pct >= 30:
+            color = "#f0a500"
+            peso = "600"
+        else:
+            color = "#bbb"
+            peso = "400"
+        filas_html += (
+            f'<tr>'
+            f'<td style="font-weight:{peso};color:#1A1A1A;font-size:14px;'
+            f'padding:5px 10px;" aria-label="Letra {alt["letra"].upper()}">'
+            f'{alt["letra"].upper()}</td>'
+            f'<td style="padding:5px 10px;width:130px;">'
+            f'<div style="background:#f1e4e4;border-radius:6px;height:10px;overflow:hidden;">'
+            f'<div style="background:{color};width:{pct:.0f}%;height:100%;'
+            f'border-radius:6px;" aria-hidden="true"></div></div></td>'
+            f'<td style="text-align:right;font-weight:{peso};color:{color};'
+            f'font-size:13px;padding:5px 10px;">{pct:.1f}%</td>'
+            f'</tr>'
+        )
+
+    # Aviso de ambigüedad si las dos primeras opciones están cerca
+    nota = ""
+    if len(alternativas) >= 2:
+        diferencia = alternativas[0]["confianza"] - alternativas[1]["confianza"]
+        if diferencia < 10:
+            nota = (
+                f'<p style="font-size:11.5px;color:#f0a500;margin-top:6px;" '
+                f'role="alert" aria-label="Advertencia de ambigüedad">'
+                f'⚠ La IA dudó entre <b>{alternativas[0]["letra"].upper()}</b> y '
+                f'<b>{alternativas[1]["letra"].upper()}</b> (diferencia: {diferencia:.1f}%). '
+                f'Repite la seña con más claridad.</p>'
+            )
+
+    st.markdown(
+        f"""
+<div class="card" role="region" aria-label="Alternativas XAI: letras consideradas por la IA">
+    <div class="card-title" aria-hidden="true">🔍 ¿Qué otras letras consideró la IA?</div>
+    <table style="width:100%;border-collapse:collapse;"
+           aria-label="Top {len(alternativas)} alternativas evaluadas por el SVM">
+        <thead>
+            <tr>
+                <th style="text-align:left;font-size:11px;color:#6b6b6b;
+                           padding:2px 10px;">Letra</th>
+                <th style="text-align:left;font-size:11px;color:#6b6b6b;
+                           padding:2px 10px;">Probabilidad SVM</th>
+                <th style="text-align:right;font-size:11px;color:#6b6b6b;
+                           padding:2px 10px;">%</th>
+            </tr>
+        </thead>
+        <tbody>{filas_html}</tbody>
+    </table>
+    {nota}
+    <p style="font-size:11px;color:#767676;margin-top:8px;">
+        El SVM evaluó las {len(alternativas)} letras más probables y seleccionó la de mayor
+        probabilidad de Platt. Un valor alto indica que la seña fue clara y bien posicionada.
+    </p>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
 
 # ─────────────────────────────── Estadísticas ─────────────────────────────────

@@ -1,5 +1,5 @@
 """
-test_sistema.py — Suite de pruebas de sistema (UT-01 a UT-18) — LSP Vision AI.
+tests/test_sistema.py — Suite de pruebas de sistema (UT-01 a UT-18) — LSP Vision AI.
 Universidad Privada del Norte (UPN) · Capstone Project Sistemas 2026
 
 VERSIÓN REFACTORIZADA (XP — Principio de Honestidad): los stubs originales
@@ -8,15 +8,17 @@ Los tests que dependen de hardware físico (cámara) están marcados con
 @pytest.mark.skip y documentan su criterio de aceptación.
 
 Ejecutar:
-    pytest test_sistema.py -v
-    python test_sistema.py          (genera reporte_pruebas.txt)
+    pytest tests/test_sistema.py -v
+    pytest tests/ -v                   (junto con toda la suite)
+    python tests/test_sistema.py       (genera reporte_pruebas.xml)
 """
 import os
 import sys
 import numpy as np
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
+# Compatibilidad para ejecución directa: python tests/test_sistema.py
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 import lsp_core
 import lsp_auth
@@ -170,7 +172,6 @@ def test_ut16_privacidad_frames_no_persistidos(tmp_path):
     """UT-16 HU-20 GDPR Art. 25: procesamiento de frames no crea archivos de imagen."""
     import glob as _glob
     antes = set(_glob.glob("*.png") + _glob.glob("*.jpg"))
-    # Simular el flujo de procesamiento de un frame
     img = np.zeros((240, 320, 3), dtype=np.uint8)
     vec = lsp_core.extraer_landmarks(img)
     assert vec is None   # sin mano, sin persistencia
@@ -199,7 +200,7 @@ def test_ut18_entorno_importa_dependencias_principales():
     assert len(faltantes) == 0, f"Dependencias no instaladas: {faltantes}"
 
 
-# ─────────────────────── Runner standalone (genera reporte_pruebas.txt) ───────
+# ─────────────────────── Runner standalone (genera reporte_pruebas.xml) ───────
 
 if __name__ == "__main__":
     import subprocess
