@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fase 11 — Matriz de confusión + heatmap PNG.
 
 Uso:  python qa/confusion_matrix.py
@@ -6,7 +6,7 @@ Uso:  python qa/confusion_matrix.py
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 import lsp_core
 from qa._utils import REPORTES, banner
 

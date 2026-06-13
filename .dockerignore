@@ -1,0 +1,43 @@
+# .dockerignore — excluye archivos innecesarios o sensibles de la imagen Docker
+# Ref: SEGURIDAD.md — Capa de Infraestructura
+
+# Control de versiones
+.git
+.gitignore
+
+# Entornos virtuales Python
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Secretos y configuración local
+.streamlit/secrets.toml
+*.env
+.env.*
+secrets.*
+
+# Artefactos de tests y cobertura
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Dataset de imágenes (grande, no va a producción)
+data/
+
+# Reportes de QA (generados en runtime)
+reportes/
+
+# Documentación y artefactos de desarrollo
+docs/
+*.md
+!README.md
+
+# Windows artifacts
+Thumbs.db
+desktop.ini

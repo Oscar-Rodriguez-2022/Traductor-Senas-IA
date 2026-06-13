@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fase 12 — Validación cruzada K-Fold (k=5 y k=10).
 Reentrena sobre folds para una estimación honesta (no optimista).
 Reporta media y desviación estándar del accuracy.
@@ -8,7 +8,7 @@ Uso:  python qa/cross_validation.py
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 import lsp_core
 from qa._utils import guardar_csv, banner
 

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fase 10 — Métricas de precisión del modelo sobre el dataset real.
 Accuracy, Precision, Recall y F1 (macro y por clase).
 
@@ -7,7 +7,7 @@ Uso:  python qa/evaluate.py
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 import lsp_core
 from qa._utils import guardar_csv, guardar_json, banner
 

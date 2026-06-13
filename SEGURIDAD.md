@@ -10,20 +10,38 @@ base de datos, ni formularios de texto libre). Es una app **Streamlit** que:
 - Procesa frames en memoria y devuelve la letra. **No almacena imágenes**.
 - No tiene login, ni cookies de sesión personalizadas, ni almacenamiento de datos del usuario.
 
-## Vectores evaluados
+## Vectores evaluados (Plan de Seguridad Integral — tres capas)
+
+### Capa de Aplicación
 
 | Riesgo | Estado | Justificación |
 |---|---|---|
-| **XSS** | ✅ Bajo | Se usa `unsafe_allow_html=True`, pero solo se inyectan datos NO controlados por el usuario (la letra predicha — una sola letra a-z — y un número). No hay texto de usuario reflejado en el HTML. |
-| **Inyección SQL** | ✅ N/A | No hay base de datos ni consultas. |
-| **CSRF** | ✅ Implementado | `enableXsrfProtection = true` activo en `.streamlit/config.toml`. |
-| **Inputs inválidos** | ✅ Controlado | `lsp_core.predecir()` valida el vector (42 valores finitos) y lanza `ValueError`; cubierto por pruebas. |
-| **Sanitización** | ✅ OK | El único "input" es el frame de cámara (binario), procesado por OpenCV/MediaPipe. |
-| **Errores expuestos** | ✅ Implementado | `showErrorDetails = false` activo en `.streamlit/config.toml` desde v1.1. |
-| **Secretos en el repo** | ✅ OK | No hay claves API ni credenciales en el código. `secrets.toml` en `.gitignore`. |
-| **Permiso de cámara** | ✅ OK | Lo gestiona el navegador; el usuario debe autorizar explícitamente. |
-| **Autenticación** | ✅ Implementado | Módulo `lsp_auth.py`: tokens HMAC-SHA256 con expiración de 60 min (v1.1). |
-| **Auditoría** | ✅ Implementado | Módulo `lsp_audit.py`: log JSON Lines sin datos personales (v1.1). |
+| **XSS** | ✅ Bajo | `unsafe_allow_html=True` solo inyecta datos del sistema (letra a-z, número). Nunca texto libre del usuario. Verificado en `tests/test_seguridad.py::TestSanitizacionInputs`. |
+| **Inyección SQL** | ✅ N/A | No hay base de datos ni consultas SQL. |
+| **Inyección en hash** | ✅ Controlado | `hash_password()` trata cualquier input como texto plano (PBKDF2-HMAC-SHA256); inyecciones son hasheadas, no ejecutadas. |
+| **CSRF** | ✅ Implementado | `enableXsrfProtection = true` en `.streamlit/config.toml`. |
+| **Inputs inválidos** | ✅ Controlado | `lsp_core.predecir()` valida 42 valores finitos y lanza `ValueError`. |
+| **Fuerza bruta (brute-force)** | ✅ Implementado v1.2 | Rate limiting: tras `MAX_INTENTOS=5` fallidos consecutivos, `lsp_auth.generar_token_sesion()` retorna `None` durante `BLOQUEO_SEGUNDOS=300` (5 min). Auto-reset en login exitoso. |
+| **Errores expuestos** | ✅ Implementado | `showErrorDetails = false` en `.streamlit/config.toml`. |
+| **Secretos en el repo** | ✅ OK | Sin claves en código. `secrets.toml` en `.gitignore`. Detectado por `tests/test_seguridad.py::test_no_credenciales_en_texto_plano`. |
+
+### Capa de Almacenamiento
+
+| Riesgo | Estado | Justificación |
+|---|---|---|
+| **Deserialización maliciosa (PKL)** | ✅ Implementado v1.2 | `lsp_core.calcular_hash_modelo()` y `verificar_integridad_modelo()` calculan SHA-256 del modelo. Verificar antes de cargar modelos de fuentes externas. |
+| **Datos personales en audit log** | ✅ OK | IDs de sesión son SHA-256[:8], no reversibles. Sin IP, user-agent ni nombre. Verificado en `tests/test_seguridad.py::TestAuditLogAnonimato`. |
+| **Landmarks biométricos en log** | ✅ OK | El log solo registra el evento y detalle textual; nunca vectores de 42 floats. |
+| **Autenticación** | ✅ Implementado | Tokens HMAC-SHA256 con expiración de 60 min. PBKDF2 260k iteraciones. |
+| **Auditoría** | ✅ Implementado | Log JSON Lines anónimo, purga automática 7 días. |
+
+### Capa de Infraestructura
+
+| Riesgo | Estado | Justificación |
+|---|---|---|
+| **Permiso de cámara** | ✅ OK | Controlado por el navegador; el usuario debe autorizar explícitamente. |
+| **Frames persistidos** | ✅ OK | Procesamiento en memoria únicamente. Verificado en `tests/test_seguridad.py::TestPrivacidadPorDiseno`. |
+| **Configuración insegura** | ✅ OK | `showErrorDetails=false`, `enableXsrfProtection=true`. Verificado en `tests/test_seguridad.py::TestConfiguracionStreamlit`. |
 
 ## Recomendaciones (actualizadas v1.1)
 
@@ -62,15 +80,16 @@ El filesystem de Streamlit Cloud es **efímero**: al reiniciar el servidor (auto
 
 ---
 
-## Conclusión (v1.1)
+## Conclusión (v1.2)
 
 La superficie de ataque es **mínima** por diseño (sin BD, sin datos de usuario
-persistentes, procesamiento efímero en memoria). Los controles de seguridad de la
-versión 1.1 implementan: autenticación HMAC, trazas ocultas en producción, XSRF activo
-y auditoría anónima. El riesgo principal a vigilar sigue siendo la **deserialización
-de `modelo.pkl`**: solo cargar modelos generados por el equipo.
+persistentes, procesamiento efímero en memoria). Los controles de la v1.2 añaden:
+rate limiting anti-fuerza-bruta y verificación SHA-256 del modelo PKL.
+
+La suite `tests/test_seguridad.py` cubre las tres capas con 20 tests automatizados.
 
 | Versión | Fecha | Cambios de seguridad |
 |---|---|---|
 | 1.0 | 2026-06-09 | Análisis inicial — sin controles implementados |
 | 1.1 | 2026-06-10 | Auth HMAC (`lsp_auth`), audit log (`lsp_audit`), `showErrorDetails=false`, XSRF, privacidad GDPR documentada |
+| 1.2 | 2026-06-12 | Rate limiting anti-brute-force (`MAX_INTENTOS=5`, `BLOQUEO_SEGUNDOS=300`); verificación de integridad `modelo.pkl` SHA-256 (`calcular_hash_modelo`, `verificar_integridad_modelo`); suite `tests/test_seguridad.py` con 20 tests por capas |

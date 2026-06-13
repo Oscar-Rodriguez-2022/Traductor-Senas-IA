@@ -1,4 +1,4 @@
-# Manual de Usuario Preliminar — LSP Vision AI
+﻿# Manual de Usuario Preliminar — LSP Vision AI
 ## Sistema Interactivo de Visión Artificial para la Comunicación Inclusiva (LSP)
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
 **Autor:** Rodriguez Chacara, Oscar Daniel
@@ -9,7 +9,7 @@
 
 1. [Descripción general del sistema](#1-descripción-general-del-sistema)
 2. [Requisitos del sistema](#2-requisitos-del-sistema)
-3. [Acceso e inicio de sesión](#3-acceso-e-inicio-de-sesión)
+3. [Acceso e inicio de sesión](#3-acceso-e-inicio-de-sesión) — incluye protección anti-fuerza-bruta (§3.5)
 4. [Pantalla principal — Traductor en tiempo real](#4-pantalla-principal--traductor-en-tiempo-real)
 5. [Interpretación del indicador de confianza](#5-interpretación-del-indicador-de-confianza)
 6. [Historial de señas y construcción de texto](#6-historial-de-señas-y-construcción-de-texto)
@@ -62,7 +62,7 @@ No almacena imágenes ni datos personales. Todo el procesamiento ocurre en memor
 
 **Versión local:**
 ```bash
-streamlit run app.py
+streamlit run src/app.py
 ```
 Luego abre el navegador en `http://localhost:8501`.
 
@@ -93,10 +93,35 @@ Al abrir la aplicación verás únicamente el formulario de acceso. El contenido
 | Situación | Resultado |
 |-----------|-----------|
 | Clave correcta | Se redirige al traductor y se genera una sesión válida por 60 minutos. |
-| Clave incorrecta | Aparece el mensaje *"Clave incorrecta. Intenta nuevamente."* Sin bloqueo. |
+| Clave incorrecta (1–4 intentos) | Aparece el mensaje *"Clave incorrecta. Intentos restantes: N"*. |
+| Clave incorrecta (5.° intento) | Cuenta bloqueada por 5 minutos. Ver sección 3.5. |
+| Cuenta bloqueada | Aparece el mensaje *"Demasiados intentos fallidos. Espera 5 minutos."* |
 | Sesión expirada (> 60 min) | Se muestra nuevamente el formulario de acceso. |
 
 > **Privacidad:** el sistema no registra tu identidad ni dirección IP. Solo guarda un identificador de sesión anónimo de 8 caracteres para la auditoría de accesos.
+
+### 3.5 Protección contra accesos no autorizados (Rate Limiting)
+
+El sistema incorpora una **protección anti-fuerza-bruta** que bloquea el acceso temporalmente tras múltiples intentos fallidos consecutivos:
+
+| Parámetro | Valor |
+|-----------|-------|
+| Intentos permitidos antes del bloqueo | 5 |
+| Duración del bloqueo | 5 minutos (300 segundos) |
+| Contador visible | Sí — se muestra cuántos intentos quedan |
+| Reseteo automático | Al introducir la clave correcta o al expirar el período |
+
+**¿Qué ver en pantalla durante el bloqueo?**
+
+```
+⛔  Demasiados intentos fallidos.
+    Por seguridad, el acceso está bloqueado.
+    Espera 5 minutos e intenta nuevamente.
+```
+
+Este control no guarda ningún dato personal; el contador se mantiene en memoria durante la sesión del servidor. Un reinicio del servidor restablece el contador.
+
+> **Para evaluadores:** si durante una demostración se alcanza el límite de 5 intentos, espera 5 minutos o reinicia el servidor local con `streamlit run src/app.py`.
 
 ---
 
@@ -263,6 +288,9 @@ El sistema reconoce las letras estáticas del alfabeto LSP implementadas en el d
 **¿Puedo usarlo en el teléfono?**
 La aplicación es responsiva, pero el rendimiento del modelo puede variar en dispositivos móviles. Se recomienda el uso en computadora de escritorio o laptop.
 
+**¿Qué pasa si escribo la clave incorrectamente 5 veces?**
+El sistema bloquea el acceso durante 5 minutos como medida de seguridad. Aparecerá el mensaje *"Demasiados intentos fallidos."* Espera el tiempo indicado e intenta nuevamente. Si estás ejecutando el servidor localmente, puedes reiniciarlo para restablecer el contador.
+
 **La sesión se cerró sola, ¿qué pasó?**
 Las sesiones expiran a los 60 minutos por seguridad. Ingresa tu clave nuevamente para continuar.
 
@@ -285,4 +313,5 @@ Para reportar problemas técnicos o consultas académicas, dirigirse al equipo d
 
 ---
 
-*Versión 1.0 — Junio 2026 · LSP Vision AI · UPN Sistemas*
+*Versión 1.1 — Junio 2026 · LSP Vision AI · UPN Sistemas*
+*Cambios v1.1: sección 3.5 Rate Limiting, FAQ ampliado, referencias a nueva estructura `docs/`*

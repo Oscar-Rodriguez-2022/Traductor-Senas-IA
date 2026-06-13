@@ -11,3 +11,18 @@ max-line-length = 120
 
 [tool.pylint."messages control"]
 disable = ["C0114", "C0115", "C0116", "C0103", "W0718", "R0914", "R0801"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "test_sistema.py"]
+addopts = "-v --tb=short"
+pythonpath = ["src"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
+markers = [
+    "slow: tests que requieren más de 1 segundo (model eval, FPS)",
+    "integration: tests que requieren recursos externos (modelo.pkl, dataset)",
+    "security: tests del plan de seguridad DevSecOps por capas",
+    "hardware: tests que requieren hardware físico (cámara web)",
+]

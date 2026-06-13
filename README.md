@@ -1,4 +1,4 @@
-# Sistema Interactivo de Visión Artificial para la Comunicación Inclusiva de Personas con Discapacidad Auditiva (LSP)
+﻿# Sistema Interactivo de Visión Artificial para la Comunicación Inclusiva de Personas con Discapacidad Auditiva (LSP)
 
 ### Universidad Privada del Norte (UPN)
 * **Facultad de Ingeniería**
@@ -101,7 +101,7 @@ pip install -r requirements.txt
 py -3.12 augmentar_dataset.py   # o: py -3.12 entrenar_modelo.py
 
 # 5. Ejecutar la aplicación web
-streamlit run app.py
+streamlit run src/app.py
 ```
 
 **Clave de acceso demo:** `UPN2026`

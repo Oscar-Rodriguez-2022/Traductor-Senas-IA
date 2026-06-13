@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fase 5 — Benchmark de rendimiento por etapa del pipeline.
 Mide carga de modelo, detección MediaPipe, extracción, clasificación y total.
 
@@ -9,7 +9,7 @@ import sys
 import time
 import statistics
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 import lsp_core
 from qa._utils import guardar_csv, banner
 

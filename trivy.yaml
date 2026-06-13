@@ -1,0 +1,57 @@
+# trivy.yaml — Configuración de escaneo de vulnerabilidades con Trivy
+# DevSecOps — Capa de Infraestructura (ref. SEGURIDAD.md)
+#
+# Uso local:
+#   trivy image lsp-vision-ai:latest
+#   trivy fs --config trivy.yaml .
+#
+# Uso en CI/CD (GitHub Actions):
+#   - name: Scan Docker image
+#     uses: aquasecurity/trivy-action@master
+#     with:
+#       image-ref: lsp-vision-ai:latest
+#       format: table
+#       exit-code: '1'
+#       severity: CRITICAL,HIGH
+
+severity:
+  - CRITICAL
+  - HIGH
+  - MEDIUM
+
+# Tipos de escaneo habilitados
+scan:
+  - vuln         # vulnerabilidades en dependencias
+  - config       # misconfiguraciones de Dockerfile / K8s
+  - secret       # secretos en código fuente
+
+# Ignorar falsos positivos documentados
+ignore-unfixed: false
+
+# Límite de tiempo por escaneo
+timeout: 10m0s
+
+# Formato de salida
+format: table
+
+# Salir con código ≠ 0 si hay CVE CRITICAL o HIGH (para bloquear CI)
+exit-code: 1
+exit-on-eol-os: false
+
+# Archivos y directorios a ignorar
+skip-dirs:
+  - .venv
+  - venv
+  - data
+  - reportes
+  - .git
+
+skip-files:
+  - "**/*.pyc"
+
+# Políticas de excepción por CVE (agregar aquí CVEs aceptados con justificación)
+# Ejemplo:
+# ignore-policy: |
+#   package(name == "curl") {
+#     msg = "curl solo se usa en HEALTHCHECK, no expone datos de usuario"
+#   }

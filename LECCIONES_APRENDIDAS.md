@@ -112,6 +112,50 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 
 ---
 
+---
+
+## Sprint 4 — Trazabilidad, Calidad y Cierre de Capstone
+
+### Decisiones técnicas
+
+#### DT-09: Separación de artefactos de arquitectura en `docs/`
+**Decisión:** crear la carpeta `docs/` con `requerimientos.md` (15 RF + 15 RNF), `docs/arquitectura/COMPONENTES.md` (diagramas Mermaid) y `docs/arquitectura/MODELO_DATOS.md` (modelo de datos incremental).
+**Motivación:** las HU-01 y HU-02 referenciaban `docs/requerimientos.md` y `docs/arquitectura/` que no existían. Los evaluadores y futuros integrantes necesitan encontrar la documentación en rutas predecibles.
+**Resultado:** trazabilidad completa CA-01.1 (15 RF + 15 RNF), CA-02.1/02.2/02.3 (diagramas de componentes y casos de uso) verificables mediante links en `HISTORIAS_USUARIO.md`.
+**Lección:** los artefactos de documentación referenciados en las HUs deben existir como archivos reales desde el Sprint en que se crea la HU. Un link roto es evidencia de deuda técnica de documentación.
+
+#### DT-10: Reemplazo de tests-stub por assertions reales (XP — Honestidad)
+**Decisión:** reescribir los 18 tests en `test_sistema.py` que usaban `assertTrue(True)` y variables hardcoded (`precision_obtenida = 0.87; assertGreaterEqual(precision_obtenida, 0.85)`).
+**Motivación:** los tests que siempre pasan sin ejecutar código real violan el principio XP de *feedback honesto*. Proporcionan falsa confianza al equipo y al evaluador.
+**Resultado:** 15 de los 18 tests ahora llaman a `lsp_core`, `lsp_auth` o `sklearn` directamente. Los 3 tests dependientes de hardware físico (cámara) llevan `@pytest.mark.skip` con justificación explícita.
+**Lección:** en revisiones de código, buscar activamente el patrón `assert True` o variables locales hardcodeadas como evidencia de tests stub. Un test stub que siempre pasa es peor que no tener test: crea una falsa sensación de cobertura.
+
+#### DT-11: Rate limiting como control de seguridad en capa de aplicación
+**Decisión:** añadir protección anti-fuerza-bruta en `lsp_auth.py`: bloqueo automático tras 5 intentos fallidos consecutivos durante 5 minutos, con reset automático en login exitoso y en expiración del período.
+**Motivación:** la ausencia de rate limiting dejaba abierto un vector de ataque de diccionario contra la clave académica, que es intrínsecamente menos compleja que una clave de producción.
+**Resultado:** `esta_bloqueado()`, `_registrar_fallo()` y `_resetear_intentos()` añadidos con estado de módulo thread-safe. 5 tests TDD en `tests/test_seguridad.py::TestRateLimiting`.
+**Lección:** los controles de seguridad de nivel de aplicación (rate limiting, lockout) son tan importantes como los criptográficos (HMAC). Ambos deben estar en el DoD desde el primer sprint que incluya autenticación.
+
+#### DT-12: Verificación de integridad del modelo PKL como control de cadena de suministro
+**Decisión:** añadir `calcular_hash_modelo()` y `verificar_integridad_modelo()` en `lsp_core.py` para detectar manipulación del archivo `modelo.pkl` antes de cargarlo.
+**Motivación:** la deserialización de pickles arbitrarios es una vulnerabilidad conocida (OWASP CWE-502). El modelo se genera localmente pero podría ser reemplazado por un archivo malicioso en un entorno compartido o comprometido.
+**Resultado:** función SHA-256 en bloques de 64 KB disponible para verificación manual y automatizada. Documentada en `SEGURIDAD.md` v1.2.
+**Lección:** los archivos binarios generados durante el desarrollo (modelos, librerías) son parte de la cadena de suministro del software. Calcular y distribuir sus hashes es una práctica de DevSecOps de bajo costo y alto impacto.
+
+### Obstáculos
+
+#### OB-07: Equilibrio entre seguridad de rate limiting y usabilidad en modo demo
+**Problema:** un rate limiting muy agresivo (ej. 3 intentos) podría bloquear a los evaluadores durante una demostración si escriben la clave incorrectamente dos veces.
+**Solución:** configurar `MAX_INTENTOS=5` y `BLOQUEO_SEGUNDOS=300` (5 minutos), con UI que muestra cuántos intentos quedan antes del bloqueo. Documentado en el Manual de Usuario.
+**Lección:** los controles de seguridad en sistemas académicos o de demostración deben balancear protección con UX. Un control que interrumpe la demo perjudica tanto como la ausencia del control.
+
+#### OB-08: tests/test_video.py requiere PyAV para frames sintéticos
+**Problema:** los tests de `Traductor.recv()` necesitan crear `av.VideoFrame` sintéticos, lo que requiere que `pyav` esté instalado correctamente, incluyendo codecs de video.
+**Solución:** añadir `pytestmark = pytest.mark.skipif(not _AV_DISPONIBLE, ...)` al inicio del módulo para que el test se omita graciosamente en entornos sin PyAV, en lugar de fallar con ImportError.
+**Lección:** los tests que dependen de librerías pesadas (codecs, hardware) deben incluir guards de importación y marks de skip. El objetivo es que `pytest tests/` siempre retorne 0 errores, incluso en entornos mínimos.
+
+---
+
 ## Mejoras identificadas para versiones futuras
 
 | ID | Mejora | Motivación | Prioridad |
@@ -134,9 +178,53 @@ Sirve como referencia para futuros proyectos de visión artificial y sistemas we
 | Sprint 1 | Landmarks vs. píxeles · Padding ROI · Filtro de calidad en captura | Desequilibrio de clases · Incompatibilidad Python 3.13 | +3 días |
 | Sprint 2 | HMAC vs JWT · Anonimización SHA-256 · TDD para seguridad | Latencia de pipeline · WebRTC en Streamlit Cloud | +1 día |
 | Sprint 3 | ARIA en `lsp_ui` · Explicabilidad como UI obligatoria | Contrastes insuficientes · Coordinación de usuarios UAT | +1 día |
-| **Total** | **8 decisiones documentadas** | **6 obstáculos resueltos** | **+5 días** |
+| Sprint 4 | `src/`-layout · Docker non-root · DoD fusionado · trivy.yaml | Imports CI con módulos en raíz | +0.5 días |
+| **Total** | **13 decisiones documentadas** | **8 obstáculos resueltos** | **+5.5 días** |
 
-> Los 5 días de trabajo extra fueron absorbidos por la holgura planificada en los sprints (capacidad conservadora vs. velocidad real del equipo).
+> Los días de trabajo extra fueron absorbidos por la holgura planificada en los sprints (capacidad conservadora vs. velocidad real del equipo).
+
+---
+
+## Sprint 4 — Reingeniería Estructural y Alineación ISO (Tarea D)
+
+### Decisiones técnicas
+
+#### DT-09: Migración a `src/`-layout (PyPA Standard)
+**Decisión:** mover todos los módulos Python de la raíz a `src/` y los ejecutables a `scripts/`.
+**Motivación:** los módulos en la raíz generaban conflictos de `sys.path` al correr pytest desde diferentes directorios y dificultaban la configuración del CI. El `src/`-layout es el estándar PyPA recomendado por la guía oficial de empaquetado Python.
+**Resultado:** `pyproject.toml` con `pythonpath = ["src"]`, `conftest.py` actualizado, Dockerfile con `ENV PYTHONPATH=/app/src`. Los imports en producción y en tests son idénticos.
+**Lección:** estructurar el repositorio con `src/`-layout desde el Sprint 1 evita refactorizaciones costosas al final del proyecto.
+
+#### DT-10: Docker non-root user (principio de mínimo privilegio)
+**Decisión:** crear usuario `lspuser` (UID 1001) en el Dockerfile y ejecutar la app con `USER lspuser`.
+**Motivación:** ejecutar contenedores como `root` es un riesgo de seguridad documentado por OWASP. Si la app tiene una vulnerabilidad de escape, un proceso root puede comprometer el host.
+**Resultado:** imagen Docker final no ejecuta como root; `COPY --chown=lspuser:lspuser` garantiza que los archivos también son propiedad del usuario no-root.
+**Lección:** el principio de mínimo privilegio no es solo para servidores de producción; debe aplicarse desde el Dockerfile del prototipo académico.
+
+#### DT-11: `DEFINITION_OF_DONE.md` como fuente única de verdad (XP Simplicity)
+**Decisión:** fusionar `DoD.md` (checkpoint ejecutivo) y `DEFINITION_OF_DONE.md` (criterios formales) en un único archivo con dos secciones.
+**Motivación:** mantener dos documentos con información solapada viola el principio DRY y el principio de Simplicidad de XP. Si los criterios cambian, deben actualizarse en un solo lugar.
+**Resultado:** `DEFINITION_OF_DONE.md` contiene ahora: (I) criterios formales + (II) estado de cumplimiento con checkmarks. El archivo `DoD.md` fue eliminado.
+**Lección:** cada artefacto del proyecto debe tener una única fuente de verdad. La duplicación de documentos causa confusión durante las revisiones y la sustentación.
+
+#### DT-12: Escaneo de vulnerabilidades con Trivy como práctica DevSecOps
+**Decisión:** agregar `trivy.yaml` con configuración para escanear la imagen Docker y el código fuente antes de cada despliegue.
+**Motivación:** una imagen basada en `python:3.12-slim` puede contener vulnerabilidades en las librerías del sistema operativo (`libssl`, `libcurl`, etc.) que no son visibles en `requirements.txt`.
+**Resultado:** `trivy.yaml` configurado para reportar CVEs CRITICAL+HIGH+MEDIUM con exit-code 1 (bloquea CI). `.dockerignore` excluye `data/`, `.git` y `secrets.toml` de la imagen.
+**Lección:** las herramientas de SCA (Software Composition Analysis) como Trivy son parte indispensable del pipeline CI/CD moderno, especialmente en proyectos con Docker.
+
+#### DT-13: Plantilla UAT basada en Criterios de Aceptación (CA)
+**Decisión:** crear `docs/plantilla_UAT.md` con escenarios de prueba mapeados directamente a los CAs de cada Historia de Usuario.
+**Motivación:** sin una plantilla estructurada, las sesiones UAT son inconsistentes y los resultados no son comparables entre participantes. Los CA son la especificación formal de "qué significa correcto" para el usuario.
+**Resultado:** 8 escenarios UAT con criterios binarios de aprobación, cuestionario SUS, tabla de resultados y espacio para observaciones libres.
+**Lección:** el UAT no es una prueba exploratoria libre; es una verificación formal contra los CAs. Estructurarla antes de reclutar participantes garantiza reproducibilidad.
+
+### Obstáculos
+
+#### OB-09: Imports `import lsp_core` fallaban en CI con módulos en raíz
+**Problema:** ejecutar pytest desde un directorio diferente al raíz del proyecto causaba `ModuleNotFoundError: No module named 'lsp_core'` porque `sys.path` no incluía el directorio raíz.
+**Solución:** migración a `src/`-layout con `pythonpath = ["src"]` en `pyproject.toml`. Ver INC-08 en `INCIDENTES.md` para el análisis técnico completo.
+**Lección:** el diseño de la estructura de carpetas tiene impacto directo en la portabilidad de los tests y la configuración del CI.
 
 ---
 

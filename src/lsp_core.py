@@ -5,6 +5,17 @@ Centraliza la lógica que antes estaba incrustada en A.py / app.py / B.py:
 carga del modelo, extracción de landmarks, validación y predicción.
 Tanto la app como la suite de pruebas (tests/) y los scripts de QA (qa/)
 importan desde aquí, evitando duplicar código y permitiendo medir calidad.
+
+Trazabilidad de Historias de Usuario:
+  HU-06 CA-06.1 — Extracción de landmarks  (extraer_landmarks, extraer_landmarks_de_archivo)
+  HU-06 CA-06.2 — Normalización de landmarks (coordenadas en [0,1] de MediaPipe)
+  HU-06 CA-06.3 — Integridad de datos       (landmarks_validos, cargar_dataset descarta None)
+  HU-07 CA-07.1 — División para entrenamiento (cargar_dataset devuelve X, y)
+  HU-07 CA-07.3 — Persistencia del modelo    (cargar_modelo desde modelo.pkl)
+  HU-09 CA-09.1 — Detección 21 landmarks     (_get_hands, extraer_landmarks)
+  HU-10 CA-10.1 — Carga correcta del modelo  (cargar_modelo con FileNotFoundError explícito)
+  HU-10 CA-10.2 — Predicción en tiempo real  (predecir → letra + confianza%)
+  HU-22 CA-22.3 — Liberación de recursos     (close_hands limpia _hands_cache)
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -212,6 +223,67 @@ def imagenes_disponibles(data_folder=DATA_FOLDER):
         list[str]: Lista de rutas absolutas/relativas de archivos PNG, ordenadas alfabéticamente.
     """
     return sorted(glob.glob(os.path.join(data_folder, "*", "*.png")))
+
+
+# ───────────────────────── Integridad del modelo ──────────────────────────────
+
+def calcular_hash_modelo(path: str = MODELO_PATH) -> str:
+    """
+    Calcula el hash SHA-256 del archivo del modelo en bloques de 64 KB.
+
+    Usar para generar un hash de referencia al entrenar el modelo y para
+    verificar que el archivo no ha sido modificado antes de cargarlo.
+
+    Args:
+        path (str): Ruta al archivo del modelo (PKL). Por defecto 'modelo.pkl'.
+
+    Returns:
+        str: Hash SHA-256 hexadecimal de 64 caracteres.
+
+    Raises:
+        FileNotFoundError: Si el archivo no existe.
+    """
+    import hashlib
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"No se encontró el modelo en '{path}'.")
+    sha256 = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            sha256.update(chunk)
+    return sha256.hexdigest()
+
+
+def verificar_integridad_modelo(path: str = MODELO_PATH, hash_esperado: str = None) -> bool:
+    """
+    Verifica que el hash SHA-256 del modelo coincida con el hash de referencia.
+
+    Protege contra la carga de modelos PKL manipulados (deserialización maliciosa).
+    Si no se provee hash_esperado, intenta leer '<path>.sha256'. Si no existe
+    ese archivo, devuelve True con una advertencia (comportamiento permisivo para
+    compatibilidad hacia atrás).
+
+    Args:
+        path (str): Ruta al archivo del modelo.
+        hash_esperado (str | None): Hash SHA-256 de 64 chars. None = leer de <path>.sha256.
+
+    Returns:
+        bool: True si el hash coincide o no hay referencia. False si hay discrepancia.
+    """
+    import hashlib
+    import hmac as _hmac
+    if not os.path.exists(path):
+        return False
+
+    hash_actual = calcular_hash_modelo(path)
+
+    if hash_esperado is None:
+        hash_file = path + ".sha256"
+        if not os.path.exists(hash_file):
+            return True  # sin referencia → permisivo; advertencia en la carga
+        with open(hash_file, "r", encoding="utf-8") as f:
+            hash_esperado = f.read().strip()
+
+    return _hmac.compare_digest(hash_actual, hash_esperado)
 
 
 def close_hands() -> None:

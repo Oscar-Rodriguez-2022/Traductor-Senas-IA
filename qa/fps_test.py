@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fase 6 — Medición de FPS sostenidos durante 30 s.
 Procesa imágenes del dataset en bucle simulando el flujo de cámara
 (sin hardware) y reporta FPS promedio/máximo/mínimo.
@@ -9,7 +9,7 @@ import os
 import sys
 import time
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 import lsp_core
 from qa._utils import guardar_csv, banner
 

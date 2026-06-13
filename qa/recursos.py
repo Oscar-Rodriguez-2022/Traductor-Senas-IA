@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fases 8 y 9 — Consumo de RAM y CPU durante detección continua.
 Detecta posibles fugas de memoria (memory leaks).
 
@@ -8,7 +8,7 @@ import os
 import sys
 import time
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 import lsp_core
 from qa._utils import guardar_csv, banner
 

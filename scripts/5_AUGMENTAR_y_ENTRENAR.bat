@@ -8,6 +8,8 @@ echo   Multiplica el dataset x16 y entrena el modelo SVM
 echo ============================================================
 echo.
 
+cd /d "%~dp0.."
+
 :: Buscar Python 3.12 (requerido por MediaPipe 0.10.21)
 set PY312=
 for %%P in (
@@ -43,7 +45,7 @@ echo Iniciando extraccion de landmarks y augmentation...
 echo (Esto puede tardar 1-3 minutos segun el tamaño del dataset)
 echo.
 
-%PY312% augmentar_dataset.py
+%PY312% scripts\augmentar_dataset.py
 
 if %errorlevel%==0 (
     echo.

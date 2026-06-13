@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fase 18 — Consolida todos los reportes (CSV/PNG) en un PDF y un HTML
 listos para anexar a la tesis / sustentación.
 
@@ -8,7 +8,7 @@ import os
 import sys
 import csv
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 from qa._utils import REPORTES, banner
 
 

@@ -6,6 +6,16 @@ este módulo solo gestiona el procesamiento de frames de video, sin código de U
 
 El modelo se inyecta como dependencia en __init__ en lugar de accederse como
 variable global, lo que facilita las pruebas unitarias con mocks.
+
+Trazabilidad de Historias de Usuario:
+  HU-08 CA-08.1 — Stream WebRTC activa la cámara al cargar la página  (Traductor.__init__)
+  HU-08 CA-08.3 — Frames procesados correctamente antes de detección   (recv: resize 320×240)
+  HU-08 CA-08.4 — Rendimiento mínimo de captura                        (fps con EMA)
+  HU-09 CA-09.1 — Detección de 21 landmarks con MediaPipe              (recv: hands.process)
+  HU-09 CA-09.2 — Visualización del skeleton sobre el video            (recv: draw_landmarks)
+  HU-10 CA-10.2 — Predicción y confianza actualizadas por frame        (recv → lsp_core.predecir)
+  HU-10 CA-10.3 — Indicador de confianza (rojo/amarillo) disponible    (self.confianza para lsp_ui)
+  HU-22 CA-22.1 — FPS sostenidos ≥24 en 60 s                          (self.fps con EMA, α=0.2)
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'

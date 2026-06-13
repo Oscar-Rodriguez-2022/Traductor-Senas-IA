@@ -1,4 +1,4 @@
-"""
+﻿"""
 LSP Vision AI — Traductor de Lengua de Señas Peruana
 Universidad Privada del Norte (UPN) — Capstone Project Sistemas 2026
 
@@ -9,7 +9,18 @@ Orquestador principal de la aplicación Streamlit. Delega:
   - Procesamiento de video   → lsp_video.Traductor
   - Lógica de modelo         → lsp_core.*
 
-Probar local:  streamlit run app.py
+Probar local:  streamlit run src/app.py
+
+Trazabilidad de Historias de Usuario:
+  HU-08 CA-08.1 — Captura de video en tiempo real (webrtc_streamer)
+  HU-10 CA-10.1 — Carga del modelo al iniciar (cargar_modelo)
+  HU-10 CA-10.2 — Panel de resultado actualizado ≤0.4 s (panel_resultado fragment)
+  HU-11 CA-11.1 — Historial de señas delegado a lsp_ui.render_resultado
+  HU-12 CA-12.1 — Integración completa de módulos (orquestación de los 5 módulos)
+  HU-13 CA-13.4 — Guard de autenticación (lsp_auth.login_requerido)
+  HU-14 CA-14.1 — Registro de PAGINA_VISITADA (lsp_audit.registrar_acceso)
+  HU-15 CA-15.3 — Skip-nav y estilos WCAG (lsp_ui.render_estilos / render_skip_nav)
+  HU-16 CA-16.1 — Explicabilidad del pipeline (lsp_ui.render_pipeline_explicado)
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'

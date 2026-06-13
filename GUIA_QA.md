@@ -1,4 +1,4 @@
-# 🧪 Guía de Calidad de Software — Traductor LSP (UPN)
+﻿# 🧪 Guía de Calidad de Software — Traductor LSP (UPN)
 
 Capa profesional de pruebas, métricas y validación para el Capstone.
 Todo es **ejecutable desde terminal** y genera **evidencias** para la sustentación.
@@ -40,7 +40,7 @@ Con `make` (Git Bash) o con el menú `QA.bat`:
 | 13 | Robustez (luz, ruido, rotación...) | `python qa/robustez.py` | `reportes/robustez.csv` |
 | 18 | Reporte consolidado | `python qa/generar_reportes.py` | `reportes/REPORTE_QA.pdf` y `.html` |
 | 16 | Calidad de código | `flake8 ...` / `black ...` / `pylint ...` | consola |
-| 19 | Dashboard web de métricas | `streamlit run app.py` → menú *Metricas QA* | navegador |
+| 19 | Dashboard web de métricas | `streamlit run src/app.py` → menú *Metricas QA* | navegador |
 
 ---
 

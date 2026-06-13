@@ -41,7 +41,7 @@ El proyecto se desarrolló en **5 Sprints** (> 3 requeridos por estándar acadé
 > **para** poder planificar el desarrollo con precisión y alinearlo al objetivo general del proyecto.
 
 **Prioridad:** M (Must have)
-**Módulos:** `docs/requerimientos.md` (documentación)
+**Módulos:** [`docs/requerimientos.md`](docs/requerimientos.md) — 15 RF + 15 RNF
 **Estado:** ✅ Completada
 
 ### Criterios de Aceptación
@@ -68,7 +68,7 @@ El proyecto se desarrolló en **5 Sprints** (> 3 requeridos por estándar acadé
 > **para** garantizar la mantenibilidad, escalabilidad y correcta integración entre componentes.
 
 **Prioridad:** M (Must have)
-**Módulos:** `docs/arquitectura/` (diagramas de componentes y casos de uso)
+**Módulos:** [`docs/arquitectura/COMPONENTES.md`](docs/arquitectura/COMPONENTES.md) — diagramas Mermaid de componentes, casos de uso y flujo de datos
 **Estado:** ✅ Completada
 
 ### Criterios de Aceptación

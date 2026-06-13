@@ -17,13 +17,51 @@ Uso en producción:
 import hashlib
 import hmac
 import secrets
+import threading
 import time
 
-# ──────────────────────────────── Constantes ──────────────────────────────────
+# ──────────────────────────────── Constantes ──────���───────────────────────���───
 PEPPER = "LSP_UPN_2026"              # sal fija de aplicación (no es un secreto criptográfico)
 SESSION_EXPIRY_MINUTES = 60
 DEMO_PASSWORD = "UPN2026"           # clave de demostración académica — visible intencionalmente
 _PBKDF2_ITERATIONS = 260_000        # OWASP 2023 mínimo para PBKDF2-HMAC-SHA256
+
+# ──────────────────────── Rate limiting (brute-force protection) ───────────────
+MAX_INTENTOS = 5            # intentos fallidos consecutivos antes de bloquear
+BLOQUEO_SEGUNDOS = 300      # duración del bloqueo: 5 minutos
+
+_intentos_fallidos: int = 0
+_ultimo_fallo_ts: float = 0.0
+_rate_lock = threading.Lock()
+
+
+def esta_bloqueado() -> bool:
+    """
+    Indica si el sistema está en período de bloqueo por intentos fallidos.
+
+    Returns:
+        bool: True si se superó MAX_INTENTOS y el tiempo de bloqueo aún no ha expirado.
+    """
+    with _rate_lock:
+        if _intentos_fallidos < MAX_INTENTOS:
+            return False
+        if time.time() - _ultimo_fallo_ts >= BLOQUEO_SEGUNDOS:
+            return False   # período de bloqueo expirado automáticamente
+        return True
+
+
+def _registrar_fallo() -> None:
+    global _intentos_fallidos, _ultimo_fallo_ts
+    with _rate_lock:
+        _intentos_fallidos += 1
+        _ultimo_fallo_ts = time.time()
+
+
+def _resetear_intentos() -> None:
+    global _intentos_fallidos, _ultimo_fallo_ts
+    with _rate_lock:
+        _intentos_fallidos = 0
+        _ultimo_fallo_ts = 0.0
 
 
 # ──────────────────────────────── Funciones públicas ──────────────────────────
@@ -50,17 +88,26 @@ def generar_token_sesion(password_ingresada: str, password_hash_esperado: str) -
     """
     Verifica la clave y emite un token de sesión firmado con HMAC-SHA256.
 
+    Incluye protección anti-fuerza-bruta: devuelve None si el sistema está
+    bloqueado por superar MAX_INTENTOS intentos fallidos consecutivos.
+
     Args:
         password_ingresada: Clave introducida por el usuario.
         password_hash_esperado: Hash almacenado (generado con hash_password()).
 
     Returns:
-        str | None: Token con formato "timestamp.nonce.firma", o None si la clave es incorrecta.
+        str | None: Token con formato "timestamp.nonce.firma", o None si la clave
+            es incorrecta o el sistema está bloqueado por rate limiting.
     """
-    hash_ingresada = hash_password(password_ingresada)
-    if not hmac.compare_digest(hash_ingresada, password_hash_esperado):
+    if esta_bloqueado():
         return None
 
+    hash_ingresada = hash_password(password_ingresada)
+    if not hmac.compare_digest(hash_ingresada, password_hash_esperado):
+        _registrar_fallo()
+        return None
+
+    _resetear_intentos()
     ts = str(int(time.time()))
     nonce = secrets.token_hex(8)
     firma = _firmar(ts, nonce)
@@ -177,14 +224,26 @@ def _render_login(st, st_state: dict) -> None:
         enviado = st.form_submit_button("Ingresar", use_container_width=True)
 
     if enviado:
-        hash_esperado = _obtener_hash_esperado()
-        token = generar_token_sesion(clave, hash_esperado)
-        if token:
-            st_state["lsp_token"] = token
-            import lsp_audit
-            lsp_audit.registrar_acceso("LOGIN_OK", st_state=st_state)
-            st.rerun()
+        if esta_bloqueado():
+            st.error(
+                f"Acceso bloqueado por {MAX_INTENTOS} intentos fallidos. "
+                f"Espera {BLOQUEO_SEGUNDOS // 60} minutos antes de intentar nuevamente."
+            )
         else:
-            import lsp_audit
-            lsp_audit.registrar_acceso("LOGIN_FAIL")
-            st.error("Clave incorrecta. Intenta nuevamente.")
+            hash_esperado = _obtener_hash_esperado()
+            token = generar_token_sesion(clave, hash_esperado)
+            if token:
+                st_state["lsp_token"] = token
+                import lsp_audit
+                lsp_audit.registrar_acceso("LOGIN_OK", st_state=st_state)
+                st.rerun()
+            else:
+                import lsp_audit
+                lsp_audit.registrar_acceso("LOGIN_FAIL")
+                restantes = max(0, MAX_INTENTOS - _intentos_fallidos)
+                if restantes > 0:
+                    st.error(f"Clave incorrecta. Intentos restantes antes del bloqueo: {restantes}.")
+                else:
+                    st.error(
+                        f"Acceso bloqueado. Espera {BLOQUEO_SEGUNDOS // 60} minutos."
+                    )

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fase 7 — Test de estrés: 100/500/1000/5000 predicciones consecutivas.
 Mide errores, degradación del tiempo de respuesta y crecimiento de memoria (HU-22 CA-22.3).
 
@@ -12,7 +12,7 @@ import sys
 import time
 import tracemalloc
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 import lsp_core
 from qa._utils import guardar_csv, banner
 

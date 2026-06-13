@@ -9,6 +9,18 @@ Extrae todo el HTML/CSS de app.py aplicando correcciones WCAG 2.1 AA:
 - Skip-nav (WCAG 2.4.1 nivel A)
 - aria-hidden en emojis decorativos del pipeline
 - Indicador visual de baja confianza (< 60%) en borde amarillo
+
+Trazabilidad de Historias de Usuario:
+  HU-10 CA-10.3 — Indicador de confianza rojo/amarillo     (render_resultado: borde por umbral)
+  HU-11 CA-11.1 — Panel de historial de señas              (render_resultado: sección historial)
+  HU-12 CA-12.2 — Controles e interfaz responden al usuario (render_topbar, render_hero)
+  HU-12 CA-12.3 — Estado del sistema visible               (render_estado_sistema)
+  HU-15 CA-15.1 — aria-live="polite" en resultado          (render_resultado: atributo ARIA)
+  HU-15 CA-15.2 — Contraste de texto ≥4.5:1               (render_estilos: #6b6b6b, #767676)
+  HU-15 CA-15.3 — Skip-nav funcional (WCAG 2.4.1)          (render_skip_nav)
+  HU-16 CA-16.1 — Explicabilidad del pipeline de IA        (render_pipeline_explicado)
+  HU-16 CA-16.2 — Emojis decorativos con aria-hidden       (render_pipeline_explicado: aria-hidden)
+  HU-17 CA-17.1 — Estadísticas del sistema al usuario      (render_estadisticas)
 """
 import streamlit as st
 
@@ -18,6 +30,10 @@ def render_estilos() -> None:
     """Inyecta el CSS completo con correcciones de contraste WCAG 2.1 AA."""
     st.markdown(
         """
+<script>
+/* WCAG 3.1.1 — Idioma de la página: inyectar lang="es" en el documento */
+document.documentElement.lang = 'es';
+</script>
 <style>
 /* Enlace de saltar navegación (WCAG 2.4.1 — nivel A) */
 .skip-nav {
@@ -28,6 +44,19 @@ def render_estilos() -> None:
     border-radius: 0 0 8px 0; font-size: 14px;
 }
 .skip-nav:focus { top: 0; outline: 3px solid #fff; }
+
+/* WCAG 2.4.7 — Foco visible: outline en todos los elementos interactivos */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid #E30613 !important;
+    outline-offset: 2px !important;
+}
+/* Alto contraste en modo forzado (Windows High Contrast) */
+@media (forced-colors: active) {
+    .skip-nav, button { forced-color-adjust: none; }
+}
 
 /* Ocultar elementos por defecto de Streamlit */
 #MainMenu {visibility: hidden;}
@@ -272,32 +301,32 @@ def render_pipeline_explicado() -> None:
     st.write("")
     st.markdown(
         """
-<div class="card" role="region" aria-label="Diagrama del pipeline de procesamiento">
+<div class="card" role="region" aria-label="Diagrama del pipeline de procesamiento de señas">
     <div class="card-title" aria-hidden="true">⚙️ ¿Cómo funciona?</div>
-    <div class="pipe" role="list" aria-label="Etapas del pipeline">
-        <div class="step" role="listitem">
+    <div class="pipe" role="list" aria-label="5 etapas del pipeline de reconocimiento">
+        <div class="step" role="listitem" aria-label="Etapa 1: Cámara — captura de video en tiempo real">
             <div class="ico" aria-hidden="true">📷</div>
-            <b>Cámara</b><small>Captura en tiempo real</small>
+            <b>1. Cámara</b><small>Captura en tiempo real</small>
         </div>
         <div class="arrow" aria-hidden="true">→</div>
-        <div class="step" role="listitem">
+        <div class="step" role="listitem" aria-label="Etapa 2: MediaPipe Hands — detección de 21 puntos clave de la mano">
             <div class="ico" aria-hidden="true">✋</div>
-            <b>MediaPipe Hands</b><small>21 puntos clave</small>
+            <b>2. MediaPipe</b><small>21 puntos clave</small>
         </div>
         <div class="arrow" aria-hidden="true">→</div>
-        <div class="step" role="listitem">
+        <div class="step" role="listitem" aria-label="Etapa 3: Landmarks — extracción de 42 coordenadas normalizadas">
             <div class="ico" aria-hidden="true">🔗</div>
-            <b>Landmarks</b><small>Extracción de rasgos</small>
+            <b>3. Landmarks</b><small>42 coordenadas</small>
         </div>
         <div class="arrow" aria-hidden="true">→</div>
-        <div class="step" role="listitem">
+        <div class="step" role="listitem" aria-label="Etapa 4: Modelo SVM — clasificación de la seña">
             <div class="ico" aria-hidden="true">🧠</div>
-            <b>Modelo SVM</b><small>Clasificación</small>
+            <b>4. Modelo SVM</b><small>Clasificación</small>
         </div>
         <div class="arrow" aria-hidden="true">→</div>
-        <div class="step" role="listitem">
+        <div class="step" role="listitem" aria-label="Etapa 5: Predicción — letra y nivel de confianza en pantalla">
             <div class="ico" aria-hidden="true">🅰️</div>
-            <b>Predicción</b><small>Letra en pantalla</small>
+            <b>5. Predicción</b><small>Letra + confianza%</small>
         </div>
     </div>
 </div>
@@ -305,7 +334,7 @@ def render_pipeline_explicado() -> None:
         unsafe_allow_html=True,
     )
 
-    with st.expander("¿Cómo decide la IA? — Explicabilidad del sistema"):
+    with st.expander("¿Cómo decide la IA? — Explicabilidad y limitaciones del sistema"):
         st.markdown(
             """
 **Representación geométrica de la mano**
@@ -321,12 +350,24 @@ El SVM aprendió **hiperplanos** que separan los vectores de 42 valores correspo
 cada letra de la LSP. Durante la predicción, calcula a qué clase pertenece el vector midiendo
 la distancia a esos hiperplanos. La **confianza** es la probabilidad de Platt: *P(clase | vector) × 100*.
 
-**¿Puede equivocarse?**
+**Indicadores de confianza**
 
-Sí. Letras visualmente similares (B/E, A/S, F/9) tienen vectores de landmarks parecidos.
-Una confianza **< 60%** indica ambigüedad — el borde de la tarjeta se vuelve amarillo como
-indicador visual. Las clases con pocas muestras de entrenamiento tienen menor *recall*.
-El modelo fue entrenado con datos del equipo UPN; representar más variaciones mejora la precisión.
+| Borde | Significado |
+|-------|-------------|
+| 🔴 Rojo (≥ 60%) | Alta seguridad — la letra está bien reconocida |
+| 🟡 Amarillo (< 60%) | Ambigüedad — repite la seña o ajusta la posición |
+| Sin borde | No hay mano visible |
+
+**⚠️ Limitaciones y sesgos conocidos (IA Ética)**
+
+El modelo puede equivocarse en los siguientes casos:
+- **Letras similares:** B/E, A/S, G/Q comparten vectores de landmarks parecidos.
+- **Sesgo de entrenamiento:** el modelo fue entrenado con datos del equipo UPN (4 personas). La precisión puede variar con otras manos, tonos de piel o condiciones de iluminación.
+- **Letras dinámicas:** J y Z requieren movimiento y no están soportadas en esta versión.
+- **Iluminación deficiente:** poca luz o contraluz reduce la capacidad de MediaPipe para detectar landmarks.
+
+El borde **amarillo** está diseñado para avisar antes de que el sistema cometa un error.
+Para un análisis detallado de equidad por clase, consulta el Dashboard de Métricas QA.
 """
         )
 

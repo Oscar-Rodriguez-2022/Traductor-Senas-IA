@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fase 13 — Test de robustez por aumentación de imágenes.
 No requiere capturar nuevas fotos: transforma las del dataset para simular
 condiciones adversas y mide cuántas mantienen detección de mano.
@@ -11,7 +11,7 @@ Uso:  python qa/robustez.py
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 import lsp_core
 from qa._utils import guardar_csv, banner
 
