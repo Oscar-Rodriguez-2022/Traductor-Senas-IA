@@ -1,6 +1,6 @@
 # Registro de Lecciones Aprendidas — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.1 · 2026-06-13
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.2 · 2026-06-14
 
 > **Estado: CIERRE DE PROYECTO** — 22 Historias de Usuario completadas · 137 SP totales.
 > 3 sprints regulares + 1 Sprint de Reingeniería = retrospectiva técnica integral.
@@ -255,6 +255,27 @@ Al cerrar la Fase de Cierre Académico, el análisis de deuda técnica identific
 
 ---
 
+### Hallazgo Post-Cierre: INC-12 (2026-06-14)
+
+**Contexto:** Tras la migración a MediaPipe Tasks API (`hand_landmarker.task` v0.10.21), se ejecutó un escaneo completo sobre las 13 689 imágenes del dataset.
+
+**Hallazgo:** Tasas de detección críticas en 6 letras del alfabeto LSP:
+
+| Letra | Tasa de detección | Impacto |
+|-------|------------------|---------|
+| O | 0% | Completamente excluida del modelo |
+| D | 1.8% | Representación insuficiente |
+| J | 0.8% | Gesto dinámico — pocas muestras estáticas detectables |
+| S | ~6% | Confusión con gesto de puño cerrado |
+| F | ~14% | Dedos curvados difíciles de segmentar |
+| I | ~19% | Ambigüedad con variantes de meñique |
+
+**Impacto en el modelo:** El modelo se reentrenó excluyendo las muestras no detectadas, alcanzando accuracy global de 88.3% (≥ 85% requerido). Las 6 letras afectadas requieren recaptura con la nueva API.
+
+**Lección:** La migración de versiones de librerías de visión artificial puede invalidar silenciosamente parte del dataset. Es crítico ejecutar un escaneo de detección completo antes y después de cualquier migración de librería de landmarks. Ver `docs/qa_y_pruebas/GUIA_RECAPTURA_DATASET.md` para el protocolo de recaptura.
+
+---
+
 ## Mejoras identificadas para versiones futuras
 
 | ID | Mejora | Motivación | Prioridad |
@@ -281,7 +302,8 @@ Al cerrar la Fase de Cierre Académico, el análisis de deuda técnica identific
 | Fase Cierre Académico | Artefactos `docs/` · Tests-stub → reales · Rate limiting · SHA-256 PKL | Equilibrio seguridad/usabilidad · PyAV en CI | +0.5 días |
 | Sprint Reingeniería | `src/`-layout · Docker non-root · Trivy · 34+29 tests DevSecOps+ética · DT-18 INC-07 · XAI functions · pre-commit hook | Imports CI · config.toml Docker · contaminación rate-limiter entre tests | +0 días (planificado) |
 | Post-Reingeniería | Reorganización `docs/` en subcarpetas temáticas | — | +0 días |
-| **Total** | **20 decisiones documentadas** | **11 obstáculos resueltos** | **+5.5 días** |
+| Hallazgo Post-Cierre (2026-06-14) | — | INC-12: tasas críticas de detección en O/D/J/S/F/I con MediaPipe Tasks API | +0 días |
+| **Total** | **20 decisiones documentadas** | **11 obstáculos + 1 hallazgo post-cierre** | **+5.5 días** |
 
 > Los días de trabajo extra de Sprints 1–3 fueron absorbidos por la holgura planificada en los sprints.
 > La Fase de Cierre Académico y el Sprint de Reingeniería fueron planificados explícitamente para
@@ -313,8 +335,9 @@ Las mejoras más impactantes del proceso de ingeniería, en orden de retorno sob
 | 2.0 | 2026-06-13 | Sprint Reingeniería (DT-14 a DT-18, OB-09 a OB-10), MJ-03 cerrado, retrospectiva técnica integral |
 | 3.0 | 2026-06-13 | Corrección estructura de sprints (3 regulares, no 4) · "Sprint 4" renombrado a "Fase de Cierre Académico" · DT-19 (XAI: `explicar_prediccion`) · OB-11 (contaminación rate-limiter entre tests) · MJ-09 añadido · Conteos de tests actualizados (34+29) · Resumen ejecutivo actualizado |
 | 3.1 | 2026-06-13 | DT-20 (pre-commit hook anti-secretos) · DT-09 ampliado con reorganización de `docs/` en subcarpetas temáticas · DT-13 ruta corregida a `docs/qa_y_pruebas/plantilla_UAT.md` · Resumen ejecutivo actualizado (20 DTs) |
+| 3.2 | 2026-06-14 | Hallazgo post-cierre INC-12 documentado: tasas de detección críticas en 6 letras (O/D/J/S/F/I) tras migración a MediaPipe Tasks API · Resumen ejecutivo actualizado |
 
 ---
 
-*Registro de Lecciones Aprendidas v3.1 · LSP Vision AI · UPN Sistemas 2026*
-*20 decisiones técnicas documentadas · 11 obstáculos resueltos · Proyecto cerrado 2026-06-13*
+*Registro de Lecciones Aprendidas v3.2 · LSP Vision AI · UPN Sistemas 2026*
+*20 decisiones técnicas documentadas · 11 obstáculos resueltos · 1 hallazgo post-cierre (INC-12) · Proyecto cerrado 2026-06-13*

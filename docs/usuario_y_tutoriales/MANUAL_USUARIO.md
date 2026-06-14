@@ -1,7 +1,7 @@
 # Manual de Usuario — LSP Vision AI
 ## Sistema Interactivo de Visión Artificial para la Comunicación Inclusiva (LSP)
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026-1
-**Versión:** 2.1 · **Fecha:** Junio 2026
+**Versión:** 2.1 · **Fecha:** 2026-06-13
 **Autores:** Equipo LSP Vision AI — UPN Ingeniería de Sistemas
 
 ---
@@ -461,6 +461,6 @@ Para reportar problemas técnicos o consultas académicas, dirigirse al equipo d
 
 ---
 
-*Manual de Usuario v2.1 — Junio 2026 · LSP Vision AI · UPN Sistemas*
+*Manual de Usuario v2.1 — 2026-06-13 · LSP Vision AI · UPN Sistemas*
 *Cambios v2.1: §8.2 añadido — panel de alternativas XAI top-5 (DT-19, `explicar_prediccion()`)*
 *Cambios v2.0: nuevo pipeline diagram, sección de explicabilidad XAI, tabla de letras LSP, sección de accesibilidad WCAG expandida, preguntas frecuentes ampliadas, estado del sistema*

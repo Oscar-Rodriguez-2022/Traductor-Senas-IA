@@ -250,6 +250,6 @@ El filesystem es **efímero**: al reiniciar el servidor (automático tras inacti
 |---------|-------|---------------------|
 | 1.0 | 2026-06-09 | Análisis inicial de superficie de ataque |
 | 1.1 | 2026-06-10 | Auth HMAC (`lsp_auth`), audit log (`lsp_audit`), `showErrorDetails=false`, XSRF, GDPR documentada |
-| 1.2 | 2026-06-12 | Rate limiting anti-fuerza-bruta (`MAX_INTENTOS=5`, `BLOQUEO=300s`); verificación SHA-256 del modelo PKL; `tests/test_seguridad.py` con 20 tests por capas |
+| 1.2 | 2026-06-12 | Rate limiting anti-fuerza-bruta (`MAX_INTENTOS=5`, `BLOQUEO=300s`); verificación SHA-256 del modelo PKL; `tests/test_seguridad.py` con 34 tests (4 clases: sanitización, rate limiting, audit log, integridad PKL) |
 | 2.0 | 2026-06-13 | **PLAN DE SEGURIDAD INTEGRAL** — Docker non-root, `.dockerignore`, `trivy.yaml`, INC-09 resuelto (flags Docker), todos los controles verificados y documentados; 9/9 incidentes cerrados |
 | 2.1 | 2026-06-13 | Conteos reales de tests (Sanitización 13, IntegridadModelo 7, PrivacidadPorDiseno 3, AuditLog 4+9); §3.5 pre-commit hook DT-20 (3 capas); nombre de test corregido a `TestPrivacidadPorDiseno::test_no_credenciales_en_texto_plano_en_codigo` |

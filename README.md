@@ -8,7 +8,7 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repositorio-181717?logo=github)](https://github.com/Oscar-Rodriguez-2022/Traductor-Senas-IA)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-161%2B%20PASS-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-143%20PASS-brightgreen)](tests/)
 [![License](https://img.shields.io/badge/Licencia-MIT-blue)](LICENSE)
 
 ---
@@ -114,13 +114,13 @@ Traductor-Senas-IA/
 │   └── pages/
 │       └── 1_Metricas_QA.py      │  Dashboard de métricas de calidad
 │
-├── tests/                        ← Suite TDD completa (161+ pruebas totales)
+├── tests/                        ← Suite TDD completa (143 pruebas totales)
 │   ├── conftest.py               │  Fixtures compartidos (modelo, landmarks, sesión)
 │   ├── test_auth.py              │  14 tests — autenticación HMAC (HU-13)
 │   ├── test_audit.py             │  9 tests — auditoría GDPR (HU-14)
 │   ├── test_seguridad.py         │  34 tests — DevSecOps (4 clases: sanitización, rate limiting, audit, PKL)
 │   ├── test_etica.py             │  29 tests — IA ética, XAI y equidad (HU-16, HU-20)
-│   ├── test_video.py             │  11 tests — procesamiento de video (HU-08)
+│   ├── test_video.py             │  12 tests — procesamiento de video (HU-08/09)
 │   ├── test_sistema.py           │  18 tests de sistema UT-01..UT-18 (pruebas de integración)
 │   ├── test_integracion.py       │  3 tests — flujo E2E
 │   ├── test_landmarks.py         │  Tests de extracción de landmarks (HU-06)
@@ -167,25 +167,25 @@ Traductor-Senas-IA/
 │   │   ├── HISTORIAS_USUARIO.md  │  22 HUs (HU-01..HU-22) con Gherkin y MoSCoW
 │   │   ├── SPRINT_BACKLOG.md     │  Desglose de tareas (4 sprints, 137 SP)
 │   │   ├── BURNDOWN_CHART.md     │  Burndown Charts release + 4 sprints
-│   │   ├── DEFINITION_OF_DONE.md │  Criterios DoD v1.3: TDD, DevSecOps, WCAG, 22 HUs
+│   │   ├── DEFINITION_OF_DONE.md │  Criterios DoD v2.1: TDD, DevSecOps, WCAG, 22 HUs
 │   │   ├── MATRIZ_TRAZABILIDAD.md│  Mapeo HU ↔ módulo ↔ test
 │   │   └── requerimientos.md     │  15 RF + 15 RNF
 │   ├── qa_y_pruebas/             │  Estándares de calidad y reportes técnicos
 │   │   ├── GUIA_QA.md            │  Estándares TDD y suite de 13 fases de medición
-│   │   ├── INCIDENTES.md         │  9 incidentes registrados con causa raíz y hotfix
+│   │   ├── INCIDENTES.md         │  12 incidentes registrados con causa raíz y hotfix
 │   │   ├── GUIA_RECAPTURA_DATASET.md │  Recaptura de letras con dataset insuficiente
 │   │   ├── plantilla_UAT.md      │  Plantilla de User Acceptance Testing
 │   │   └── reporte_pruebas.txt   │  Resultados de la suite de tests automatizados
 │   ├── seguridad_y_etica/        │  Plan de Seguridad Integral e IA Ética
-│   │   ├── SEGURIDAD.md          │  Plan de Seguridad Integral v2.0
+│   │   ├── SEGURIDAD.md          │  Plan de Seguridad Integral v2.1
 │   │   └── IA_ETICA.md           │  Principios XAI, análisis de sesgos, responsabilidad social
 │   ├── usuario_y_tutoriales/     │  Manuales y guías de despliegue
-│   │   ├── MANUAL_USUARIO.md     │  Manual de usuario v2.0
+│   │   ├── MANUAL_USUARIO.md     │  Manual de usuario v2.1
 │   │   ├── TUTORIAL_HUGGINGFACE.md   │  Despliegue en Hugging Face Spaces con Docker
 │   │   ├── TUTORIAL_DESPLIEGUE_WEB.md│  Despliegue en Streamlit Community Cloud
 │   │   └── TUTORIAL_EQUIPO.md    │  Normas de propiedad compartida y flujo Git
 │   └── cierre/                   │  Retrospectivas y lecciones aprendidas
-│       └── LECCIONES_APRENDIDAS.md│  Retrospectiva técnica v3.0 (3 sprints + Reingeniería)
+│       └── LECCIONES_APRENDIDAS.md│  Retrospectiva técnica v3.1 (3 sprints + Reingeniería)
 │
 ├── config/                       ← Configuraciones de herramientas de desarrollo
 │   ├── trivy.yaml                │  Escaneo de vulnerabilidades DevSecOps (CRITICAL+HIGH+MEDIUM)
@@ -278,7 +278,7 @@ QA.bat        # Windows — doble clic → opción 13
 
 | Métrica | Valor | Umbral |
 |---|---|---|
-| Tests `tests/` + sistema | **143+ tests** (114 sin streamlit + 29 XAI) + 18 sistema = **161+ total** | 0 FAIL |
+| Tests `tests/` | **143 tests** (114 base + 29 XAI/ética — 11 archivos de test) | 0 FAIL |
 | Cobertura `lsp_core` | **96%** | ≥ 96% |
 | Cobertura `lsp_auth` | **≥ 90%** | ≥ 90% |
 | Cobertura `lsp_audit` | **≥ 90%** | ≥ 90% |
@@ -301,29 +301,29 @@ QA.bat        # Windows — doble clic → opción 13
 | [`HISTORIAS_USUARIO.md`](docs/gestion_agil/HISTORIAS_USUARIO.md) | 22 Historias de Usuario (HU-01..HU-22) con criterios Gherkin, prioridad MoSCoW y estado final |
 | [`SPRINT_BACKLOG.md`](docs/gestion_agil/SPRINT_BACKLOG.md) | Desglose de cada HU en tareas técnicas (4 sprints, 137 SP) — todas completadas |
 | [`BURNDOWN_CHART.md`](docs/gestion_agil/BURNDOWN_CHART.md) | Burndown Charts release + por sprint; línea real llega a 0 en Sprint de Reingeniería |
-| [`DEFINITION_OF_DONE.md`](docs/gestion_agil/DEFINITION_OF_DONE.md) | Criterios obligatorios DoD v1.3: TDD, DevSecOps, WCAG 2.1 AA, 100% HU completadas |
+| [`DEFINITION_OF_DONE.md`](docs/gestion_agil/DEFINITION_OF_DONE.md) | Criterios obligatorios DoD v2.1: TDD, DevSecOps, WCAG 2.1 AA, 100% HU completadas |
 | [`MATRIZ_TRAZABILIDAD.md`](docs/gestion_agil/MATRIZ_TRAZABILIDAD.md) | Mapeo completo HU ↔ módulo código ↔ archivo de test ↔ estado |
 
 ### Calidad, seguridad y ética
 
 | Artefacto | Descripción |
 |---|---|
-| [`SEGURIDAD.md`](docs/seguridad_y_etica/SEGURIDAD.md) | Plan de Seguridad Integral v2.0: autenticación JWT-like HMAC, rate limiting, GDPR, Dockerfile no-root |
+| [`SEGURIDAD.md`](docs/seguridad_y_etica/SEGURIDAD.md) | Plan de Seguridad Integral v2.1: autenticación JWT-like HMAC, rate limiting, GDPR, Dockerfile no-root |
 | [`IA_ETICA.md`](docs/seguridad_y_etica/IA_ETICA.md) | Transparencia y Explicabilidad (XAI): pipeline interpretable, análisis de sesgos, equidad por clase |
 | [`GUIA_QA.md`](docs/qa_y_pruebas/GUIA_QA.md) | Estándares TDD, revisión de pares y suite automatizada de 13 fases de medición |
 | [`reporte_pruebas.txt`](docs/qa_y_pruebas/reporte_pruebas.txt) | Resultados de pruebas unitarias, integración, sistema y seguridad |
-| [`INCIDENTES.md`](docs/qa_y_pruebas/INCIDENTES.md) | 9 incidentes registrados con causa raíz, hotfix y verificación — todos resueltos |
+| [`INCIDENTES.md`](docs/qa_y_pruebas/INCIDENTES.md) | 12 incidentes (11 resueltos, 1 pendiente — INC-12) con causa raíz, hotfix y verificación |
 
 ### Documentación de usuario y despliegue
 
 | Artefacto | Descripción |
 |---|---|
-| [`MANUAL_USUARIO.md`](docs/usuario_y_tutoriales/MANUAL_USUARIO.md) | Manual de usuario v2.0: login, traductor en tiempo real, confianza, historial, QA dashboard (HU-21 CA-21.4) |
+| [`MANUAL_USUARIO.md`](docs/usuario_y_tutoriales/MANUAL_USUARIO.md) | Manual de usuario v2.1: login, traductor en tiempo real, confianza, historial, QA dashboard (HU-21 CA-21.4) |
 | [`TUTORIAL_HUGGINGFACE.md`](docs/usuario_y_tutoriales/TUTORIAL_HUGGINGFACE.md) | Despliegue en Hugging Face Spaces con Docker (recomendado para Capstone) |
 | [`TUTORIAL_DESPLIEGUE_WEB.md`](docs/usuario_y_tutoriales/TUTORIAL_DESPLIEGUE_WEB.md) | Despliegue alternativo en Streamlit Community Cloud |
 | [`TUTORIAL_EQUIPO.md`](docs/usuario_y_tutoriales/TUTORIAL_EQUIPO.md) | Normas de propiedad compartida, flujo Git y entorno para nuevos integrantes |
 | [`GUIA_RECAPTURA_DATASET.md`](docs/qa_y_pruebas/GUIA_RECAPTURA_DATASET.md) | Recaptura de letras con dataset insuficiente, respetando privacidad de datos |
-| [`LECCIONES_APRENDIDAS.md`](docs/cierre/LECCIONES_APRENDIDAS.md) | Retrospectiva técnica v3.0: 19 decisiones técnicas, 11 obstáculos — 3 sprints regulares + Sprint Reingeniería |
+| [`LECCIONES_APRENDIDAS.md`](docs/cierre/LECCIONES_APRENDIDAS.md) | Retrospectiva técnica v3.1: 20 decisiones técnicas, 11 obstáculos — 3 sprints regulares + Sprint Reingeniería |
 
 ---
 
@@ -333,10 +333,10 @@ QA.bat        # Windows — doble clic → opción 13
 |---|---|---|
 | Historias de Usuario + Sprint Backlog (Scrum) | [`HISTORIAS_USUARIO.md`](docs/gestion_agil/HISTORIAS_USUARIO.md), [`SPRINT_BACKLOG.md`](docs/gestion_agil/SPRINT_BACKLOG.md) | ✅ |
 | Burndown Chart por Sprint | [`BURNDOWN_CHART.md`](docs/gestion_agil/BURNDOWN_CHART.md) (4 sprints, 137 SP) | ✅ |
-| Definition of Done documentado | [`DEFINITION_OF_DONE.md`](docs/gestion_agil/DEFINITION_OF_DONE.md) v1.3 | ✅ |
+| Definition of Done documentado | [`DEFINITION_OF_DONE.md`](docs/gestion_agil/DEFINITION_OF_DONE.md) v2.1 | ✅ |
 | Matriz de Trazabilidad | [`MATRIZ_TRAZABILIDAD.md`](docs/gestion_agil/MATRIZ_TRAZABILIDAD.md) | ✅ |
 | Refactorización y modularidad (XP) | `src/lsp_*.py` — 6 módulos de responsabilidad única | ✅ |
-| TDD — pruebas unitarias / integración / sistema | `tests/` (161+ total: 143 unitarios/seguridad/ética + 18 sistema) | ✅ |
+| TDD — pruebas unitarias / integración / sistema | `tests/` (143 total en 11 archivos) | ✅ |
 | Pruebas de carga, estrés y rendimiento | `qa/benchmark.py`, `qa/fps_test.py`, `qa/stress_test.py` | ✅ |
 | DevSecOps — autenticación y sesiones seguras | `src/lsp_auth.py` — HMAC-SHA256, expira 60 min | ✅ |
 | DevSecOps — auditoría y privacidad (GDPR Art. 25) | `src/lsp_audit.py` — IDs anónimos SHA-256[:8] | ✅ |
@@ -371,4 +371,4 @@ QA.bat        # Windows — doble clic → opción 13
 
 *Versión 2.1 — Junio 2026 · LSP Vision AI · UPN Ingeniería de Sistemas*
 *Cambios v2.0: arquitectura src-layout, módulos lsp_* refactorizados, DevSecOps completo, WCAG 2.1 AA, Docker no-root, Sprint de Reingeniería — 137 SP totales*
-*Cambios v2.1: nuevo integrante Timana Barreda, conteos de tests actualizados (161+ total, 34 DevSecOps, 29 ética+XAI), DoD v2.1, Lecciones Aprendidas v3.1*
+*Cambios v2.1: nuevo integrante Timana Barreda, conteos de tests actualizados (143 total, 34 DevSecOps, 29 ética+XAI), DoD v2.1, Lecciones Aprendidas v3.1*

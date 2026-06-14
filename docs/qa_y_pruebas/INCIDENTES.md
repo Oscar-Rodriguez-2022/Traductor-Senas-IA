@@ -1,7 +1,7 @@
 # Log de Incidentes y Bugs Resueltos — LSP Vision AI
 ## Capstone Project Sistemas 2026 · Universidad Privada del Norte
 ### Responsable: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.1 · 2026-06-13 · **Estado: 10/10 incidentes RESUELTOS**
+### Versión: 2.2 · 2026-06-14 · **Estado: 11/12 incidentes resueltos · 1 pendiente (INC-12)**
 
 Este registro documenta incidentes, bugs y problemas técnicos identificados durante el desarrollo y las pruebas del sistema, junto con sus causas raíz y resoluciones. Complementa `LECCIONES_APRENDIDAS.md`.
 
@@ -23,9 +23,9 @@ Este registro documenta incidentes, bugs y problemas técnicos identificados dur
 | **HU afectada** | HU-09 (Detección de manos) |
 | **Síntoma** | `ImportError: cannot import 'mp.solutions'` al ejecutar con Python 3.13 |
 | **Causa raíz** | `mediapipe==0.10.35` (versión para Python 3.13) eliminó el acceso legacy a `mp.solutions.hands`; la API fue deprecada |
-| **Resolución** | Fijar Python 3.12 como versión de referencia del proyecto · Usar `mediapipe==0.10.21` en `requirements.txt` · Documentar restricción en `GUIA_RECAPTURA_DATASET.md` y en memoria del proyecto |
-| **Lección** | No asumir compatibilidad entre versiones menores de Python sin verificar el changelog de MediaPipe |
-| **Verificación** | `py -3.12 -c "import mediapipe as mp; print(mp.solutions.hands)"` → sin error |
+| **Resolución** | ~~Fijar Python 3.12 como versión de referencia y usar `mediapipe==0.10.21`~~ → **Resolución definitiva en INC-11 (2026-06-14):** Migración completa a la MediaPipe Tasks API — `mp.solutions` ya no se utiliza en ningún módulo del proyecto; `mediapipe==0.10.35` es la versión activa |
+| **Lección** | No asumir compatibilidad entre versiones menores de Python sin verificar el changelog de MediaPipe. La solución correcta es migrar a la nueva API en lugar de anclar la versión de Python |
+| **Verificación** | `pytest tests/test_landmarks.py -v` → 6 PASS · `python -c "import mediapipe as mp; print(mp.tasks.vision.HandLandmarker)"` → sin error |
 
 ---
 
@@ -119,7 +119,7 @@ Este registro documenta incidentes, bugs y problemas técnicos identificados dur
 | **HU afectada** | HU-07 CA-07.2, HU-10 CA-10.1 |
 | **Síntoma** | El modelo SVM predecía 0 muestras correctas para las letras N, Q, R, S, V en la evaluación cruzada |
 | **Causa raíz** | Condiciones de captura subóptimas (luz insuficiente, ángulo perpendicular para S/N) dejaron 0 muestras válidas donde MediaPipe detectaba landmarks correctamente |
-| **Resolución** | Sesión de recaptura siguiendo `GUIA_RECAPTURA_DATASET.md`: N, Q, R, S, V capturadas con 120+ muestras válidas por letra, fondo neutro e iluminación frontal · `scripts/augmentar_dataset.py` ×16 ejecutado sobre el dataset completo · Modelo reentrenado con `scripts/entrenar_modelo.py` · Accuracy global subió a 88.3% |
+| **Resolución** | Sesión de recaptura siguiendo `GUIA_RECAPTURA_DATASET.md`: N, Q, R, S, V capturadas con 120+ muestras válidas por letra, fondo neutro e iluminación frontal · `scripts/augmentar_dataset.py` ×16 ejecutado · Modelo reentrenado · Accuracy global subió a 88.3% con API antigua. **Nota:** el modelo fue reentrenado nuevamente el 2026-06-14 con la Tasks API (INC-11); las letras N, Q, R, S, V mantienen tasas de detección ≥ 98% con la nueva API |
 | **Lección** | La calidad del dataset debe validarse antes de entrenar: ejecutar `cargar_dataset()` con conteo por letra y rechazar entrenar si alguna clase tiene < 20 muestras válidas |
 | **Verificación** | `tests/test_etica.py::TestEquidad::test_todas_las_clases_tienen_recall_positivo` → PASS · `tests/test_etica.py::TestEquidad::test_equidad_minima_por_clase_recall_mayor_50` → PASS · `qa/evaluate.py` muestra recall > 0.80 para todas las letras |
 
@@ -175,18 +175,52 @@ Este registro documenta incidentes, bugs y problemas técnicos identificados dur
 
 ---
 
+## INC-11 · Migración a MediaPipe Tasks API (mp.solutions eliminado en 0.10.x)
+
+| Campo | Detalle |
+|---|---|
+| **Severidad** | 🔴 CRÍTICO |
+| **Fecha detección** | 2026-06-14 |
+| **Fecha resolución** | 2026-06-14 |
+| **HU afectada** | HU-09 (Detección de manos), HU-07 (Entrenamiento) |
+| **Síntoma** | `AttributeError: module 'mediapipe' has no attribute 'solutions'` al ejecutar cualquier test o script con Python 3.13 + mediapipe 0.10.30+ |
+| **Causa raíz** | La resolución de INC-01 ("usar Python 3.12") no era viable en el entorno de ejecución real (Python 3.13.7). El paquete `mediapipe` disponible para Python 3.13 en PyPI solo ofrece versiones 0.10.30–0.10.35, todas las cuales eliminaron completamente `mp.solutions` |
+| **Resolución** | Migración completa a la Tasks API de MediaPipe: (1) Descarga de `hand_landmarker.task` (7.8 MB) en la raíz del proyecto · (2) Reescritura de `_get_hands()` y `extraer_landmarks()` en `lsp_core.py` usando `mp.tasks.vision.HandLandmarker` · (3) Actualización de `lsp_video.py` para usar `detect_for_video()` con timestamps · (4) Actualización de `scripts/extraer_landmarks.py`, `augmentar_dataset.py`, `capturar_dataset.py` · (5) Modelo reentrenado con landmarks generados por la nueva API |
+| **Lección** | El archivo `hand_landmarker.task` es ahora una dependencia del proyecto y debe incluirse en el repositorio o descargarse en el setup. Documentar en `README.md` |
+| **Verificación** | `pytest tests/test_landmarks.py tests/test_integracion.py -v` → 9 PASS, 0 FAIL |
+
+---
+
+## INC-12 · Tasa de detección crítica en letras O, D, J, S, F, I (dataset quality)
+
+| Campo | Detalle |
+|---|---|
+| **Severidad** | 🔴 CRÍTICO |
+| **Fecha detección** | 2026-06-14 |
+| **Fecha resolución** | Pendiente (requiere recaptura de dataset) |
+| **HU afectada** | HU-07 CA-07.2 (dataset balanceado), HU-10 CA-10.1 (predicción correcta) |
+| **Síntoma** | Escaneo de 13 689 imágenes con MediaPipe Tasks API revela: O=0% detección (500 fotos, 0 landmarks), D=1.8% (9/509), J=0.8% (4/509), S=5.8% (29/500), F=13.7% (70/509), I=18.9% (96/509) |
+| **Causa raíz** | Las imágenes de estas letras fueron capturadas con poses de mano cerrada o semi-cerrada (puño: A, S, O; dedo índice extendido parcial: D, F, I, J) donde el modelo de detección de manos de MediaPipe requiere que los dedos sean visibles para detectar la palma. El nuevo Tasks API con `min_hand_detection_confidence=0.6` es más estricto que la API antigua |
+| **Impacto** | La letra O no puede ser reconocida. K-Fold imposible (J=4 muestras < k=5). Accuracy de D, J, S en producción no puede validarse cruzadamente |
+| **Resolución provisional** | Modelo reentrenado con las muestras disponibles (25 letras, O excluida). Augmentation ×16 aplicada para compensar el desbalance |
+| **Resolución definitiva** | Recapturar dataset para letras críticas siguiendo `docs/qa_y_pruebas/GUIA_RECAPTURA_DATASET.md`: (1) Fondo blanco o neutro, (2) iluminación frontal difusa ≥ 200 lux, (3) mostrar la mano completa visible, (4) múltiples ángulos para cada letra |
+| **Lección** | Antes de entrenar, validar siempre la tasa de detección con `lsp_core.imagenes_disponibles()` + conteo por clase. Rechazar entrenamiento si alguna clase tiene < 50 muestras detectadas |
+| **Verificación pendiente** | Tras recaptura: `tests/test_etica.py::TestEquidad::test_equidad_minima_por_clase_recall_mayor_50` → PASS para todas las 26 letras |
+
+---
+
 ## Resumen Estadístico
 
 | Severidad | Cantidad | Resueltos | Pendientes |
 |-----------|---------|-----------|-----------|
-| 🔴 CRÍTICO | 3 | 3 | 0 |
+| 🔴 CRÍTICO | 5 | 4 | 1 (INC-12) |
 | 🟡 ALTO | 3 | 3 | 0 |
 | 🟢 MEDIO | 4 | 4 | 0 |
-| **Total** | **10** | **10** | **0** |
+| **Total** | **12** | **11** | **1** |
 
-**MTTR promedio (Mean Time To Resolve):** ~1.3 días para todos los incidentes.
-**Deuda técnica generada:** 0 ítems críticos pendientes al cierre del proyecto.
+**MTTR promedio (Mean Time To Resolve):** ~1.1 días para incidentes resueltos.
+**Deuda técnica activa:** INC-12 — recaptura de dataset para letras O, D, J, S, F, I.
 
 ---
 
-*Última actualización: 2026-06-13 · Rodriguez Chacara, Oscar Daniel · v2.1 — INC-10 añadido (OB-11: contaminación rate-limiter); conteo TestSanitizacionInputs 11→13; refs INC-07 con clase; total 10/10 incidentes*
+*Última actualización: 2026-06-14 · Rodriguez Chacara, Oscar Daniel · v2.2 — INC-11 (migración Tasks API), INC-12 (tasa detección crítica dataset); total 12 incidentes, 11 resueltos, 1 pendiente*

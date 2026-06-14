@@ -6,7 +6,7 @@
 
 Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios de la Sección I antes de marcarse como completado en el tablero Scrum. La Sección II registra el estado de cumplimiento al cierre del Capstone (v2.1).
 
-> **v2.1:** Actualizado tras la reingeniería estructural y actividades post-cierre (src-layout, DevSecOps completo, ~114 tests, pre-commit hook anti-secretos, reorganización de `docs/`).
+> **v2.1:** Actualizado tras la reingeniería estructural y actividades post-cierre (src-layout, DevSecOps completo, 143 tests, pre-commit hook anti-secretos, reorganización de `docs/`).
 > Todos los criterios han sido verificados y el proyecto está listo para sustentación y despliegue.
 
 ---
@@ -153,12 +153,12 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 | Cero fallos en la suite | 0 FAIL, 0 ERROR | ✅ |
 | Tests de integración | `tests/test_integracion.py` — 3 tests E2E | ✅ |
 | Tests de carga / estrés | `qa/benchmark.py`, `qa/fps_test.py`, `qa/stress_test.py` | ✅ |
-| Tests de video | `tests/test_video.py` — 11 tests | ✅ |
+| Tests de video | `tests/test_video.py` — 12 tests | ✅ |
 | Tests de seguridad | `tests/test_seguridad.py` — 34 tests (33 PASS + 1 SKIP) · 4 clases: Sanitización, RateLimiting, AuditLog, IntegridadPKL | ✅ |
 | Tests de ética IA | `tests/test_etica.py` — 29 tests · 5 clases: Equidad, Calibración, Explicabilidad, XAI (14), PrivacidadEtica | ✅ |
 | Tests de sistema | `tests/test_sistema.py` — 18 tests (assertions reales contra lsp_core/lsp_auth/sklearn) | ✅ |
 
-**Total tests automatizados: ~114 tests recolectados por pytest en `tests/`**
+**Total tests automatizados: 143 tests recolectados por pytest en `tests/` (114 base + 29 XAI/ética en `test_etica.py`)**
 
 ### Seguridad (DevSecOps) — ✅ CUMPLE
 
@@ -248,4 +248,4 @@ Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios
 | 1.2 | 2026-06-12 | Rate limiting, SHA-256 PKL, tests de video/seguridad/ética |
 | 1.3 | 2026-06-13 | Fusión con DoD.md · src/ restructuring · Docker non-root · trivy.yaml · plantilla UAT · INCIDENTES.md |
 | 2.0 | 2026-06-13 | **CIERRE DE PROYECTO** — Sprint Reingeniería completado, 137/137 SP, 22/22 HUs, todos los criterios DoD satisfechos |
-| 2.1 | 2026-06-13 | Conteos reales de tests (34 seguridad, 29 ética, ~114 total) · Pre-commit hook añadido a criterios de Seguridad · Rutas de docs/ actualizadas a subcarpetas temáticas · Referencias a tests con nombres de clase/método exactos |
+| 2.1 | 2026-06-13 | Conteos reales de tests (34 seguridad, 29 ética, 143 total) · Pre-commit hook añadido a criterios de Seguridad · Rutas de docs/ actualizadas a subcarpetas temáticas · Referencias a tests con nombres de clase/método exactos |

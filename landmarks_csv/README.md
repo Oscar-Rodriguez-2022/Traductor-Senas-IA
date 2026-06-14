@@ -70,3 +70,7 @@ Ese archivo sí se sube al repositorio (`git add modelo.pkl`).
 
 > Ver: `TUTORIAL_EQUIPO.md` para el flujo completo de colaboracion Git.
 > Ver: `TUTORIAL_DESPLIEGUE_WEB.md` para reentrenar antes de cada despliegue.
+
+---
+
+*Versión: 1.0 · 2026-06-13*

@@ -1,6 +1,7 @@
 # Arquitectura del Sistema — LSP Vision AI
 ## Diagramas de Componentes y Casos de Uso
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
+### Versión: 1.1 · Fecha: 2026-06-13
 
 > Este documento cumple con **CA-02.1** (diagrama de componentes con 4 módulos principales),
 > **CA-02.2** (≥7 casos de uso UC-01 a UC-07) y **CA-02.3** (tecnologías por módulo).
@@ -36,7 +37,7 @@ graph TD
     end
 
     subgraph QA["🧪 Capa de Calidad"]
-        TESTS["tests/\nSuite TDD: ~114 tests\n12 módulos de prueba"]
+        TESTS["tests/\nSuite TDD: 143 tests\n11 archivos de prueba"]
         QA_SCRIPTS["qa/\nBenchmark · FPS · Estrés\nEvaluación · Robustez\nCross-Val · Reportes"]
     end
 
@@ -165,7 +166,7 @@ c:\Traductor-Senas-IA\
 │   ├── lsp_ui.py                 # Componentes HTML/CSS/ARIA
 │   └── pages/
 │       └── 1_Metricas_QA.py      # Dashboard de métricas
-├── tests/                        # Suite TDD (~114 tests, 12 módulos)
+├── tests/                        # Suite TDD (143 tests, 11 archivos)
 │   ├── conftest.py               # Fixtures compartidas
 │   ├── test_audit.py             # Tests de auditoría
 │   ├── test_auth.py              # Tests de autenticación
@@ -241,4 +242,4 @@ c:\Traductor-Senas-IA\
 | Versión | Fecha | Cambio |
 |---------|-------|--------|
 | 1.0 | 2026-06-12 | Versión inicial — diagramas Mermaid, tecnologías, flujo de datos |
-| 1.1 | 2026-06-13 | Actualizar rutas a src/, conteo de tests (~114), carpetas scripts/ y config/, docs reorganizados en subcarpetas temáticas |
+| 1.1 | 2026-06-13 | Actualizar rutas a src/, conteo de tests (143), carpetas scripts/ y config/, docs reorganizados en subcarpetas temáticas |

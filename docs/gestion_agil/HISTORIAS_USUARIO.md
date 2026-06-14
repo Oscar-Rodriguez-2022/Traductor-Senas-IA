@@ -19,7 +19,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 | **Sprint 1** | Planificación, Dataset y Modelo ML | HU-01, HU-02, HU-03, HU-04, HU-05, HU-06, HU-07 | Arquitectura definida, entorno configurado, dataset LSP y modelo SVM entrenado (≥ 85% accuracy) |
 | **Sprint 2** | Aplicación Web, Calidad y Seguridad | HU-08, HU-09, HU-10, HU-11, HU-12, HU-13, HU-14, HU-17, HU-18, HU-22 | App Streamlit funcional, auth HMAC, auditoría, tests automatizados y dashboard QA |
 | **Sprint 3** | Ética, Accesibilidad y Despliegue | HU-15, HU-16, HU-19, HU-20, HU-21 | WCAG 2.1 AA, explicabilidad de IA, privacidad GDPR Art. 25 y despliegue web |
-| **Sprint Reingeniería** | Modularidad, TDD Avanzado y DevSecOps | TR-01..TR-13 (tareas de refactor) | src-layout, 34 tests DevSecOps, 29 tests IA Ética (TestXAI), 11 tests video, rate limiting, Docker non-root, pre-commit hook — 137 SP totales |
+| **Sprint Reingeniería** | Modularidad, TDD Avanzado y DevSecOps | TR-01..TR-13 (tareas de refactor) | src-layout, 34 tests DevSecOps, 29 tests IA Ética (TestXAI), 12 tests video, rate limiting, Docker non-root, pre-commit hook — 137 SP totales |
 
 > Todos los Sprints tuvieron duración de 2-3 semanas con Sprint Review y Retrospectiva al final.
 > El Definition of Done completo se encuentra en [`DEFINITION_OF_DONE.md`](DEFINITION_OF_DONE.md).
@@ -153,7 +153,7 @@ El proyecto se desarrolló en **4 Sprints** (> 3 requeridos por estándar acadé
 - Entonces quedan organizadas en carpetas etiquetadas por seña (ej. `data/a/`, `data/b/`).
 
 **CA-04.3 — Ejecución y depuración**
-- Dado que el script `A.py` se ejecuta,
+- Dado que el script `scripts/capturar_dataset.py` se ejecuta (antes: `A.py`),
 - Cuando se prueba en al menos 2 equipos distintos del equipo,
 - Entonces corre sin errores,
 - Y se descartan las imágenes con errores de detección de manos por MediaPipe.
@@ -873,7 +873,7 @@ Tipo de verificación: **Automatizada** (`pytest`) · **QA** (scripts de medici�
 | HU-01 | Definición de requerimientos y alcance | Revisión y validación del líder técnico | Manual | ✅ |
 | HU-02 | Arquitectura modular | Revisión de diagramas (componentes, casos de uso) en Sprint Review | Manual | ✅ |
 | HU-03 | Entorno de desarrollo y repositorio | Verificación de `requirements.txt` y commits en ≥3 equipos | Manual | ✅ |
-| HU-04 | Recolección inicial del dataset | Inspección del dataset y ejecución de `A.py` en ≥2 equipos | Manual | ✅ |
+| HU-04 | Recolección inicial del dataset | Inspección del dataset y ejecución de `scripts/capturar_dataset.py` en ≥2 equipos | Manual | ✅ |
 | HU-05 | Dataset completo LSP | Inspección, etiquetado y depuración del dataset | Manual | ✅ |
 | HU-06 | Extracción de landmarks y preprocesamiento | Validación de integridad de vectores y etiquetas | Manual | ✅ |
 | HU-07 | Entrenamiento y validación del SVM | `qa/evaluate.py` (accuracy, precision, recall, F1 ≥ 85%) | QA | ✅ |
@@ -901,14 +901,14 @@ Tipo de verificación: **Automatizada** (`pytest`) · **QA** (scripts de medici�
 | Auditoría | `tests/test_audit.py` | 9 | HU-14 | ✅ 9/9 |
 | DevSecOps | `tests/test_seguridad.py` | 34 (33 PASS + 1 SKIP) | HU-13, HU-14, HU-20 | ✅ |
 | IA Ética / XAI | `tests/test_etica.py` | 29 (TestEquidad + TestCalibracion + TestExplicabilidad + TestXAI + TestPrivacidadEtica) | HU-16, HU-20 | ✅ 29/29 |
-| Video / WebRTC | `tests/test_video.py` | 11 | HU-08, HU-09 | ✅ 11/11 |
+| Video / WebRTC | `tests/test_video.py` | 12 | HU-08, HU-09 | ✅ 12/12 |
 | Integración E2E | `tests/test_integracion.py` | 3 | HU-10, HU-12 | ✅ 3/3 |
 | Sistema | `tests/test_sistema.py` | 18 | HU-01..HU-20 | ✅ 18/18 |
 | Landmarks | `tests/test_landmarks.py` | — | HU-06, HU-09 | ✅ |
 | Modelo SVM | `tests/test_modelo.py` | — | HU-07, HU-10 | ✅ |
 | Validación datos | `tests/test_validacion.py` | — | HU-05, HU-06 | ✅ |
 | Manejo errores | `tests/test_errores.py` | — | HU-22 | ✅ |
-| **TOTAL (`tests/`)** | — | **~114 recolectados** | **22 HUs** | **✅** |
+| **TOTAL (`tests/`)** | — | **143 recolectados** | **22 HUs** | **✅** |
 | QA scripts | `qa/benchmark.py`, `qa/fps_test.py`, `qa/stress_test.py` | métricas | HU-22 | ✅ |
 
 **Entorno de referencia:** Python 3.12 + MediaPipe 0.10.21.

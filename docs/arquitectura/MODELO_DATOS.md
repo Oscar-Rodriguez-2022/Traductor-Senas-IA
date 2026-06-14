@@ -1,6 +1,7 @@
 # Modelo de Datos — LSP Vision AI
 ## Diseño Incremental por Sprint
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
+### Versión: 1.1 · Fecha: 2026-06-13
 
 > Este documento describe las estructuras de datos del sistema, su evolución
 > incremental por sprint y su coherencia con el diseño arquitectónico.

@@ -18,7 +18,7 @@
 | Criterios de Aceptación | 67+ | 67+ | **100%** |
 | Módulos de código | 6 | 6 | **100%** |
 | Archivos de test | 11 | 11 | **100%** |
-| Tests automatizados | ~114 | ~114 | **100%** |
+| Tests automatizados | 143 | 143 | **100%** |
 
 ---
 
@@ -91,6 +91,7 @@
 | `render_hero()` | HU-12 | CA-12.2 (h1 semántico, instrucciones) | Inspección visual | ✅ |
 | `render_resultado(letra, conf, mano)` | HU-10, HU-15 | CA-10.3 (borde rojo/amarillo), CA-15.1 (`aria-live="polite"`) | `tests/test_etica.py::test_umbral_confianza_60_documentado_en_ui` | ✅ |
 | `render_pipeline_explicado()` | HU-16 | CA-16.1 (pipeline 5 etapas), CA-16.2 (limitaciones documentadas) | `tests/test_etica.py::test_pipeline_explicado_menciona_limitaciones` | ✅ |
+| `render_alternativas(alternativas)` | HU-16 | CA-16.2 (top-5 alternativas XAI con barras de probabilidad; aviso de ambigüedad cuando diferencia < 10%) | `tests/test_etica.py::TestXAI` | ✅ |
 | `render_estado_sistema(n, modelo_ok)` | HU-12 | CA-12.3 (estado del sistema visible) | Inspección visual | ✅ |
 | `render_estadisticas(n, fps)` | HU-17 | CA-17.1 (4 tarjetas de métricas) | Inspección visual | ✅ |
 | `render_footer()` | HU-15 | CA-15.1 (`role="contentinfo"`) | Inspección HTML | ✅ |
@@ -105,8 +106,8 @@
 | `cargar_modelo()` `@st.cache_resource` | HU-10 | CA-10.1 (carga al iniciar, cacheada) | `tests/test_modelo.py::test_cargar_modelo` | ✅ |
 | Guard `lsp_auth.login_requerido(...)` | HU-13 | CA-13.4 (guard antes de mostrar contenido) | `tests/test_auth.py::test_login_requerido_*` | ✅ |
 | `lsp_audit.registrar_acceso(...)` | HU-14 | CA-14.1 (registra `PAGINA_VISITADA`) | `tests/test_audit.py` | ✅ |
-| `webrtc_streamer(Traductor(...))` | HU-08 | CA-08.1 (stream activo) | `tests/test_integracion.py` | ✅ |
-| `panel_resultado()` `@st.fragment` | HU-10, HU-11 | CA-10.2 (actualización ≤0.4s), CA-11.1 (historial) | `tests/test_integracion.py` | ✅ |
+| `webrtc_streamer(Traductor(...))` *(ext: streamlit-webrtc)* | HU-08 | CA-08.1 (stream activo) | `tests/test_integracion.py` | ✅ |
+| `panel_resultado()` `@st.fragment` *(inner fn de app.py:124)* | HU-10, HU-11 | CA-10.2 (actualización ≤0.4s), CA-11.1 (historial) | `tests/test_integracion.py` | ✅ |
 | `RTC_CONFIG` con STUN + TURN | HU-08 | CA-08.1 (NAT simétrico — redes universitarias) | Prueba manual en red UPN | ✅ |
 
 ---
@@ -171,7 +172,7 @@
 | `tests/test_validacion.py` | **9** | HU-05, HU-06 | ✅ |
 | `tests/test_errores.py` | **4** | HU-22 | ✅ |
 | `tests/test_sistema.py` | 18 | HU-01..HU-20 | ✅ UT-01..UT-18 |
-| **Total** | **~114** | **22 HUs** | ✅ |
+| **Total** | **143** | **22 HUs** | ✅ |
 
 ---
 
@@ -212,4 +213,4 @@
 |---------|-------|--------|
 | 1.0 | 2026-06-12 | Versión inicial — trazabilidad de 8 módulos, 22 HUs, 49+ tests |
 | 2.0 | 2026-06-13 | Actualización post-reingeniería: `src/`-layout, `scripts/`, estado ✅ en todas las HUs, tabla de cobertura por módulo completa |
-| 2.1 | 2026-06-13 | XAI functions en §1 (DT-19: `explicar_prediccion`, `nombres_landmarks`, `sesgos_conocidos`); CA-13.7 rate limiting; pre-commit hook en §8 (DT-20); conteos reales de tests (seguridad 34, ética 29, video 12, validacion 9, total ~114); `test_sistema.py` → `tests/test_sistema.py`; HU-16 lsp_core ✅; path UAT corregido |
+| 2.1 | 2026-06-13 | XAI functions en §1 (DT-19: `explicar_prediccion`, `nombres_landmarks`, `sesgos_conocidos`); CA-13.7 rate limiting; pre-commit hook en §8 (DT-20); conteos reales de tests (seguridad 34, ética 29, video 12, validacion 9, total 143); `test_sistema.py` → `tests/test_sistema.py`; HU-16 lsp_core ✅; path UAT corregido |
