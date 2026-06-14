@@ -1,5 +1,5 @@
-predicciones,errores,excepciones,promedio_ms,total_s,estado
-100,0,0,0.092,0.01,OK
-500,0,0,0.093,0.05,OK
-1000,0,0,0.096,0.1,OK
-5000,0,0,0.094,0.47,OK
+predicciones,errores,promedio_ms,total_s,delta_memoria_mb,estado,memoria_estado
+100,0,0.452,0.05,25.96,OK,OK
+500,0,0.406,0.2,4.38,OK,OK
+1000,0,0.404,0.4,3.73,OK,OK
+5000,0,0.396,1.98,3.73,OK,OK

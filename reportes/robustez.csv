@@ -1,9 +1,9 @@
 condicion,detectadas,total,tasa_deteccion_pct
 Normal (referencia),40,40,100.0
-Poca luz,13,40,32.5
-Luz intensa,7,40,17.5
+Poca luz,1,40,2.5
+Luz intensa,0,40,0.0
 Fondo complejo (ruido),0,40,0.0
-Mano inclinada (35 grados),27,40,67.5
-Mano parcial,24,40,60.0
-Distancia corta (zoom),1,40,2.5
-Distancia larga (lejos),39,40,97.5
+Mano inclinada (35 grados),3,40,7.5
+Mano parcial,40,40,100.0
+Distancia corta (zoom),0,40,0.0
+Distancia larga (lejos),40,40,100.0

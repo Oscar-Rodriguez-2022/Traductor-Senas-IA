@@ -1,9 +1,9 @@
 {
-  "muestras": 2385,
-  "clases": 18,
-  "accuracy": 0.883,
-  "precision_macro": 0.879,
-  "recall_macro": 0.874,
-  "f1_macro": 0.876,
-  "_generado": "2026-06-13T10:22:15"
+  "muestras": 9585,
+  "clases": 25,
+  "accuracy": 1.0,
+  "precision_macro": 1.0,
+  "recall_macro": 1.0,
+  "f1_macro": 1.0,
+  "_generado": "2026-06-14T05:14:43"
 }
