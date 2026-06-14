@@ -17,7 +17,7 @@
 
 | Categoría | Documentos clave |
 |---|---|
-| **Scrum** | [Historias de Usuario](docs/gestion_agil/HISTORIAS_USUARIO.md) · [Sprint Backlog](docs/gestion_agil/SPRINT_BACKLOG.md) · [Burndown Charts](docs/gestion_agil/BURNDOWN_CHART.md) · [DoD v1.3](docs/gestion_agil/DEFINITION_OF_DONE.md) |
+| **Scrum** | [Historias de Usuario](docs/gestion_agil/HISTORIAS_USUARIO.md) · [Sprint Backlog](docs/gestion_agil/SPRINT_BACKLOG.md) · [Burndown Charts](docs/gestion_agil/BURNDOWN_CHART.md) · [DoD v2.1](docs/gestion_agil/DEFINITION_OF_DONE.md) |
 | **Calidad / TDD** | [Guía QA](docs/qa_y_pruebas/GUIA_QA.md) · [Incidentes](docs/qa_y_pruebas/INCIDENTES.md) · [Lecciones Aprendidas](docs/cierre/LECCIONES_APRENDIDAS.md) |
 | **Seguridad y Ética** | [Plan de Seguridad](docs/seguridad_y_etica/SEGURIDAD.md) · [IA Ética / XAI](docs/seguridad_y_etica/IA_ETICA.md) · [Matriz de Trazabilidad](docs/gestion_agil/MATRIZ_TRAZABILIDAD.md) |
 | **Despliegue** | [Hugging Face (Docker)](docs/usuario_y_tutoriales/TUTORIAL_HUGGINGFACE.md) · [Streamlit Cloud](docs/usuario_y_tutoriales/TUTORIAL_DESPLIEGUE_WEB.md) · [Manual de Usuario](docs/usuario_y_tutoriales/MANUAL_USUARIO.md) |
@@ -371,4 +371,4 @@ QA.bat        # Windows — doble clic → opción 13
 
 *Versión 2.1 — Junio 2026 · LSP Vision AI · UPN Ingeniería de Sistemas*
 *Cambios v2.0: arquitectura src-layout, módulos lsp_* refactorizados, DevSecOps completo, WCAG 2.1 AA, Docker no-root, Sprint de Reingeniería — 137 SP totales*
-*Cambios v2.1: nuevo integrante Timana Barreda, conteos de tests actualizados (161+ total, 34 DevSecOps, 29 ética+XAI), DoD v1.3, Lecciones Aprendidas v3.0*
+*Cambios v2.1: nuevo integrante Timana Barreda, conteos de tests actualizados (161+ total, 34 DevSecOps, 29 ética+XAI), DoD v2.1, Lecciones Aprendidas v3.1*
