@@ -33,6 +33,7 @@ NUM_LANDMARKS = 21          # puntos que devuelve MediaPipe Hands
 NUM_FEATURES = 42           # 21 puntos * (x, y)
 LETTERS = "abcdefghijklmnopqrstuvwxyz"
 DATA_FOLDER = "data"
+HAND_LANDMARKER_MODEL = "hand_landmarker.task"
 
 _hands_cache = {}
 
@@ -60,7 +61,7 @@ def cargar_modelo(path=MODELO_PATH):
 # ───────────────────────── MediaPipe ─────────────────────────
 def _get_hands(static_image_mode=True):
     """
-    Devuelve (y cachea) una instancia de MediaPipe Hands.
+    Devuelve (y cachea) una instancia de MediaPipe HandLandmarker (Tasks API).
 
     Usar static_image_mode=True para imágenes fijas (dataset, QA).
     Usar static_image_mode=False para video en tiempo real (app.py).
@@ -69,12 +70,25 @@ def _get_hands(static_image_mode=True):
     import mediapipe as mp
     clave = bool(static_image_mode)
     if clave not in _hands_cache:
-        _hands_cache[clave] = mp.solutions.hands.Hands(
-            static_image_mode=static_image_mode,
-            max_num_hands=1,
-            model_complexity=0,
-            min_detection_confidence=0.6,
+        if not os.path.exists(HAND_LANDMARKER_MODEL):
+            raise FileNotFoundError(
+                f"Modelo '{HAND_LANDMARKER_MODEL}' no encontrado en el directorio de trabajo. "
+                "Descárgalo ejecutando: python -c \"import urllib.request; "
+                "urllib.request.urlretrieve('https://storage.googleapis.com/mediapipe-models/"
+                "hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task', 'hand_landmarker.task')\""
+            )
+        running_mode = (
+            mp.tasks.vision.RunningMode.IMAGE
+            if static_image_mode
+            else mp.tasks.vision.RunningMode.VIDEO
         )
+        options = mp.tasks.vision.HandLandmarkerOptions(
+            base_options=mp.tasks.BaseOptions(model_asset_path=HAND_LANDMARKER_MODEL),
+            running_mode=running_mode,
+            num_hands=1,
+            min_hand_detection_confidence=0.6,
+        )
+        _hands_cache[clave] = mp.tasks.vision.HandLandmarker.create_from_options(options)
     return _hands_cache[clave]
 
 
@@ -82,8 +96,8 @@ def extraer_landmarks(img, static_image_mode=True):
     """
     Extrae los landmarks de la mano detectada en una imagen BGR.
 
-    Usa MediaPipe Hands para detectar 21 puntos anatómicos y devuelve
-    sus coordenadas (x, y) normalizadas en el rango [0, 1].
+    Usa MediaPipe HandLandmarker (Tasks API) para detectar 21 puntos anatómicos
+    y devuelve sus coordenadas (x, y) normalizadas en el rango [0, 1].
 
     Args:
         img (numpy.ndarray): Imagen en formato BGR (como la devuelve cv2.imread).
@@ -94,15 +108,22 @@ def extraer_landmarks(img, static_image_mode=True):
             o None si no se detecta ninguna mano en la imagen.
     """
     import cv2
+    import mediapipe as mp
     if img is None or not hasattr(img, "shape") or img.size == 0:
         return None
-    hands = _get_hands(static_image_mode)
+    import time
+    landmarker = _get_hands(static_image_mode)
     rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    resultado = hands.process(rgb)
-    if not resultado.multi_hand_landmarks:
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+    if static_image_mode:
+        resultado = landmarker.detect(mp_image)
+    else:
+        # VIDEO mode requiere timestamps crecientes en milisegundos
+        resultado = landmarker.detect_for_video(mp_image, int(time.time_ns() // 1_000_000))
+    if not resultado.hand_landmarks:
         return None
     landmarks = []
-    for lm in resultado.multi_hand_landmarks[0].landmark:
+    for lm in resultado.hand_landmarks[0]:
         landmarks.append(lm.x)
         landmarks.append(lm.y)
     return landmarks if len(landmarks) == NUM_FEATURES else None

@@ -90,13 +90,14 @@ def augmentar(landmarks):
 # ─────────────────────────── Extracción de landmarks ──────────────────────────
 
 def extraer_landmarks(data_folder="data"):
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(
-        static_image_mode=True,
-        max_num_hands=1,
-        model_complexity=0,
-        min_detection_confidence=0.5,
+    HAND_LANDMARKER_MODEL = "hand_landmarker.task"
+    options = mp.tasks.vision.HandLandmarkerOptions(
+        base_options=mp.tasks.BaseOptions(model_asset_path=HAND_LANDMARKER_MODEL),
+        running_mode=mp.tasks.vision.RunningMode.IMAGE,
+        num_hands=1,
+        min_hand_detection_confidence=0.5,
     )
+    hands = mp.tasks.vision.HandLandmarker.create_from_options(options)
 
     X, y = [], []
     letras_ok = []
@@ -114,16 +115,17 @@ def extraer_landmarks(data_folder="data"):
             img = cv2.imread(img_path)
             if img is None:
                 continue
-            results = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-            if results.multi_hand_landmarks:
-                for hl in results.multi_hand_landmarks:
-                    lm = []
-                    for pt in hl.landmark:
-                        lm.append(pt.x)
-                        lm.append(pt.y)
-                    X.append(lm)
-                    y.append(letter)
-                    utiles += 1
+            rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+            results = hands.detect(mp_image)
+            if results.hand_landmarks:
+                lm = []
+                for pt in results.hand_landmarks[0]:
+                    lm.append(pt.x)
+                    lm.append(pt.y)
+                X.append(lm)
+                y.append(letter)
+                utiles += 1
 
         estado = f"{utiles:>3} utiles / {len(imagenes):>3} fotos"
         advertencia = " <-- SIN MUESTRAS, captura con A.py" if utiles == 0 else ""

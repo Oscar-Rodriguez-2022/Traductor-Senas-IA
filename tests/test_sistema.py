@@ -110,11 +110,14 @@ def test_ut08_reconocimiento_devuelve_letra_valida(modelo_sys, landmarks_sys):
 
 def test_ut09_precision_minima_modelo(modelo_sys):
     """UT-09 HU-07 CA-07.2: accuracy del modelo ≥ 85% en el dataset disponible."""
+    from collections import Counter
     X, y = lsp_core.cargar_dataset(limite_por_letra=5)
     if len(X) == 0:
         pytest.skip("Dataset vacío; no se puede evaluar la precisión")
     from sklearn.model_selection import train_test_split
-    _, X_test, _, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
+    conteos = Counter(y)
+    use_stratify = y if min(conteos.values()) >= 2 else None
+    _, X_test, _, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=use_stratify)
     predicciones = modelo_sys.predict(X_test)
     accuracy = np.mean(predicciones == y_test)
     assert accuracy >= 0.85, f"Accuracy {accuracy:.1%} inferior al mínimo requerido de 85%"

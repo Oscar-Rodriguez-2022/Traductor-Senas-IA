@@ -27,18 +27,23 @@ import time
 import av
 import cv2
 import mediapipe as mp
+from mediapipe.framework.formats import landmark_pb2 as _lm_pb2
 from streamlit_webrtc import VideoProcessorBase
 
 import lsp_core
+
+_HAND_CONNECTIONS = mp.solutions.hands.HAND_CONNECTIONS
+_LANDMARK_SPEC = mp.solutions.drawing_utils.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=3)
+_CONNECTION_SPEC = mp.solutions.drawing_utils.DrawingSpec(color=(0, 0, 255), thickness=2)
 
 
 class Traductor(VideoProcessorBase):
     """
     Procesador de frames WebRTC para reconocimiento de señas LSP en tiempo real.
 
-    Cada frame recibido es procesado por MediaPipe Hands para extraer landmarks,
-    que luego se clasifican con el modelo SVM. Los resultados se almacenan en
-    atributos protegidos por un Lock para acceso thread-safe desde el hilo de UI.
+    Cada frame recibido es procesado por MediaPipe HandLandmarker para extraer
+    landmarks, que luego se clasifican con el modelo SVM. Los resultados se
+    almacenan en atributos protegidos por un Lock para acceso thread-safe.
 
     Attributes:
         letra (str): Última letra detectada. Valor '-' si no hay mano visible.
@@ -56,15 +61,8 @@ class Traductor(VideoProcessorBase):
                 si el modelo no está disponible; en ese caso no habrá predicciones.
         """
         self._modelo = modelo
-        self.hands = mp.solutions.hands.Hands(
-            static_image_mode=False,
-            max_num_hands=1,
-            model_complexity=0,          # modo rápido para menor latencia en CPU
-            min_detection_confidence=0.6,
-            min_tracking_confidence=0.5,
-        )
-        self._mp_drawing = mp.solutions.drawing_utils
-        self._mp_hands = mp.solutions.hands
+        # VIDEO mode: sincrónico con timestamps, mejor tracking que IMAGE mode
+        self._landmarker = lsp_core._get_hands(static_image_mode=False)
         self.lock = threading.Lock()
         self.letra = "-"
         self.confianza = 0.0
@@ -87,28 +85,33 @@ class Traductor(VideoProcessorBase):
         Returns:
             av.VideoFrame: Frame anotado con skeleton de mano y badges informativos.
         """
-        img = frame.to_ndarray(format="bgr24")
+        img = frame.to_ndarray(format="bgr24").copy()
         h, w, _ = img.shape
 
         # Procesar a menor resolución para aliviar la CPU
         rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         rgb_small = cv2.resize(rgb, (320, 240))
-        results = self.hands.process(rgb_small)
+        ts_ms = int(time.time_ns() // 1_000_000)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_small)
+        results = self._landmarker.detect_for_video(mp_image, ts_ms)
 
         letra, conf, mano = "-", 0.0, False
         alternativas_frame: list = []
 
-        if results.multi_hand_landmarks:
+        if results.hand_landmarks:
             mano = True
-            for hand_landmarks in results.multi_hand_landmarks:
-                self._mp_drawing.draw_landmarks(
-                    img, hand_landmarks, self._mp_hands.HAND_CONNECTIONS,
-                    self._mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=3),
-                    self._mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2),
+            for hand_lms in results.hand_landmarks:
+                _proto = _lm_pb2.NormalizedLandmarkList()
+                _proto.landmark.extend([
+                    _lm_pb2.NormalizedLandmark(x=lm.x, y=lm.y, z=lm.z)
+                    for lm in hand_lms
+                ])
+                mp.solutions.drawing_utils.draw_landmarks(
+                    img, _proto, _HAND_CONNECTIONS,
+                    _LANDMARK_SPEC, _CONNECTION_SPEC,
                 )
                 if self._modelo is not None:
-                    landmarks = [coord for lm in hand_landmarks.landmark
-                                 for coord in (lm.x, lm.y)]
+                    landmarks = [coord for lm in hand_lms for coord in (lm.x, lm.y)]
                     if lsp_core.landmarks_validos(landmarks):
                         try:
                             # HU-16 CA-16.2: usar explicar_prediccion en lugar de predecir

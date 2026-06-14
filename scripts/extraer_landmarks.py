@@ -20,8 +20,14 @@ import csv
 import cv2
 import mediapipe as mp
 
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1, model_complexity=0)
+HAND_LANDMARKER_MODEL = "hand_landmarker.task"
+_options = mp.tasks.vision.HandLandmarkerOptions(
+    base_options=mp.tasks.BaseOptions(model_asset_path=HAND_LANDMARKER_MODEL),
+    running_mode=mp.tasks.vision.RunningMode.IMAGE,
+    num_hands=1,
+    min_hand_detection_confidence=0.6,
+)
+hands = mp.tasks.vision.HandLandmarker.create_from_options(_options)
 
 data_folder = "data"
 letters = "abcdefghijklmnopqrstuvwxyz"
@@ -45,17 +51,17 @@ for letter in letters:
         if img is None:
             continue
         rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        results = hands.process(rgb)
-        if results.multi_hand_landmarks:
-            for hand_landmarks in results.multi_hand_landmarks:
-                fila = []
-                for lm in hand_landmarks.landmark:
-                    fila.append(lm.x)
-                    fila.append(lm.y)
-                if len(fila) == 42:
-                    fila.append(letter)
-                    filas.append(fila)
-                    usadas += 1
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        results = hands.detect(mp_image)
+        if results.hand_landmarks:
+            fila = []
+            for lm in results.hand_landmarks[0]:
+                fila.append(lm.x)
+                fila.append(lm.y)
+            if len(fila) == 42:
+                fila.append(letter)
+                filas.append(fila)
+                usadas += 1
     if usadas:
         print(f"  Letra {letter.upper()}: {usadas} muestras")
 
