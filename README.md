@@ -1,3 +1,13 @@
+---
+title: Traductor Senas IA
+emoji: 🤟
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Sistema Interactivo de Visión Artificial para la Comunicación Inclusiva de Personas con Discapacidad Auditiva (LSP)
 
 ### Universidad Privada del Norte (UPN)
