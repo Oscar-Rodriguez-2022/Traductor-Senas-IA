@@ -81,26 +81,33 @@ if modelo is None:
 lsp_ui.render_hero()
 
 # ─────────────────────────── Layout principal ─────────────────────────────────
-RTC_CONFIG = RTCConfiguration({
-    "iceServers": [
-        {"urls": ["stun:stun.l.google.com:19302"]},
-        {
-            "urls": ["turn:openrelay.metered.ca:80"],
-            "username": "openrelayproject",
-            "credential": "openrelayproject",
-        },
-        {
-            "urls": ["turn:openrelay.metered.ca:443"],
-            "username": "openrelayproject",
-            "credential": "openrelayproject",
-        },
-        {
-            "urls": ["turn:openrelay.metered.ca:443?transport=tcp"],
-            "username": "openrelayproject",
-            "credential": "openrelayproject",
-        },
-    ]
-})
+@st.cache_resource(ttl=3600)
+def _get_rtc_config():
+    try:
+        import requests as _req
+        app_url = st.secrets.get("METERED_APP_URL", "")
+        api_key = st.secrets.get("METERED_SECRET_KEY", "")
+        if app_url and api_key:
+            resp = _req.get(
+                f"https://{app_url}/api/v1/turn/credentials?apiKey={api_key}",
+                timeout=5,
+            )
+            if resp.status_code == 200:
+                return RTCConfiguration({"iceServers": resp.json()})
+    except Exception:
+        pass
+    return RTCConfiguration({
+        "iceServers": [
+            {"urls": ["stun:stun.l.google.com:19302"]},
+            {"urls": ["stun:stun1.l.google.com:19302"]},
+            {"urls": ["stun:stun2.l.google.com:19302"]},
+            {
+                "urls": ["turn:openrelay.metered.ca:443?transport=tcp"],
+                "username": "openrelayproject",
+                "credential": "openrelayproject",
+            },
+        ]
+    })
 
 col_main, col_side = st.columns([3, 2], gap="large")
 
@@ -109,7 +116,7 @@ with col_main:
     ctx = webrtc_streamer(
         key="lsp",
         video_processor_factory=lambda: Traductor(modelo),
-        rtc_configuration=RTC_CONFIG,
+        rtc_configuration=_get_rtc_config(),
         media_stream_constraints={"video": True, "audio": False},
         video_html_attrs=VideoHTMLAttributes(
             autoPlay=True,
