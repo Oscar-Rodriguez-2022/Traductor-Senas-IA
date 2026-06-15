@@ -32,6 +32,7 @@ COPY --chown=lspuser:lspuser . .
 # Agregar src/ al PYTHONPATH para que los módulos lsp_* sean importables
 # tanto por Streamlit como por cualquier script Python del contenedor.
 ENV PYTHONPATH=/app/src
+ENV HOME=/tmp
 
 # ── Puerto ────────────────────────────────────────────────────────────────────
 # HuggingFace Spaces requiere el puerto 7860.

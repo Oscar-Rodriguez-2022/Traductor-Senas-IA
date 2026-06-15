@@ -84,16 +84,19 @@ lsp_ui.render_hero()
 @st.cache_resource(ttl=3600)
 def _get_rtc_config():
     try:
-        import requests as _req
-        app_url = st.secrets.get("METERED_APP_URL", "")
-        api_key = st.secrets.get("METERED_SECRET_KEY", "")
-        if app_url and api_key:
-            resp = _req.get(
-                f"https://{app_url}/api/v1/turn/credentials?apiKey={api_key}",
+        import os as _os
+        account_sid = _os.environ.get("TWILIO_ACCOUNT_SID", "")
+        auth_token = _os.environ.get("TWILIO_AUTH_TOKEN", "")
+        if account_sid and auth_token:
+            import requests as _req
+            resp = _req.post(
+                f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Tokens.json",
+                auth=(account_sid, auth_token),
                 timeout=5,
             )
-            if resp.status_code == 200:
-                return RTCConfiguration({"iceServers": resp.json()})
+            if resp.status_code == 201:
+                ice_servers = resp.json().get("ice_servers", [])
+                return RTCConfiguration({"iceServers": ice_servers})
     except Exception:
         pass
     return RTCConfiguration({
