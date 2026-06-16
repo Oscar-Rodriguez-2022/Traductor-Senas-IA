@@ -1,10 +1,11 @@
 # Modelo de Datos — LSP Vision AI
 ## Diseño Incremental por Sprint
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Versión: 1.1 · Fecha: 2026-06-13
+### Versión: 1.2 · Fecha: 2026-06-16
 
 > Este documento describe las estructuras de datos del sistema, su evolución
 > incremental por sprint y su coherencia con el diseño arquitectónico.
+> Para el inventario operativo, diccionario unificado y pipelines, ver [`MANUAL_BASE_DE_DATOS.md`](MANUAL_BASE_DE_DATOS.md).
 
 ---
 
@@ -322,3 +323,4 @@ reportes/
 |---------|-------|--------|
 | 1.0 | 2026-06-12 | Versión inicial — 7 estructuras de datos documentadas con evolución por sprint |
 | 1.1 | 2026-06-13 | Añadir §7 estado Traductor, §8 XAI (explicar_prediccion + NOMBRES_LANDMARKS + SESGOS_CONOCIDOS); documentar rate limiting, verificación SHA-256 del modelo, ruta real audit_log.jsonl, constantes de seguridad |
+| 1.2 | 2026-06-16 | Nota sobre landmarks_csv/ como carpeta local excluida de git; referencia cruzada a MANUAL_BASE_DE_DATOS.md |
