@@ -4,9 +4,9 @@ __pycache__/
 venv/
 .DS_Store
 
-# CSV de landmarks de cada compañero (intermedios, no van al repo)
+# Carpeta de landmarks colaborativos (intermedios, no van al repo)
+landmarks_csv/
 landmarks_*.csv
-landmarks_csv/*.csv
 
 # Artefactos de QA (se regeneran). Los reportes finales SÍ se conservan.
 .pytest_cache/

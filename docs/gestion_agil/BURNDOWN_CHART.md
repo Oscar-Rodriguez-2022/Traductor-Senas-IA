@@ -86,7 +86,7 @@ xychart-beta
 
 ## Sprint 1 — Planificación, Dataset y Modelo ML
 
-**Duración:** 15 días hábiles · **Capacidad:** 36 SP · **Equipo:** 3 integrantes
+**Duración:** 15 días hábiles · **Capacidad:** 36 SP · **Equipo:** 7 integrantes
 
 | Día | SP Ideal Restantes | SP Real Restantes | HUs cerradas |
 |-----|--------------------|-------------------|--------------|
@@ -118,7 +118,7 @@ xychart-beta
 
 ## Sprint 2 — Aplicación Web, Calidad y Seguridad
 
-**Duración:** 10 días hábiles · **Capacidad:** 57 SP · **Equipo:** 3 integrantes
+**Duración:** 10 días hábiles · **Capacidad:** 57 SP · **Equipo:** 7 integrantes
 
 | Día | SP Ideal Restantes | SP Real Restantes | HUs cerradas |
 |-----|--------------------|-------------------|--------------|
@@ -152,7 +152,7 @@ xychart-beta
 
 ## Sprint 3 — Ética, Accesibilidad y Despliegue
 
-**Duración:** 10 días hábiles · **Capacidad:** 24 SP · **Equipo:** 3 integrantes
+**Duración:** 10 días hábiles · **Capacidad:** 24 SP · **Equipo:** 7 integrantes
 
 | Día | SP Ideal Restantes | SP Real Restantes | HUs cerradas |
 |-----|--------------------|-------------------|--------------|
@@ -186,7 +186,7 @@ xychart-beta
 
 ## Sprint de Reingeniería — Modularidad y DevSecOps
 
-**Duración:** 5 días hábiles · **Capacidad:** 20 SP · **Equipo:** 3 integrantes
+**Duración:** 5 días hábiles · **Capacidad:** 20 SP · **Equipo:** 7 integrantes
 
 | Día | SP Ideal Restantes | SP Real Restantes | Tareas cerradas |
 |-----|--------------------|-------------------|-----------------|

@@ -447,10 +447,13 @@ Este sistema fue desarrollado como proyecto Capstone para la Universidad Privada
 
 | Integrante | Rol |
 |---|---|
-| Rodriguez Chacara, Oscar Daniel | Desarrollo Full-Stack, ML, QA, Despliegue |
-| Armas Alvarado, José Deyvis | Desarrollo y ML |
-| Arias Chauca, Nicolás Enrry | Desarrollo y QA |
-| Reátegui Arévalo, Oscar Manuel | Desarrollo y Despliegue |
+| Acosta Abarca, Andrea Karina Alessandra | Diseño UX/UI, Captura y Etiquetado de Dataset |
+| Angulo López, Sebastian | Procesamiento de Imágenes y Aumento de Datos |
+| Armas Alvarado, Jose Deyvis | Desarrollo ML e Ingeniería de Modelos |
+| Arias Chauca, Nicolas Enrry | Desarrollo Backend y QA |
+| Reategui Arevalo, Oscar Manuel | Desarrollo e Integración de Despliegue |
+| Rodriguez Chacara, Oscar Daniel | Líder Técnico, Full-Stack, ML, DevSecOps |
+| Timana Barreda, Santiago Mathias | Desarrollo Frontend y Testing |
 
 **Docente:** Edward Jose Flores Masias
 **Institución:** Universidad Privada del Norte — Facultad de Ingeniería
@@ -461,6 +464,7 @@ Para reportar problemas técnicos o consultas académicas, dirigirse al equipo d
 
 ---
 
-*Manual de Usuario v2.1 — 2026-06-13 · LSP Vision AI · UPN Sistemas*
+*Manual de Usuario v2.2 — 2026-06-16 · LSP Vision AI · UPN Sistemas*
+*Cambios v2.2: equipo actualizado a 7 integrantes (Acosta Abarca, Angulo López incorporados), roles revisados*
 *Cambios v2.1: §8.2 añadido — panel de alternativas XAI top-5 (DT-19, `explicar_prediccion()`)*
 *Cambios v2.0: nuevo pipeline diagram, sección de explicabilidad XAI, tabla de letras LSP, sección de accesibilidad WCAG expandida, preguntas frecuentes ampliadas, estado del sistema*

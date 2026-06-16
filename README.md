@@ -39,11 +39,13 @@ pinned: false
 
 | Integrante | Rol | Contribución |
 |---|---|---|
-| **Rodriguez Chacara, Oscar Daniel** | Desarrollo Full-Stack, ML, QA, Despliegue | 100% |
-| **Armas Alvarado, José Deyvis** | Desarrollo y ML | 100% |
-| **Arias Chauca, Nicolás Enrry** | Desarrollo y QA | 100% |
-| **Reátegui Arévalo, Oscar Manuel** | Desarrollo y Despliegue | 100% |
-| **Timana Barreda, Santiago Mathias** | Desarrollo y Testing | 100% |
+| **Acosta Abarca, Andrea Karina Alessandra** | Diseño UX/UI, Captura y Etiquetado de Dataset | 100% |
+| **Angulo López, Sebastian** | Procesamiento de Imágenes y Aumento de Datos | 100% |
+| **Armas Alvarado, Jose Deyvis** | Desarrollo ML e Ingeniería de Modelos | 100% |
+| **Arias Chauca, Nicolas Enrry** | Desarrollo Backend y QA | 100% |
+| **Reategui Arevalo, Oscar Manuel** | Desarrollo e Integración de Despliegue | 100% |
+| **Rodriguez Chacara, Oscar Daniel** | Líder Técnico, Full-Stack, ML, DevSecOps | 100% |
+| **Timana Barreda, Santiago Mathias** | Desarrollo Frontend y Testing | 100% |
 
 ---
 
@@ -381,4 +383,5 @@ QA.bat        # Windows — doble clic → opción 13
 
 *Versión 2.1 — Junio 2026 · LSP Vision AI · UPN Ingeniería de Sistemas*
 *Cambios v2.0: arquitectura src-layout, módulos lsp_* refactorizados, DevSecOps completo, WCAG 2.1 AA, Docker no-root, Sprint de Reingeniería — 137 SP totales*
+*Cambios v2.2: equipo ampliado a 7 integrantes (Acosta Abarca, Angulo López incorporados), roles actualizados*
 *Cambios v2.1: nuevo integrante Timana Barreda, conteos de tests actualizados (143 total, 34 DevSecOps, 29 ética+XAI), DoD v2.1, Lecciones Aprendidas v3.1*
