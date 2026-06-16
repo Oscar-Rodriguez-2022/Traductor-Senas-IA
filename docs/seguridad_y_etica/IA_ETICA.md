@@ -114,10 +114,12 @@ Ejecutar `make confusion` y `make evaluate` para generar:
 
 **Criterio de equidad mínimo:** ninguna clase debe tener recall < 50% con el dataset completo.
 
-**Estado actual (post-reingeniería v2.0):**
+**Estado actual (modelo v2.2 — Tasks API, 2026-06-14):**
 - INC-07 resuelto: letras N, Q, R, S, V recapturadas con 120+ muestras válidas + augmentación ×16.
-- Accuracy global: 88.3% (umbral: ≥85%).
-- Recall mínimo por clase: ≥80% para todas las letras implementadas.
+- INC-11 resuelto: modelo reentrenado con MediaPipe Tasks API; 25 clases activas.
+- Accuracy global: **100%** en evaluación interna (split 80/20 post-augmentation, dataset controlado).
+  > *Nota metodológica:* el split se realizó sobre el dataset ya aumentado (×16), por lo que el set de test contiene variaciones geométricas de las mismas imágenes de entrenamiento. Clases con muy baja detección (J=3 muestras, D=9, S=9) tienen 1–2 muestras en test. El modelo anterior (API legacy) alcanzó 88.3%. El valor del 100% refleja condiciones controladas, no generalización universal.
+- Recall mínimo por clase: 100% para todas las 25 clases en evaluación interna.
 - `tests/test_etica.py::TestEquidad::test_todas_las_clases_tienen_recall_positivo` → PASS.
 - `tests/test_etica.py::TestEquidad::test_equidad_minima_por_clase_recall_mayor_50` → PASS.
 

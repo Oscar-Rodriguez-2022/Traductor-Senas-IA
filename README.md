@@ -297,11 +297,13 @@ QA.bat        # Windows — doble clic → opción 13
 | Cobertura `lsp_audit` | **≥ 90%** | ≥ 90% |
 | Pylint | **7.14/10** | ≥ 7.5/10 |
 | Flake8 | **0 errores** | 0 |
-| Latencia pipeline completo | **~18 ms** | < 200 ms |
-| FPS sostenidos | **24.7 FPS** | ≥ 24 FPS (60 s) |
+| Latencia pipeline completo | **24.48 ms** (MediaPipe 23.91 ms + SVM 0.22 ms) | < 200 ms |
+| FPS sostenidos | **82.7 FPS** (rango 15–89) | ≥ 24 FPS (60 s) |
 | Estrés 5 000 predicciones | **0 errores** | 0 excepciones |
-| Accuracy del modelo SVM | **88.3%** | ≥ 85% |
+| Accuracy del modelo SVM | **100%** en 25 clases ¹ | ≥ 85% |
 | Tests DevSecOps (`test_seguridad.py`) | **33/34 PASS + 1 SKIP** | 0 FAIL |
+
+> ¹ **Nota metodológica:** accuracy medido sobre el split de test del dataset con augmentation ×16 aplicado antes del split 80/20. Clases con baja detección MediaPipe Tasks API tienen representación mínima en test (J = 3 muestras totales, D = 9, S = 9). Resultado optimista dentro de condiciones controladas; en producción la variabilidad de usuarios afecta el rendimiento. El modelo anterior (API legacy, INC-11) alcanzó 88.3% en configuración distinta. Ver [`MANUAL_BASE_DE_DATOS.md §5`](docs/arquitectura/MANUAL_BASE_DE_DATOS.md) para análisis de calidad por clase.
 
 ---
 
