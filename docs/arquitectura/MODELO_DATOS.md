@@ -105,7 +105,7 @@ No se almacena en producción: el sistema web procesa frames en memoria (GDPR Ar
 **Módulo:** `scripts/extraer_landmarks.py` · **HU:** HU-05 (RF-12)
 
 ```
-Ruta:     landmarks_csv/<usuario>_landmarks.csv
+Ruta:     landmarks_csv/<usuario>_landmarks.csv  (carpeta local — excluida de git, ver .gitignore)
 Columnas: letra, x0, y0, x1, y1, ..., x20, y20  (43 columnas en total)
 
 Ejemplo:

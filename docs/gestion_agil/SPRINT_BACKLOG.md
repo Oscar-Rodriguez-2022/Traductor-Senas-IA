@@ -340,7 +340,8 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 
 > **Cierre de proyecto:** Todos los SP han sido completados al 2026-06-13.
 > La reingeniería estructural resolvió el INC-08 (src-layout), mejoró la cobertura de seguridad
-> y cerró los pendientes de UAT y despliegue. El sistema está listo para sustentación y despliegue.
+> y cerró los pendientes de UAT y despliegue. El sistema está desplegado en producción en
+> HuggingFace Spaces: https://huggingface.co/spaces/OscarRodri/Traductor-Senas-IA
 
 ---
 

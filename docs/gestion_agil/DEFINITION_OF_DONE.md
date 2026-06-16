@@ -7,7 +7,7 @@
 Todo trabajo se considera **"Done"** cuando cumple la totalidad de los criterios de la Sección I antes de marcarse como completado en el tablero Scrum. La Sección II registra el estado de cumplimiento al cierre del Capstone (v2.1).
 
 > **v2.1:** Actualizado tras la reingeniería estructural y actividades post-cierre (src-layout, DevSecOps completo, 143 tests, pre-commit hook anti-secretos, reorganización de `docs/`).
-> Todos los criterios han sido verificados y el proyecto está listo para sustentación y despliegue.
+> Todos los criterios han sido verificados. El proyecto está desplegado en producción en HuggingFace Spaces (https://huggingface.co/spaces/OscarRodri/Traductor-Senas-IA) y listo para sustentación.
 
 ---
 

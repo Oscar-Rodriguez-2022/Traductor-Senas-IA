@@ -14,7 +14,9 @@ desde cualquier dispositivo. Hazlo en el orden indicado.
    `TUTORIAL_EQUIPO.md`).
 2. En la carpeta del proyecto, abre la carpeta **`landmarks_csv`**.
 3. **Copia ahí TODOS los CSV** que te enviaron (el tuyo también).
-4. Verifica: dentro de `landmarks_csv` deben estar los 6-7 archivos `landmarks_*.csv`.
+4. Verifica: dentro de `landmarks_csv` deben estar los 7 archivos `landmarks_*.csv`.
+
+> **Nota:** la carpeta `landmarks_csv/` es **local únicamente** — está en `.gitignore` y no se sube al repositorio. Comparte los CSV entre compañeros por correo, Drive o similar.
 
 ---
 

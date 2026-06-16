@@ -200,12 +200,12 @@ c:\Traductor-Senas-IA\
 │   ├── trivy.yaml                # Scanner de vulnerabilidades
 │   └── requirements-dev.txt      # Dependencias de desarrollo
 ├── data/                         # Dataset: data/<letra>/*.png
-├── landmarks_csv/                # Exportaciones CSV colaborativas
 ├── reportes/                     # Resultados QA (CSV, PNG, JSON)
 ├── docs/
 │   ├── arquitectura/
 │   │   ├── COMPONENTES.md        # Este archivo (CA-02.1/02.2/02.3)
-│   │   └── MODELO_DATOS.md       # Modelo de datos incremental
+│   │   ├── MODELO_DATOS.md       # Modelo de datos incremental por sprint
+│   │   └── MANUAL_BASE_DE_DATOS.md # Diccionario, pipelines, calidad y privacidad
 │   ├── gestion_agil/
 │   │   ├── requerimientos.md     # 15 RF + 15 RNF (CA-01.1)
 │   │   ├── HISTORIAS_USUARIO.md  # HUs con criterios Gherkin

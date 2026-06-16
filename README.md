@@ -16,6 +16,7 @@ pinned: false
 * **Curso:** Capstone Project Sistemas (2026-1)
 * **Docente:** Edward Jose Flores Masias
 
+[![HuggingFace](https://img.shields.io/badge/🤗%20HuggingFace-Live%20Demo-orange)](https://huggingface.co/spaces/OscarRodri/Traductor-Senas-IA)
 [![GitHub](https://img.shields.io/badge/GitHub-Repositorio-181717?logo=github)](https://github.com/Oscar-Rodriguez-2022/Traductor-Senas-IA)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python)](https://www.python.org/)
 [![Tests](https://img.shields.io/badge/Tests-143%20PASS-brightgreen)](tests/)
@@ -169,12 +170,12 @@ Traductor-Senas-IA/
 │   └── QA.bat                    │  Menú interactivo de QA para Windows
 │
 ├── data/                         ← Dataset LSP (subcarpetas a/ … z/ con .png)
-├── landmarks_csv/                ← CSVs colaborativos de landmarks por integrante
 ├── reportes/                     ← Reportes QA generados (CSV, PNG, PDF)
 ├── docs/                         ← Documentación técnica organizada por dominio
 │   ├── arquitectura/             │  Modelos de diseño del sistema
 │   │   ├── COMPONENTES.md        │  Diagramas Mermaid de componentes
-│   │   └── MODELO_DATOS.md       │  Modelo de datos incremental
+│   │   ├── MODELO_DATOS.md       │  Modelo de datos incremental por sprint
+│   │   └── MANUAL_BASE_DE_DATOS.md│ Diccionario, pipelines, calidad y privacidad
 │   ├── gestion_agil/             │  Seguimiento y trazabilidad Scrum
 │   │   ├── HISTORIAS_USUARIO.md  │  22 HUs (HU-01..HU-22) con Gherkin y MoSCoW
 │   │   ├── SPRINT_BACKLOG.md     │  Desglose de tareas (4 sprints, 137 SP)
@@ -320,6 +321,7 @@ QA.bat        # Windows — doble clic → opción 13
 
 | Artefacto | Descripción |
 |---|---|
+| [`MANUAL_BASE_DE_DATOS.md`](docs/arquitectura/MANUAL_BASE_DE_DATOS.md) | Inventario de entidades de datos, diccionario unificado, pipelines A/B/C, calidad e integridad, privacidad GDPR |
 | [`SEGURIDAD.md`](docs/seguridad_y_etica/SEGURIDAD.md) | Plan de Seguridad Integral v2.1: autenticación JWT-like HMAC, rate limiting, GDPR, Dockerfile no-root |
 | [`IA_ETICA.md`](docs/seguridad_y_etica/IA_ETICA.md) | Transparencia y Explicabilidad (XAI): pipeline interpretable, análisis de sesgos, equidad por clase |
 | [`GUIA_QA.md`](docs/qa_y_pruebas/GUIA_QA.md) | Estándares TDD, revisión de pares y suite automatizada de 13 fases de medición |

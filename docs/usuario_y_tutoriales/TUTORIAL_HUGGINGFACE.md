@@ -1,14 +1,16 @@
 # Guía de Despliegue — Hugging Face Spaces (Docker)
 ## LSP Vision AI · Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Versión: 2.0 · 2026-06-13
+### Versión: 2.1 · 2026-06-16 · **✅ DESPLEGADO EN PRODUCCIÓN**
+
+> **App en vivo:** [https://huggingface.co/spaces/OscarRodri/Traductor-Senas-IA](https://huggingface.co/spaces/OscarRodri/Traductor-Senas-IA)
 
 Hugging Face Spaces es la plataforma estándar de la industria para publicar proyectos de IA/ML.
 Esta guía cubre el despliegue con **Docker** (modalidad que demuestra competencias DevOps para el Capstone).
 El `Dockerfile` del proyecto ya está configurado con las medidas de seguridad requeridas (usuario no-root, flags de seguridad Streamlit).
 
-> **Demo en la sustentación:** durante la presentación ejecuta la app localmente con
-> `streamlit run src/app.py` para máximo rendimiento.
-> La URL de HF sirve para demostrar que el sistema está públicamente accesible.
+> **Demo en la sustentación:** la app ya está pública en la URL de arriba.
+> Para máximo rendimiento en la presentación, ejecuta también la app localmente con `streamlit run src/app.py`.
+> La URL de HF demuestra que el sistema está públicamente accesible sin necesidad de instalar nada.
 
 ---
 
@@ -68,7 +70,7 @@ Clona el Space de HF en tu máquina y copia los archivos del proyecto:
 
 ```bash
 # 1. Clonar el Space vacío de HF
-git clone https://huggingface.co/spaces/TU_USUARIO_HF/lsp-vision-ai
+git clone https://huggingface.co/spaces/OscarRodri/Traductor-Senas-IA
 cd lsp-vision-ai
 
 # 2. Copiar TODOS los archivos del proyecto (reemplaza con tu ruta real)
@@ -121,7 +123,7 @@ Copia el hash de 64 caracteres y pégalo como valor del secret `LSP_PASSWORD_HAS
 
 ## Parte E — Verificar el despliegue
 
-1. Ve a tu Space en `https://huggingface.co/spaces/TU_USUARIO_HF/lsp-vision-ai`.
+1. Ve a tu Space en `https://huggingface.co/spaces/OscarRodri/Traductor-Senas-IA`.
 2. HF construirá la imagen Docker automáticamente (tarda 3-8 minutos la primera vez).
 3. Puedes ver el log de construcción en la pestaña **Logs** (útil para depurar errores).
 4. Cuando el indicador pase a verde (**Running**), la app está disponible.
@@ -205,7 +207,7 @@ El hardware gratuito de HF (2 vCPU, 16 GB RAM) es más que suficiente para esta 
 
 Captura o registra los siguientes elementos como evidencias del despliegue (HU-21):
 
-1. **URL pública del Space** — `https://huggingface.co/spaces/TU_USUARIO_HF/lsp-vision-ai`
+1. **URL pública del Space** — `https://huggingface.co/spaces/OscarRodri/Traductor-Senas-IA`
 2. **Captura del log de build exitoso** en la pestaña Logs de HF
 3. **Captura del traductor funcionando** en la URL pública (login + cámara activa + letra detectada)
 4. **Captura desde un dispositivo distinto al de desarrollo** (celular o laptop de un compañero)
