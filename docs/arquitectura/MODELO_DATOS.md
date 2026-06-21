@@ -1,7 +1,7 @@
 # Modelo de Datos — LSP Vision AI
 ## Diseño Incremental por Sprint
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Versión: 1.2 · Fecha: 2026-06-16
+### Versión: 1.3 · Fecha: 2026-06-21
 
 > Este documento describe las estructuras de datos del sistema, su evolución
 > incremental por sprint y su coherencia con el diseño arquitectónico.
@@ -17,9 +17,9 @@
 Entrada: imagen BGR (numpy.ndarray, forma HxWx3)
          └─ captura desde webcam (640×480) o PNG del dataset
 
-Extracción: MediaPipe Hands → 21 puntos anatómicos (NOMBRES_LANDMARKS, ver §8)
+Extracción: MediaPipe HandLandmarker (Tasks API, mp.tasks.vision) → 21 puntos anatómicos (NOMBRES_LANDMARKS, ver §8)
             Cada punto: (x, y) normalizados en [0.0, 1.0]
-            Configuración: model_complexity=0, min_detection_confidence=0.6
+            Configuración: num_hands=1, min_hand_detection_confidence=0.6
 
 Salida: vector de 42 floats = [x0, y0, x1, y1, ..., x20, y20]
 
@@ -59,9 +59,10 @@ Forma numpy: (1, 42)  al predecir con SVM
 }
 
 # Dimensiones típicas del dataset de entrenamiento
-# Letras: hasta 26 (a–z, excluyendo j y z que son dinámicas)
-# Muestras por letra: ~100–500 imágenes × 16 augmentaciones = ~1600–8000
-# Total dataset aumentado: O(50 000) vectores × 42 features
+# Letras: 25 de 26 (a–z, excluyendo la o — sin detección válida, ver INC-12)
+# Muestras por letra: muy desigual, de 3 (j) y 9 (d, s) hasta ~500–997 (la mayoría)
+# Total landmarks extraídos del dataset crudo: 9 585 vectores × 42 features (reportes/metricas.json)
+# El entrenamiento del modelo aplica además augmentación ×16 sobre estos vectores
 ```
 
 **Archivo de integridad asociado:** `modelo.pkl.sha256`
@@ -213,27 +214,30 @@ class Traductor(VideoProcessorBase):
     alternativas: list  # top-5 dicts {letra, confianza} del resultado XAI (§8)
 ```
 
-**Configuración de MediaPipe para video en tiempo real:**
+**Configuración de MediaPipe para video en tiempo real (Tasks API):**
 
 ```python
-mp.solutions.hands.Hands(
-    static_image_mode=False,       # modo tracking (más eficiente que detección por frame)
-    max_num_hands=1,
-    model_complexity=0,            # modo rápido para menor latencia en CPU
-    min_detection_confidence=0.6,
-    min_tracking_confidence=0.5,
+mp.tasks.vision.HandLandmarkerOptions(
+    base_options=mp.tasks.BaseOptions(model_asset_path="hand_landmarker.task"),
+    running_mode=mp.tasks.vision.RunningMode.VIDEO,  # sincrónico con timestamps
+    num_hands=1,
+    min_hand_detection_confidence=0.6,
 )
 ```
+
+> `mp.solutions` ya no se usa para la **detección**; sigue usándose únicamente para el
+> **dibujo** del overlay (`mp.solutions.drawing_utils.draw_landmarks`) en `lsp_video.py`,
+> ya que la Tasks API no incluye utilidades de dibujo propias.
 
 **Pipeline de un frame:**
 
 ```
 recv(av.VideoFrame)
   → BGR 640×480 → resize RGB 320×240
-  → MediaPipe Hands.process()
+  → HandLandmarker.detect_for_video()
   → landmarks_validos()
   → explicar_prediccion()  ← obtiene letra + confianza + alternativas XAI sin coste extra
-  → draw_landmarks + badges overlay
+  → draw_landmarks (mp.solutions.drawing_utils) + badges overlay
   → actualiza atributos bajo lock
   → retorna av.VideoFrame anotado
 ```
@@ -324,3 +328,4 @@ reportes/
 | 1.0 | 2026-06-12 | Versión inicial — 7 estructuras de datos documentadas con evolución por sprint |
 | 1.1 | 2026-06-13 | Añadir §7 estado Traductor, §8 XAI (explicar_prediccion + NOMBRES_LANDMARKS + SESGOS_CONOCIDOS); documentar rate limiting, verificación SHA-256 del modelo, ruta real audit_log.jsonl, constantes de seguridad |
 | 1.2 | 2026-06-16 | Nota sobre landmarks_csv/ como carpeta local excluida de git; referencia cruzada a MANUAL_BASE_DE_DATOS.md |
+| 1.3 | 2026-06-21 | Corrección §1/§2/§7: configuración real de MediaPipe Tasks API (antes mostraba `mp.solutions.hands.Hands`, ya migrado); 25 letras reales (no "j y z excluidas") |

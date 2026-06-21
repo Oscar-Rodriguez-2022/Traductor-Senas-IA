@@ -1,6 +1,6 @@
 # Guía de Recaptura del Dataset — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.0 · 2026-06-14
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.1 · 2026-06-21
 
 > **Estado al 2026-06-14 (INC-12 abierto):** La migración a la MediaPipe Tasks API reveló
 > tasas de detección críticas en las letras O (0%), D (1.8%), J (0.8%), S (5.8%), F (13.7%) e I (18.9%).
@@ -36,7 +36,8 @@ descritos en la siguiente tabla:
 > **Letras ya corregidas (INC-07, 2026-06-08):** N, Q, R, V — recapturadas con éxito, tasa ≥ 98%.
 
 > **Nota técnica:** El modelo SVM solo puede reconocer letras con al menos 5 muestras detectadas.
-> Con 4 muestras, J se incluye en el modelo pero su fiabilidad es muy baja.
+> J terminó con 3 muestras en el dataset final de entrenamiento (el escaneo inicial detectó 4/509);
+> se incluye en el modelo pero su fiabilidad es muy baja y no admite K-Fold (k≥5).
 > Con 0 muestras, O queda excluida del modelo por completo.
 
 ---
@@ -47,7 +48,7 @@ descritos en la siguiente tabla:
 |---|---|---|
 | 1 | **O** | 0 muestras — completamente excluida del modelo |
 | 2 | **D** | 9 muestras — K-Fold y evaluación cruzada imposibles |
-| 3 | **J** | 4 muestras — K-Fold y evaluación cruzada imposibles |
+| 3 | **J** | 3 muestras finales — K-Fold y evaluación cruzada imposibles |
 | 4 | **S** | 29 muestras — recall < 50%, no supera umbral de equidad |
 | 5 | **F** | 70 muestras — recall bajo |
 | 6 | **I** | 96 muestras — recall bajo |
@@ -77,7 +78,7 @@ Antes de capturar, consulta la posición correcta de cada seña problemática:
 
 ### Requisitos previos
 
-- Python 3.12 o 3.13 instalado
+- Python 3.12 instalado (versión de referencia del proyecto — ver Dockerfile/pyproject.toml)
 - Archivo `hand_landmarker.task` en la raíz del proyecto (requerido por la Tasks API)
 - Cámara web funcional
 - Buena iluminación frontal (evitar luz de fondo que siluetea la mano)
@@ -123,9 +124,10 @@ Para cada letra problemática:
    - Si se vieron pocas veces el skeleton verde dibujado: **R** para repetir.
    - Si el skeleton apareció frecuentemente: **G** para guardar y continuar.
 
-> **Nota sobre `capturar_dataset.py` y la API:** En la versión actual (`mediapipe==0.10.35`),
-> el script de captura muestra la cámara en vivo pero el dibujo del skeleton usa la API antigua.
-> La captura de imágenes funciona correctamente independientemente del overlay visual.
+> **Nota sobre `capturar_dataset.py` y la API:** En la versión actual (`mediapipe==0.10.21`),
+> el script de captura usa íntegramente la API antigua (`mp.solutions.hands`) — no se migró a la
+> Tasks API junto con `lsp_core.py`. La captura de imágenes funciona correctamente; solo el núcleo
+> de inferencia (`lsp_core.py`) y el dibujo en vivo de la app web usan la Tasks API.
 
 ### Paso 4 — Verificar la calidad antes de entrenar
 
@@ -236,7 +238,10 @@ Modelo Tasks API:     hand_landmarker.task (raíz del proyecto, 7.8 MB)
 
 ---
 
-*Guía de Recaptura v3.0 · LSP Vision AI · UPN Sistemas 2026*
+*Guía de Recaptura v3.1 · LSP Vision AI · UPN Sistemas 2026*
 *Cambios v3.0 (2026-06-14): INC-12 documentado; tabla actualizada con letras críticas actuales
-(O/D/J/S/F/I); comandos actualizados a Python 3.13; requisito `hand_landmarker.task` añadido;
+(O/D/J/S/F/I); requisito `hand_landmarker.task` añadido;
 sección consejos O/A/S actualizada; criterios K-Fold añadidos; v2.0 conservaba INC-07/N/Q/R/S/V.*
+*Cambios v3.1 (2026-06-21): Python corregido a 3.12 (versión real soportada, no 3.12/3.13);
+mediapipe corregido a 0.10.21 (no 0.10.35); J corregido a 3 muestras finales (no 4) para
+coincidir con `reportes/`; aclarado que `scripts/capturar_dataset.py` no migró a la Tasks API.*

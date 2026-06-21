@@ -1,6 +1,6 @@
 # Manual de Base de Datos — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Equipo LSP Vision AI (7 integrantes) · Versión: 1.0 · 2026-06-16
+### Autor: Equipo LSP Vision AI (7 integrantes) · Versión: 1.1 · 2026-06-21
 
 > Este documento describe el ecosistema de datos del sistema: inventario, diccionario de datos,
 > pipelines de procesamiento, calidad, privacidad y procedimientos operativos.
@@ -149,10 +149,10 @@ flowchart TD
 | Formato de serialización | joblib (no pickle nativo) |
 | Tipo de modelo | `sklearn.svm.SVC` |
 | Hiperparámetros | `kernel='rbf'`, `C=10`, `gamma='scale'`, `probability=True` |
-| Clases | 25 letras (a–z, excluyendo dinámicas) |
+| Clases | 25 letras (a–z, excluyendo la o — sin detección válida, ver INC-12) |
 | Dimensión de entrada | 42 features |
 | Dataset de entrenamiento | 9,585 muestras reales → ~153,360 tras augmentation (×16) |
-| Accuracy | 100% (validado con cross-validation en test set 20%) |
+| Accuracy | 100% sobre el dataset de entrenamiento completo (sin held-out test set independiente — `qa/evaluate.py`, resultado optimista). Cross-validation K-Fold no factible: la clase J solo tiene 3 muestras (< k=5) |
 | Tamaño en disco | ~642 KB |
 | Verificación de integridad | `modelo.pkl.sha256` — SHA-256 de 64 chars |
 | Rastreado en git | ✅ Sí (via Git LFS) |
@@ -208,7 +208,7 @@ flowchart TD
 | `stress.csv` | CSV | `predicciones`, `errores`, `promedio_ms`, `delta_memoria_mb`, `estado` |
 
 **Métricas actuales (2026-06-14):**
-- Accuracy: 100% · Precision macro: 100% · Recall macro: 100% · F1 macro: 100%
+- Accuracy: 100% · Precision macro: 100% · Recall macro: 100% · F1 macro: 100% — medido sobre el dataset de entrenamiento completo (no un test set reservado); ver nota en §3.4
 - Latencia pipeline completo: 24.48 ms promedio (MediaPipe: 23.91 ms + SVM: 0.22 ms)
 - FPS promedio: 82.7 · Rango: 15–89 FPS
 
@@ -270,7 +270,7 @@ lsp_video.Traductor.recv()
   ↓
 BGR 640×480 → resize RGB 320×240
   ↓
-MediaPipe HandLandmarker.detect_async()
+MediaPipe HandLandmarker.detect_for_video()
   ↓
 landmarks_validos() ← descarta vectores inválidos
   ↓
@@ -367,8 +367,8 @@ ok = verificar_integridad_modelo("modelo.pkl")
 
 | Sesgo | Descripción |
 |---|---|
-| Diversidad de entrenamiento | Modelo entrenado con datos de 7 personas del mismo entorno cultural |
-| Letras dinámicas | J y Z requieren movimiento — el sistema estático no las soporta |
+| Diversidad de entrenamiento | Modelo entrenado con datos de 4 personas del equipo UPN (Trujillo, Perú); no las 7 del equipo total — ver `SESGOS_CONOCIDOS` en `lsp_core.py` |
+| Letra no soportada | La letra O no es reconocible (0% detección, puño cerrado — INC-12). **Nota:** el comentario `letras_dinamicas` en el código (`lsp_core.py`) aún describe J/Z como "no soportadas por movimiento", pero ambas SÍ están entrenadas como clases estáticas en el modelo actual (J con solo 3 muestras); ese comentario está desactualizado y debe revisarse en el código |
 | Iluminación | Rendimiento se degrada con iluminación insuficiente o contraluz |
 | Letras similares | Confusiones conocidas: A/S/E, B/F, G/Q — ver `matriz_confusion.csv` |
 | Sesgo de datos | Algunas letras tienen menor representación en el dataset |
@@ -380,8 +380,9 @@ ok = verificar_integridad_modelo("modelo.pkl")
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0 | 2026-06-16 | Documento inicial — inventario completo de entidades, diccionarios, pipelines, calidad y privacidad |
+| 1.1 | 2026-06-21 | Corrección: accuracy 100% aclarado como medido sobre dataset completo (sin test set reservado, sin K-Fold posible); exclusión real es la letra O (no "letras dinámicas"); 4 personas en el dataset (no 7); `detect_async()` → `detect_for_video()` |
 
 ---
 
-*Manual de Base de Datos v1.0 · LSP Vision AI · UPN Ingeniería de Sistemas 2026*
+*Manual de Base de Datos v1.1 · LSP Vision AI · UPN Ingeniería de Sistemas 2026*
 *Complementa: [`MODELO_DATOS.md`](MODELO_DATOS.md) (estructuras técnicas por sprint)*

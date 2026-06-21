@@ -303,7 +303,7 @@ QA.bat        # Windows — doble clic → opción 13
 | Accuracy del modelo SVM | **100%** en 25 clases ¹ | ≥ 85% |
 | Tests DevSecOps (`test_seguridad.py`) | **33/34 PASS + 1 SKIP** | 0 FAIL |
 
-> ¹ **Nota metodológica:** accuracy medido sobre el split de test del dataset con augmentation ×16 aplicado antes del split 80/20. Clases con baja detección MediaPipe Tasks API tienen representación mínima en test (J = 3 muestras totales, D = 9, S = 9). Resultado optimista dentro de condiciones controladas; en producción la variabilidad de usuarios afecta el rendimiento. El modelo anterior (API legacy, INC-11) alcanzó 88.3% en configuración distinta. Ver [`MANUAL_BASE_DE_DATOS.md §5`](docs/arquitectura/MANUAL_BASE_DE_DATOS.md) para análisis de calidad por clase.
+> ¹ **Nota metodológica:** `qa/evaluate.py` mide accuracy sobre el **mismo dataset de entrenamiento** (sin held-out test set independiente) — resultado optimista, no una validación generalizable. La validación cruzada K-Fold (`qa/cross_validation.py`) no es factible actualmente porque la clase J solo tiene 3 muestras válidas (< k=5); ver INC-12. Clases con baja detección de MediaPipe Tasks API tienen muy pocas muestras (J = 3, D = 9, S = 9, F = 21). En producción la variabilidad de usuarios afectará el rendimiento real. El modelo anterior (API legacy, INC-11) alcanzó 88.3% en configuración distinta — valor histórico, no comparable directamente. Ver [`MANUAL_BASE_DE_DATOS.md §5`](docs/arquitectura/MANUAL_BASE_DE_DATOS.md) para análisis de calidad por clase.
 
 ---
 

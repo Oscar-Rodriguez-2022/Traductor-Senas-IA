@@ -1,6 +1,6 @@
 # Guía de Calidad de Software — LSP Vision AI (UPN)
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Versión: 3.1 · Fecha: 2026-06-14
+### Versión: 3.2 · Fecha: 2026-06-21
 
 Capa profesional de pruebas, métricas y validación para el Capstone.
 Todo es **ejecutable desde terminal** y genera **evidencias reproducibles** para la sustentación.
@@ -58,7 +58,7 @@ correctamente desde cualquier directorio.
 ## 2. Requisitos del Entorno de Desarrollo
 
 ```bash
-# Python 3.12 o 3.13 (ambos soportados con Tasks API)
+# Python 3.12 (versión de referencia — ver Dockerfile / pyproject.toml)
 python -m venv .venv
 .venv\Scripts\activate          # Windows
 # source .venv/bin/activate     # Linux/macOS
@@ -67,7 +67,7 @@ pip install -r config/requirements-dev.txt
 ```
 
 Las dependencias de desarrollo incluyen: `pytest`, `pytest-cov`, `flake8`, `black`,
-`pylint`, `psutil`, `mediapipe==0.10.35`, `streamlit`, `av`, `streamlit-webrtc`.
+`pylint`, `psutil`, heredadas de `requirements.txt` (`mediapipe==0.10.21`, `streamlit`, `streamlit-webrtc`).
 
 > **Requisito adicional:** el archivo `hand_landmarker.task` (7.8 MB) debe estar en la raíz
 > del proyecto. Se descarga automáticamente con:
@@ -226,7 +226,7 @@ src/                         ← Código fuente (src-layout)
 | Accuracy SVM sobre dataset detectado | 100% (training set) | ⚠️ ver nota |
 | Validación cruzada K-Fold | **OMITIDA** | ⚠️ ver §7.2 |
 
-> **Nota accuracy:** Medida sobre el mismo dataset de entrenamiento → optimista. K-Fold omitida porque J (4 muestras) y D (9 muestras) no alcanzan el mínimo de k=5. Para evaluación rigurosa se requiere recaptura de las letras críticas (ver §7.2 y INC-12).
+> **Nota accuracy:** Medida sobre el mismo dataset de entrenamiento → optimista. K-Fold omitida porque J (3 muestras) y D (9 muestras) no alcanzan el mínimo de k=5. Para evaluación rigurosa se requiere recaptura de las letras críticas (ver §7.2 y INC-12).
 
 ### 7.1 Desglose exacto por archivo de test
 
@@ -282,6 +282,10 @@ Escaneo de 13 689 imágenes con `mp.tasks.vision.HandLandmarker` (model_complexi
 **Letras con tasa crítica (< 20%) que requieren recaptura:** D, F, I, J, O, S  
 **Letras con tasa baja (20–50%) que se beneficiarían de recaptura:** A, C  
 **Modelo actual reconoce 25 letras** (O excluida por 0 detecciones)
+
+> La columna "Detectadas" es el escaneo inicial (INC-12, 2026-06-14). El dataset final usado para
+> entrenar/evaluar (`reportes/metricas_por_clase.csv`) tiene conteos ligeramente distintos tras
+> limpieza (p. ej. J = 3 muestras finales, no 4).
 
 > Ver `INC-12` en `INCIDENTES.md` y `docs/qa_y_pruebas/GUIA_RECAPTURA_DATASET.md` para instrucciones de recaptura.
 
@@ -343,7 +347,7 @@ RAM/CPU, accuracy, matriz de confusión, K-Fold y robustez (por aumentación de 
 
 ---
 
-*Guía de Calidad v3.0 · LSP Vision AI · UPN Sistemas 2026*
+*Guía de Calidad v3.2 · LSP Vision AI · UPN Sistemas 2026*
 
 *Cambios v3.0: conteos exactos por archivo (143 tests totales), `qa/__init__.py` y
 `qa/_utils.py` añadidos a la estructura, nota sobre `tests/__init__.py` (no existe por diseño),
@@ -352,6 +356,10 @@ nuevos tests XAI (`TestXAI` — 14 tests), cobertura extendida a `lsp_ui` y `lsp
 `setup.cfg` movido a `config/`, coverage migrado a `pyproject.toml`.*
 
 *Cambios v3.1 (2026-06-14): migración a MediaPipe Tasks API (`mp.tasks.vision.HandLandmarker`);
-`hand_landmarker.task` añadido como dependencia del proyecto; soporte Python 3.12 y 3.13;
+`hand_landmarker.task` añadido como dependencia del proyecto;
 sección §7 actualizada con tasas de detección reales por letra (INC-11, INC-12);
 umbral Pylint ajustado a ≥ 7.0/10; K-Fold documentada como omitida por muestras insuficientes en D, J.*
+
+*Cambios v3.2 (2026-06-21): corrección de versión real de Python (3.12, no "3.12 o 3.13" —
+`mediapipe==0.10.21` no soporta 3.13) y de mediapipe en requirements-dev (0.10.21, no 0.10.35);
+J corregido a 3 muestras finales (no 4) para coincidir con `reportes/`.*

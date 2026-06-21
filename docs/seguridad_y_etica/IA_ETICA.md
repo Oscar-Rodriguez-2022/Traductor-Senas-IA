@@ -1,7 +1,7 @@
 # IA Ética — LSP Vision AI
 ## Transparencia, Explicabilidad (XAI) y Equidad del Sistema de Visión Artificial
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel · Versión 2.1 · 2026-06-13
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 2.2 · 2026-06-21
 
 > Este documento forma parte del artefacto de Sprint 3 (HU-16, HU-20) y cumple con los
 > principios de IA Ética exigidos por el Capstone: Explicabilidad (XAI), equidad,
@@ -85,7 +85,7 @@ El módulo `src/lsp_core.py` expone tres funciones XAI verificables por tests au
         {"letra": "e", "confianza": 3.1},
         ...
     ],
-    "n_clases":     24,                           # clases que conoce el modelo
+    "n_clases":     25,                           # clases que conoce el modelo (a-z sin la o)
 }
 ```
 
@@ -103,7 +103,7 @@ El módulo `src/lsp_core.py` expone tres funciones XAI verificables por tests au
 |---|---|---|
 | **Sesgo de representatividad** | El modelo fue entrenado exclusivamente con imágenes del equipo UPN (4 personas). No representa la diversidad de tonos de piel, tamaños de mano ni condiciones de iluminación de la población peruana. | Data augmentation × 16 (rotaciones, escala, ruido). Instrucción al usuario de recapturar con variedad de condiciones. |
 | **Sesgo de clase** | Letras capturadas primero (A, B, C) tienen más muestras que las últimas. Esto puede causar menor recall para letras con pocas muestras. | `qa/cross_validation.py` detecta clases desequilibradas. `qa/confusion_matrix.py` identifica confusiones sistemáticas. |
-| **Sesgo de letras dinámicas** | Las letras J y Z del alfabeto LSP requieren movimiento. El sistema solo reconoce gestos estáticos. | Documentado en la UI. Recomendación: omitir J/Z en comunicación con el sistema. |
+| **Sesgo de letras dinámicas** | El comentario `letras_dinamicas` en `lsp_core.py` describe J y Z como gestos con movimiento no soportados. En la práctica, ambas **sí están entrenadas como clases estáticas** en el modelo actual (Z con ~493 muestras y recall normal; J con solo 3 muestras, ver INC-12). La letra realmente no reconocible es la **O** (0% detección, puño cerrado). | Documentado en la UI (texto pendiente de actualizar para reflejar que la exclusión real es O, no J/Z). Recapturar J con más muestras (ver `GUIA_RECAPTURA_DATASET.md`). |
 | **Sesgo de iluminación** | El rendimiento del modelo decrece en condiciones de luz muy baja o con luces de fondo directas. | `qa/robustez.py` evalúa el rendimiento en condiciones adversas. El borde amarillo avisa al usuario. |
 
 ### 3.2 Métricas de equidad por clase
@@ -117,8 +117,8 @@ Ejecutar `make confusion` y `make evaluate` para generar:
 **Estado actual (modelo v2.2 — Tasks API, 2026-06-14):**
 - INC-07 resuelto: letras N, Q, R, S, V recapturadas con 120+ muestras válidas + augmentación ×16.
 - INC-11 resuelto: modelo reentrenado con MediaPipe Tasks API; 25 clases activas.
-- Accuracy global: **100%** en evaluación interna (split 80/20 post-augmentation, dataset controlado).
-  > *Nota metodológica:* el split se realizó sobre el dataset ya aumentado (×16), por lo que el set de test contiene variaciones geométricas de las mismas imágenes de entrenamiento. Clases con muy baja detección (J=3 muestras, D=9, S=9) tienen 1–2 muestras en test. El modelo anterior (API legacy) alcanzó 88.3%. El valor del 100% refleja condiciones controladas, no generalización universal.
+- Accuracy global: **100%** en evaluación interna (`qa/evaluate.py`).
+  > *Nota metodológica:* `qa/evaluate.py` mide accuracy sobre el **mismo dataset de entrenamiento** (sin held-out test set independiente) — resultado optimista por diseño. La validación cruzada K-Fold (`qa/cross_validation.py`) no es factible porque la clase J solo tiene 3 muestras (< k=5; ver INC-12). Clases con muy baja detección (J=3 muestras, D=9, S=9) tienen representación mínima. El modelo anterior (API legacy, INC-11) alcanzó 88.3% — valor histórico, no comparable directamente. El 100% refleja condiciones controladas, no generalización universal.
 - Recall mínimo por clase: 100% para todas las 25 clases en evaluación interna.
 - `tests/test_etica.py::TestEquidad::test_todas_las_clases_tienen_recall_positivo` → PASS.
 - `tests/test_etica.py::TestEquidad::test_equidad_minima_por_clase_recall_mayor_50` → PASS.
@@ -127,7 +127,7 @@ Ejecutar `make confusion` y `make evaluate` para generar:
 
 1. **No reemplaza a un intérprete LSP profesional.** El sistema reconoce letras individuales del alfabeto manual, no palabras completas, frases ni expresiones faciales de la LSP.
 2. **Dependiente del dataset de entrenamiento.** La precisión varía según la variabilidad del gestuario del usuario frente al del equipo de entrenamiento.
-3. **Solo gestos estáticos.** Las letras J y Z (con movimiento) no están soportadas en la versión actual.
+3. **Letra O no reconocible.** El sistema solo reconoce gestos estáticos; la letra O (puño cerrado) tiene 0% de detección con MediaPipe y queda excluida del modelo (INC-12). J y Z sí están entrenadas como clases estáticas, aunque J tiene muy pocas muestras válidas (3) y baja confiabilidad real.
 4. **Requiere buena iluminación.** Condiciones de luz muy bajas o backlighting reducen la capacidad de MediaPipe para detectar landmarks.
 5. **Hardware dependiente.** El sistema usa la CPU del servidor; en entornos con alta carga puede aumentar la latencia.
 
@@ -193,7 +193,7 @@ La suite `tests/test_etica.py` verifica automáticamente **29 tests en 5 clases*
 | Área | Acción futura | Sprint estimado |
 |------|---------------|-----------------|
 | Representatividad | Incorporar dataset con diversidad demográfica (LSP Corpus PUCP) | v2.0 |
-| Equidad dinámica | Entrenar soporte para letras J y Z con LSTM sobre secuencias de landmarks | v2.0 |
+| Cobertura completa del alfabeto | Recapturar la letra O (no reconocible, 0% detección) y reforzar J (solo 3 muestras); evaluar LSTM sobre secuencias de landmarks si se confirma que J/Z requieren modelado de movimiento | v2.0 |
 | Auditoría externa | Evaluación por la Comunidad Sorda del Perú para validar precisión percibida | v2.0 |
 | Explicabilidad avanzada | Implementar SHAP values para visualizar la importancia de cada landmark en la predicción | v3.0 |
 | Reporte de sesgo | Generar automáticamente un reporte de equidad por clase al entrenar | v2.0 |
@@ -207,3 +207,4 @@ La suite `tests/test_etica.py` verifica automáticamente **29 tests en 5 clases*
 | 1.0 | 2026-06-12 | Versión inicial — análisis de sesgos, XAI, WCAG, responsabilidad social |
 | 2.0 | 2026-06-13 | Actualización post-reingeniería — INC-07 resuelto (equidad verificada), estado de tests actualizado, sección de equidad por clase con resultados reales |
 | 2.1 | 2026-06-13 | §2.4 nueva: API XAI de `lsp_core.py` (`explicar_prediccion`, `nombres_landmarks`, `sesgos_conocidos`); §3.1 referencia a `sesgos_conocidos()`; §3.2 nombres de tests con clase; §5 expandida a 29 tests en 5 clases (`TestXAI` 14 destacado) |
+| 2.2 | 2026-06-21 | Corrección §3.2: accuracy 100% aclarado como medición sobre dataset completo (sin split de test, sin K-Fold posible); §3.1/§3.3: la letra realmente no reconocible es O (no "J y Z dinámicas" — ambas están entrenadas como clases estáticas); `n_clases` del ejemplo corregido a 25 |

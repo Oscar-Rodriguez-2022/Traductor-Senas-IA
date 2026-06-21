@@ -1,7 +1,7 @@
 # Arquitectura del Sistema — LSP Vision AI
 ## Diagramas de Componentes y Casos de Uso
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Versión: 1.1 · Fecha: 2026-06-13
+### Versión: 1.2 · Fecha: 2026-06-21
 
 > Este documento cumple con **CA-02.1** (diagrama de componentes con 4 módulos principales),
 > **CA-02.2** (≥7 casos de uso UC-01 a UC-07) y **CA-02.3** (tecnologías por módulo).
@@ -130,7 +130,7 @@ sequenceDiagram
     participant CAM as Cámara Web
     participant WEBRTC as streamlit-webrtc
     participant TRADUCTOR as lsp_video.Traductor
-    participant MP as MediaPipe Hands
+    participant MP as MediaPipe HandLandmarker (Tasks API)
     participant SVM as lsp_core.predecir()
     participant UI as lsp_ui.render_resultado()
     participant PANEL as Panel Resultado
@@ -138,7 +138,7 @@ sequenceDiagram
     CAM->>WEBRTC: Frame BGR 640×480
     WEBRTC->>TRADUCTOR: recv(frame)
     TRADUCTOR->>TRADUCTOR: resize → 320×240 (alivio CPU)
-    TRADUCTOR->>MP: process(rgb_small)
+    TRADUCTOR->>MP: detect_for_video(mp_image, ts_ms)
     MP-->>TRADUCTOR: 21 landmarks (x,y) normalizados
     TRADUCTOR->>TRADUCTOR: landmarks_validos(vector_42)
     TRADUCTOR->>SVM: predecir(modelo, landmarks)
@@ -243,3 +243,4 @@ c:\Traductor-Senas-IA\
 |---------|-------|--------|
 | 1.0 | 2026-06-12 | Versión inicial — diagramas Mermaid, tecnologías, flujo de datos |
 | 1.1 | 2026-06-13 | Actualizar rutas a src/, conteo de tests (143), carpetas scripts/ y config/, docs reorganizados en subcarpetas temáticas |
+| 1.2 | 2026-06-21 | Corregir diagrama de secuencia: la detección usa `HandLandmarker.detect_for_video()` (Tasks API), no `process()` (API antigua) |

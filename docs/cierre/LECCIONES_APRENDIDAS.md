@@ -1,6 +1,6 @@
 # Registro de Lecciones Aprendidas — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
-### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.2 · 2026-06-14
+### Autor: Rodriguez Chacara, Oscar Daniel · Versión 3.3 · 2026-06-21
 
 > **Estado: CIERRE DE PROYECTO** — 22 Historias de Usuario completadas · 137 SP totales.
 > 3 sprints regulares + 1 Sprint de Reingeniería = retrospectiva técnica integral.
@@ -270,7 +270,9 @@ Al cerrar la Fase de Cierre Académico, el análisis de deuda técnica identific
 | F | ~14% | Dedos curvados difíciles de segmentar |
 | I | ~19% | Ambigüedad con variantes de meñique |
 
-**Impacto en el modelo:** El modelo se reentrenó excluyendo las muestras no detectadas, alcanzando accuracy global de 88.3% (≥ 85% requerido). Las 6 letras afectadas requieren recaptura con la nueva API.
+**Impacto en el modelo:** El modelo se reentrenó excluyendo las muestras no detectadas, alcanzando accuracy global de 88.3% (≥ 85% requerido) en este primer reentrenamiento del mismo día. Las 6 letras afectadas requieren recaptura con la nueva API.
+
+> **Actualización:** un reentrenamiento posterior, también el 2026-06-14, elevó la accuracy a 100% sobre el dataset de entrenamiento completo (`reportes/metricas.json`) — sin held-out test set independiente, por lo que es un resultado optimista, no una validación generalizable. Ver nota metodológica en `README.md` e `IA_ETICA.md §3.2`.
 
 **Lección:** La migración de versiones de librerías de visión artificial puede invalidar silenciosamente parte del dataset. Es crítico ejecutar un escaneo de detección completo antes y después de cualquier migración de librería de landmarks. Ver `docs/qa_y_pruebas/GUIA_RECAPTURA_DATASET.md` para el protocolo de recaptura.
 
@@ -280,7 +282,7 @@ Al cerrar la Fase de Cierre Académico, el análisis de deuda técnica identific
 
 | ID | Mejora | Motivación | Prioridad |
 |----|--------|------------|-----------|
-| MJ-01 | Soporte para letras dinámicas (J, Z) usando secuencias de landmarks | El alfabeto LSP completo incluye letras con movimiento; el sistema actual solo reconoce gestos estáticos. | Alta |
+| MJ-01 | Recaptura de la letra O (0% detección, no reconocible) y refuerzo de J (solo 3 muestras válidas); evaluar soporte real con secuencias de landmarks si se confirma que el movimiento es necesario | El alfabeto LSP completo incluye letras con movimiento; el sistema actual solo reconoce gestos estáticos. J y Z ya están entrenadas como clases estáticas, pero J tiene muy pocas muestras de calidad (INC-12). | Alta |
 | MJ-02 | Botón de cierre de sesión explícito | Actualmente la sesión solo expira por tiempo o recarga de página. | Media |
 | MJ-03 | ~~Balanceo del dataset con data augmentation~~ **RESUELTO en Sprint Reingeniería** | INC-07 cerrado: augmentation ×16 implementado, recall mínimo ≥80% en todas las clases. | ~~Alta~~ **Cerrado** |
 | MJ-04 | Log de auditoría persistente en base de datos | El log actual es efímero en Streamlit Cloud (se pierde al reiniciar). Una base de datos SQLite o PostgreSQL daría persistencia real. | Media |
@@ -336,8 +338,9 @@ Las mejoras más impactantes del proceso de ingeniería, en orden de retorno sob
 | 3.0 | 2026-06-13 | Corrección estructura de sprints (3 regulares, no 4) · "Sprint 4" renombrado a "Fase de Cierre Académico" · DT-19 (XAI: `explicar_prediccion`) · OB-11 (contaminación rate-limiter entre tests) · MJ-09 añadido · Conteos de tests actualizados (34+29) · Resumen ejecutivo actualizado |
 | 3.1 | 2026-06-13 | DT-20 (pre-commit hook anti-secretos) · DT-09 ampliado con reorganización de `docs/` en subcarpetas temáticas · DT-13 ruta corregida a `docs/qa_y_pruebas/plantilla_UAT.md` · Resumen ejecutivo actualizado (20 DTs) |
 | 3.2 | 2026-06-14 | Hallazgo post-cierre INC-12 documentado: tasas de detección críticas en 6 letras (O/D/J/S/F/I) tras migración a MediaPipe Tasks API · Resumen ejecutivo actualizado |
+| 3.3 | 2026-06-21 | Aclarado que el 88.3% del reentrenamiento inicial post-INC-12 fue superado por un 100% en un reentrenamiento posterior el mismo día (ver `reportes/metricas.json`); MJ-01 corregido — J y Z ya están entrenadas como clases estáticas, la letra realmente no reconocible es O |
 
 ---
 
-*Registro de Lecciones Aprendidas v3.2 · LSP Vision AI · UPN Sistemas 2026*
+*Registro de Lecciones Aprendidas v3.3 · LSP Vision AI · UPN Sistemas 2026*
 *20 decisiones técnicas documentadas · 11 obstáculos resueltos · 1 hallazgo post-cierre (INC-12) · Proyecto cerrado 2026-06-13*
