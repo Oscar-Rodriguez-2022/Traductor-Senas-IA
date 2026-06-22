@@ -1,7 +1,7 @@
 # Manual de Usuario — LSP Vision AI
 ## Sistema Interactivo de Visión Artificial para la Comunicación Inclusiva (LSP)
 ### Universidad Privada del Norte · Capstone Project Sistemas 2026-1
-**Versión:** 2.1 · **Fecha:** 2026-06-13
+**Versión:** 2.3 · **Fecha:** 2026-06-21
 **Autores:** Equipo LSP Vision AI — UPN Ingeniería de Sistemas
 
 ---
@@ -56,9 +56,9 @@ El sistema opera en cinco etapas que se ejecutan en menos de 20 milisegundos por
 
 El sistema reconoce las letras del alfabeto manual LSP que se realizan con gesto estático:
 
-> **A B C D E F G H I K L M N O P Q R S T U V W X Y**
+> **A B C D E F G H I J K L M N P Q R S T U V W X Y Z**
 
-> **Nota:** Las letras **J** y **Z** requieren movimiento de la mano (gesto dinámico) y están fuera del alcance de la versión actual del sistema.
+> **Nota:** La letra **O** (puño completamente cerrado) no es reconocible en la versión actual: MediaPipe no logra detectar landmarks en esa pose (0% de detección, ver INC-12). Las letras **J** y **Z** sí están entrenadas como gestos estáticos, pero **J** tiene muy pocas muestras de calidad en el dataset (solo 3), por lo que su reconocimiento es poco confiable — se recomienda no confiar en la letra J hasta que se recapture el dataset.
 
 ---
 
@@ -255,14 +255,14 @@ Es un valor entre 0% y 100% que indica qué tan seguro está el modelo de su pre
 
 ### 5.4 Letras visualmente similares en LSP
 
-Algunas letras del alfabeto LSP tienen landmarks muy similares. El sistema los indica con borde amarillo:
+Algunas letras del alfabeto LSP tienen poses de mano parecidas, lo que en teoría podría dificultar su distinción:
 
-| Grupo de confusión | Por qué se confunden |
+| Grupo de confusión | Por qué podrían confundirse |
 |---|---|
 | **A / S** | Dedos doblados, solo difiere la posición del pulgar |
-| **B / 4** | Todos los dedos extendidos con variación mínima |
 | **G / Q** | Índice extendido horizontal vs. vertical |
-| **E / O** | Todos los dedos curvados con diferentes radios |
+
+> **Nota:** `reportes/matriz_confusion.csv` (evaluación sobre el dataset de entrenamiento) muestra actualmente **0 confusiones reales** entre clases — la matriz es perfectamente diagonal. Esto es un resultado optimista (mismo dataset de entrenamiento, ver §7.3); en uso real con manos distintas a las del equipo, estas similitudes geométricas sí podrían causar ambigüedad, por lo que el sistema muestra borde amarillo ante baja confianza independientemente del par de letras.
 
 En estos casos, mantener la seña más estable y con mejor iluminación mejora la discriminación.
 
@@ -425,7 +425,7 @@ Verifica que el navegador tiene permiso para acceder a la cámara. Busca el íco
 4. Algunas letras LSP (A/S, G/Q, B/E) son visualmente similares. Revisa la tabla de grupos de confusión en la sección 5.4.
 
 **¿Qué letras reconoce el sistema?**
-El sistema reconoce los gestos estáticos del alfabeto LSP: A B C D E F G H I K L M N O P Q R S T U V W X Y. Las letras J y Z (que requieren movimiento) no están en el alcance de la versión actual.
+El sistema reconoce 25 de las 26 letras del alfabeto LSP: A B C D E F G H I J K L M N P Q R S T U V W X Y Z. La letra **O** no es reconocible en esta versión (0% de detección con MediaPipe — puño completamente cerrado, ver INC-12). La letra **J** sí está entrenada, pero con muy pocas muestras (3), por lo que su precisión real es baja.
 
 **¿Puedo usarlo en el teléfono?**
 La interfaz es responsiva, pero el rendimiento puede variar en dispositivos móviles de gama baja. Se recomienda el uso en computadora de escritorio o laptop para una experiencia óptima.
@@ -464,7 +464,8 @@ Para reportar problemas técnicos o consultas académicas, dirigirse al equipo d
 
 ---
 
-*Manual de Usuario v2.2 — 2026-06-16 · LSP Vision AI · UPN Sistemas*
+*Manual de Usuario v2.3 — 2026-06-21 · LSP Vision AI · UPN Sistemas*
+*Cambios v2.3: lista de letras reconocidas corregida — el sistema reconoce A-Z excepto la O (no excepto J/Z); J y Z sí están entrenadas (J con solo 3 muestras, baja confiabilidad); tabla de letras similares corregida (quitada O, que no es una clase del modelo; quitado "B/4", no es una letra LSP); nota sobre matriz de confusión real (0 confusiones, evaluación optimista)*
 *Cambios v2.2: equipo actualizado a 7 integrantes (Acosta Abarca, Angulo López incorporados), roles revisados*
 *Cambios v2.1: §8.2 añadido — panel de alternativas XAI top-5 (DT-19, `explicar_prediccion()`)*
 *Cambios v2.0: nuevo pipeline diagram, sección de explicabilidad XAI, tabla de letras LSP, sección de accesibilidad WCAG expandida, preguntas frecuentes ampliadas, estado del sistema*

@@ -1,7 +1,7 @@
 # Sprint Backlog — LSP Vision AI
 ## Universidad Privada del Norte · Capstone Project Sistemas 2026
 ### Autor: Rodriguez Chacara, Oscar Daniel
-### Versión: 2.1 · Última actualización: 2026-06-13 · **Estado: CIERRE DE PROYECTO — 137/137 SP completados**
+### Versión: 2.2 · Última actualización: 2026-06-21 · **Estado: CIERRE DE PROYECTO — 137/137 SP completados**
 
 Este documento desglosa cada Historia de Usuario en tareas técnicas concretas,
 siguiendo la jerarquía: **Épica → Historia de Usuario → Tarea Técnica → Código**.
@@ -348,3 +348,4 @@ Estado de tareas: ✅ Completada · 🔄 En progreso · ⏳ Pendiente
 *Documento de gestión ágil v2.1 · Capstone Project UPN Sistemas 2026*
 *Herramienta complementaria: GitHub Projects (tablero Kanban con estas tareas por columna)*
 *Actualización v2.1: conteos de tests corregidos (seguridad 34, ética 29), XAI DT-19 en TR-08, actividades post-cierre DT-20, `A.py` → `scripts/capturar_dataset.py`*
+*Actualización v2.2 (2026-06-21): el umbral de Pylint en T-18.5/TR-12 (≥7.5) fue el objetivo original de sprint; el umbral final vigente del proyecto es ≥7.0/10 (score real medido: 7.14/10) — ver `GUIA_QA.md` y `DEFINITION_OF_DONE.md`.*

@@ -1,7 +1,7 @@
 # Plantilla de Pruebas de Aceptación (UAT)
 ## LSP Vision AI — Capstone Project Sistemas 2026
 ### Universidad Privada del Norte
-### Versión del documento: 1.0 · Fecha: 2026-06-13
+### Versión del documento: 1.1 · Fecha: 2026-06-21
 
 **Proyecto:** Traductor de Lengua de Señas Peruana (LSP) con IA  
 **Versión del sistema:** v1.1 (MediaPipe Tasks API · 25 letras reconocibles)  
@@ -89,8 +89,9 @@ Validar que el sistema cumple los Criterios de Aceptación (CA) definidos en las
 **Criterio de aprobación:** ≥ 4/6 letras reconocidas con confianza ≥ 70%.
 
 **Nota:** El sistema reconoce 25 letras LSP estáticas (A–Z excepto O). La letra **O** no está disponible
-en esta versión por falta de muestras detectables (ver INC-12). Las letras **J** y **Z** requieren
-movimiento y no son soportadas en el modo estático de esta versión (deuda técnica v1.1).
+en esta versión por falta de muestras detectables (ver INC-12). Las letras **J** y **Z** sí están
+entrenadas como clases estáticas; **J** tiene solo 3 muestras válidas y baja confiabilidad real
+(deuda técnica pendiente, ver `GUIA_RECAPTURA_DATASET.md`).
 
 ---
 
